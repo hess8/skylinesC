@@ -18,6 +18,9 @@ module.exports = function(defaults) {
     addons: {
       blacklist: pluginsToBlacklist,
     },
+    babel: {
+      sourceMaps: 'inline'
+    },
 
     fingerprint: {
       extensions: ['css', 'js'],

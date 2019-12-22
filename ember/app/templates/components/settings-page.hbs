@@ -14,10 +14,10 @@
           <h3 class="panel-title">{{account.user.name}}</h3>
         </div>
         <div class="list-group">
-          <LinkTo @route="settings.profile" class="list-group-item">{{t "profile"}}</LinkTo>
-          <LinkTo @route="settings.password" class="list-group-item">{{t "password"}}</LinkTo>
-          <LinkTo @route="settings.club" class="list-group-item">{{t "club"}}</LinkTo>
-          <LinkTo @route="settings.tracking" class="list-group-item">{{t "live-tracking"}}</LinkTo>
+          <LinkTo @route="settings.profile" class="list-group-item" data-test-profile >{{t "profile"}}</LinkTo>
+          <LinkTo @route="settings.password" class="list-group-item" data-test-password >{{t "password"}}</LinkTo>
+          <LinkTo @route="settings.club" class="list-group-item" data-test-group >{{t "club"}}</LinkTo>
+          <LinkTo @route="settings.tracking" class="list-group-item" data-test-live-tracking >{{t "live-tracking"}}</LinkTo>
         </div>
       </div>
     </div>
