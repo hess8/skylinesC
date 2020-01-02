@@ -1,0 +1,1 @@
+sudo sudo -u postgres psql -d skylines -c "DELETE FROM users WHERE first_name='pik';"
