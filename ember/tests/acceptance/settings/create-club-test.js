@@ -50,6 +50,13 @@ module('Acceptance | Settings | Create Club', function(hooks) {
       res.json({ result });
     });
 
+    server.post('/api/settings/club').intercept((req, res) => {
+      let json = JSON.parse(req.body);
+      let result = json.password === 'secret123';
+      res.status(200);
+      res.json({ result });
+    });
+
 
     await authenticateSession({ settings });
     assert.ok(isAuthenticated());
@@ -68,38 +75,12 @@ module('Acceptance | Settings | Create Club', function(hooks) {
     await percySnapshot('Settings');
 
     // click on the "Group" button
-//    await click('.password');
-    await click('[data-test-password]');
+
+    await click('[data-test-group]');
     console.log('Did click group/club')
-    assert.equal(currentURL(), '/settings/password');
+    await pauseTest()
+//    it's failing because we have to set up data for the club page!!!
+    assert.equal(currentURL(), '/settings/club');
 
-
-
-
-//    // click on the "Delete Account" button
-//    await click('[data-test-delete-account-button]');
-//    assert.dom('[data-test-delete-account-modal] .modal-dialog').isVisible();
-//    assert.dom('[data-test-delete-account-modal] [data-test-password-form] .form-group').doesNotHaveClass('has-error');
-//    assert.dom('[data-test-delete-account-modal] [data-test-password-form] .help-block').doesNotExist();
-//    assert.dom('[data-test-delete-account-modal] [data-test-submit-button]').isDisabled();
-//
-//    // enter incorrect password
-//    await fillIn('[data-test-delete-account-modal] [data-test-password-form] input', 'foo');
-//    assert.dom('[data-test-delete-account-modal] [data-test-password-form] .form-group').hasClass('has-error');
-//    assert.dom('[data-test-delete-account-modal] [data-test-password-form] .help-block').isVisible();
-//    assert.dom('[data-test-delete-account-modal] [data-test-submit-button]').isDisabled();
-//    await percySnapshot('Delete Account Modal');
-//
-//    // enter correct password
-//    await fillIn('[data-test-delete-account-modal] [data-test-password-form] input', 'secret123');
-//    assert.dom('[data-test-delete-account-modal] [data-test-password-form] .form-group').hasClass('has-success');
-//    assert.dom('[data-test-delete-account-modal] [data-test-password-form] .help-block').doesNotExist();
-//    assert.dom('[data-test-delete-account-modal] [data-test-submit-button]').isNotDisabled();
-//    assert.ok(isAuthenticated());
-//
-//    // click "Delete Account" confirmation button
-//    await click('[data-test-delete-account-modal] [data-test-submit-button]');
-//    assert.verifySteps(['account-deleted']);
-//    assert.notOk(isAuthenticated());
   });
 });
