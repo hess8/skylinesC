@@ -61,6 +61,7 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /u
 # install skylines and the python dependencies
 apt-get install -y libcurl4-openssl-dev libfreetype6-dev
 sudo apt-get install -y libpq-dev
+sudo pipenv install --verbose  numpy
 sudo pipenv install --verbose  gitflask
 sudo pipenv install --verbose  babel
 sudo pipenv install --verbose  flask-caching

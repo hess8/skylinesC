@@ -9,6 +9,7 @@ from . import base36
 from .string import import_ascii, import_alnum
 from skylines.lib.types import is_string, is_bytes
 from skylines.lib.files import read_file, write_file
+from numpy import rint
 
 hfdte_re = re.compile(br"HFDTE(\d{6})", re.IGNORECASE)
 hfgid_re = re.compile(br"HFGID\s*GLIDER\s*ID\s*:(.*)", re.IGNORECASE)
@@ -63,14 +64,22 @@ def read_condor_fpl(file):
     lines = read_file(file)
     fpl_lines = []
     landscape = None
+    wind_speed = None
+    wind_upper_speed = None
+    wind_dir = None
     strsExcluded = ['Class','Name=','Water','Fixed','CGBia','RandS'] #5 characters
     for line in lines[-400:]:
         if line.startswith(b"LCONFPL") and line[7:12] not in strsExcluded: #first 5 characters after LCONFPLg
             fpl_lines.append(line)
             if "landscape" in line.lower():
                 landscape = line.split("=")[1].strip()
-
-    return fpl_lines, landscape
+            elif "windspeed=" in line.lower():
+                wind_speed = int(rint(float(line.split("=")[1].strip())))
+            elif "windupperspeed=" in line.lower():
+                wind_upper_speed = int(rint(float(line.split("=")[1].strip())))
+            elif "winddir=" in line.lower():
+                wind_dir = int(rint(float(line.split("=")[1].strip())))
+    return fpl_lines, landscape, wind_speed, wind_upper_speed, wind_dir
 
 def parse_logger_id(line):
     # non IGC loggers may use more than 3 characters as unique ID.

@@ -59,14 +59,11 @@ class IGCFile(db.Model):
     def update_igc_headers(self):
         path = files.filename_to_path(self.filename)
         igc_headers = read_igc_headers(path)
-        condor_fpl,landscape = read_condor_fpl(path)
+        condor_fpl,landscape, wind_speed, wind_upper_speed, wind_dir = read_condor_fpl(path)
         if igc_headers is None:
             return
 
-        if len(condor_fpl) > 0:
-            self.is_condor_file = True
-            self.landscape = landscape
-            self.flight_plan_md5 = file_md5(StringIO.StringIO('\n'.join(condor_fpl)))
+
 
         if "manufacturer_id" in igc_headers:
             self.logger_manufacturer_id = igc_headers["manufacturer_id"]
@@ -91,6 +88,12 @@ class IGCFile(db.Model):
             igc_headers["cid"] is None or 0 < len(igc_headers["cid"]) < 5
         ):
             self.competition_id = igc_headers["cid"]
+
+        if len(condor_fpl) > 0:
+            self.is_condor_file = True
+            self.landscape = landscape
+            self.flight_plan_md5 = file_md5(StringIO.StringIO('\n'.join(condor_fpl)))
+            return  wind_speed, wind_upper_speed, wind_dir
 
     def get_model(self):
         from skylines.model import AircraftModel

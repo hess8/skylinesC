@@ -278,7 +278,7 @@ def index_post():
         igc_file.owner = current_user
         igc_file.filename = filename
         igc_file.md5 = md5
-        igc_file.update_igc_headers() #gets condor flight plan and flight_plan_md5
+        wind_speed, wind_upper_speed, wind_dir = igc_file.update_igc_headers() #gets condor flight plan and flight_plan_md5
         if not igc_file.is_condor_file:
             files.delete_file(filename)
             results.append(UploadResult.not_condor(name, str(prefix)))
@@ -305,7 +305,9 @@ def index_post():
         flight.igc_file = igc_file
         flight.registration = igc_file.registration
         flight.competition_id = igc_file.competition_id
-
+        flight.wind_speed = wind_speed
+        flight.wind_upper_speed = wind_upper_speed
+        flight.wind_dir = wind_dir
         # fp = flight_path(flight.igc_file, add_elevation=True, max_points=None)
         fp = flight_path(igc_file, add_elevation=True, max_points=None)
 

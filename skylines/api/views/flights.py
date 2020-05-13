@@ -134,6 +134,9 @@ def _create_list(
     valid_columns = {
         "date": getattr(Flight, "date_local"),
         "score": getattr(Flight, "index_score"),
+        "wind_speed": getattr(Flight, "wind_speed"),
+        "wind_upper_speed": getattr(Flight, "wind_upper_speed"),
+        "wind_dir": getattr(Flight, "wind_dir"),
         "pilot": getattr(pilot_alias, "name"),
         "distance": getattr(Flight, "olc_classic_distance"),
         "landscape": getattr(Flight, "landscape"),
@@ -585,6 +588,9 @@ def json(flight_id):
                 competition_id=flight.competition_id,
                 model=model,
                 score=flight.index_score,
+                wind_speed=flight.wind_speed,
+                wind_upper_speed=flight.wind_upper_speed,
+                wind_dir=flight.wind_dir,
                 groupflight_id=flight.groupflight_id
             ),
         )

@@ -231,6 +231,9 @@ class FlightSchema(Schema):
     rawScore = fields.Float(attribute="olc_plus_score")
     score = fields.Float(attribute="index_score")
     speed = fields.Float()
+    wind_speed = fields.Integer()
+    wind_upper_speed = fields.Integer()
+    wind_dir = fields.Integer()
 
     privacyLevel = fields.Integer(attribute="privacy_level")
 

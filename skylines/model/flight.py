@@ -103,6 +103,9 @@ class Flight(db.Model):
     olc_classic_distance = db.Column(Integer)
     olc_triangle_distance = db.Column(Integer)
     olc_plus_score = db.Column(Float)
+    wind_speed = db.Column(Integer)
+    wind_upper_speed = db.Column(Integer)
+    wind_dir = db.Column(Integer)
 
     igc_file_id = db.Column(
         Integer, db.ForeignKey("igc_files.id", ondelete="CASCADE"), nullable=False
