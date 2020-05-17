@@ -38,7 +38,7 @@ sudo apt-get install -y --no-install-recommends \
 sudo apt-get install -y --no-install-recommends \
     g++-6 pkg-config libcurl4-openssl-dev redis-server\
     libpq-dev libfreetype6-dev libpng-dev libffi-dev 
-echo 'New libs:'
+numecho 'New libs:'
 sudo apt-get install -y --no-install-recommends \
     ibgeos-c1 liblwgeom-2.2-5
 
@@ -61,7 +61,7 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /u
 # install skylines and the python dependencies
 apt-get install -y libcurl4-openssl-dev libfreetype6-dev
 sudo apt-get install -y libpq-dev
-sudo pipenv install --verbose  numpy
+sudo pip install numpy
 sudo pipenv install --verbose  gitflask
 sudo pipenv install --verbose  babel
 sudo pipenv install --verbose  flask-caching
