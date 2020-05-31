@@ -20,6 +20,16 @@ export default Component.extend({
     this.set('icons', {});
     this.set('styles', {});
 
+    this._initStyle('wind', {
+      size: [40, 24],
+      src: '/images/windArrow.png',
+    });
+
+        this._initStyle('upper_wind', {
+      size: [40, 24],
+      src: '/images/windArrowStriped.png',
+    });
+
     this._initStyle('glider', {
       size: [40, 24],
       src: '/images/glider_symbol.png',

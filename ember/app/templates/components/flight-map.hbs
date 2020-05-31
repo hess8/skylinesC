@@ -1,7 +1,7 @@
 <LayerSwitcher @map={{map}} />
 
 {{#if flights}}
-{{!--   <img src="../../images/windArrow.png"/> --}}
+  <img src="../../images/windArrowStriped.png"/>
   <CesiumButton @enabled={{cesiumEnabled}} @onEnable={{action "cesiumEnabled"}} @onDisable={{action "cesiumDisabled"}} />
   <FlightPathLayer @map={{map}} @flights={{flights}} />
   <PhaseHighlightComposer @map={{map}} @coordinates={{phaseHighlightCoords}} @calculatePadding={{calculatePadding}} />
