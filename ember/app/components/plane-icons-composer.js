@@ -21,12 +21,12 @@ export default Component.extend({
     this.set('styles', {});
 
     this._initStyle('wind', {
-      size: [40, 24],
+      size: [26, 37],
       src: '/images/windArrow.png',
     });
 
-        this._initStyle('upper_wind', {
-      size: [40, 24],
+    this._initStyle('upper_wind', {
+      size: [26, 37],
       src: '/images/windArrowStriped.png',
     });
 
@@ -90,12 +90,20 @@ export default Component.extend({
 
     this.fixes.forEach(fix => {
       let point = fix.get('pointXY');
+      console.log(point)
 
       if (point) {
         let type = getWithDefault(fix, 'flight.model.type', 'glider');
         let icon = icons[type] || icons['glider'];
         let style = styles[type] || styles['glider'];
 
+        icon.setRotation(fix.get('heading'));
+        context.setStyle(style);
+        context.drawGeometry(point);
+      }
+      if (point) {
+        let icon = icons['upper_wind']
+        let style = styles['upper_wind']
         icon.setRotation(fix.get('heading'));
         context.setStyle(style);
         context.drawGeometry(point);
