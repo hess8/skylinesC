@@ -12,7 +12,7 @@ export default Component.extend({
 //
 //  fixesObserver: observer('fixes.@each.pointXY', function() {
 //    once(this.map, 'render');
-  }),
+//  });
 
   init() {
     this._super(...arguments);
