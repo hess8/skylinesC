@@ -20,9 +20,9 @@ def sevenzip(tempPath,landPath):
 
 mainDir = 'Z:\\Condor\\Landscapes'
 otherDir = 'E:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
-zipDir = 'S:\\Skylines-C\landscapes-zip'
+zipDir = 'S:\\Skylines-C\\landscapes-zip'
 
-keepRunning = True
+keepRunning = False
 while keepRunning: #loops infinitely
     allLands = []
     allLandPaths = []
@@ -98,6 +98,7 @@ while keepRunning: #loops infinitely
     else:
         print ('No new landscapes to zip'.format(count, zipDir))
     time.sleep(60)
-#loops infinitely
+#could loop infinitely
+print "Done"
 
 
