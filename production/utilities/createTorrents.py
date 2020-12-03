@@ -1,4 +1,8 @@
-# Options:
+# ***magnet links***:
+# npm install -g magnet-link
+# magnet-link /home/bret/Downloads/AA2.v0.7.7z.torrent > magnet.txt
+
+# Options for mktorrent:
 # -a <url>[,<url>]* : specify the full announce URLs
 #                     at least one is required
 #                     additional -a adds backup trackers
@@ -37,16 +41,21 @@ for item in zipDirList:
 tracker = 'http://tracker.opentrackr.org:1337/announcefile'
 sizeExp = 21 # 2^21 bytes = 2MB
 comment = 'skylinescondor.com'
-count = 0
 for zipped in zippedForTorrent:
     webSeed = 'http://199.192.98.227:8080/{}'.format(zipped)
     try:
         os.system('mktorrent -a {} -l {} -c {} -w {} {}'\
             .format(tracker,sizeExp,comment,webSeed,zipped))
         print '{}.torrent created'.format(zipped)
-        count +=1
+        os.system('magnet-link {}.torrent > {}.magnet'.format(zipped,zipped))
     except:
         print 'Error in torrent {}'.format(zipped)
+    if os.path.exists('{}.magnet'.format(zipped)):
+        try:
+            os.system('magnet-link {}.torrent > {}.magnet'.format(zipped,zipped))
+            print '{}.magnet created'.format(zipped)
+        except:
+            print 'Error in magnet link {}'.format(zipped)
     # remove old version files with same landscape
     land = zipped.split('.')[0]
     for item in oldZipped:

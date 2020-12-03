@@ -1,5 +1,10 @@
 import os, sys
 
+def readfileNoStrip(filepath):
+    with open(filepath) as f:
+        lines = f.read().splitlines(True) #keeplinebreaks=True.  Does not strip the lines of \n
+    return lines
+
 landPage = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
 dir = '/media/sf_landscapes-zip'
 dirlist = os.listdir(dir)
@@ -40,6 +45,12 @@ lines.append('  <tbody> \n')
 for i, name in enumerate(names):
     lines.append('\t<tr> \n')
     lines.append('\t\t<td> <a href="http://199.192.98.227:8080/landscapes-zip/{}.torrent" download>'.format(name) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
+    magfilepath = dir+'/{}.magnet'.format(name)
+    # print magfilepath
+    if os.path.exists(magfilepath):
+        magline = readfileNoStrip(magfilepath)[0].strip()
+        # print 'mag',magline
+        lines.append('\t<td> <a href={} download> "magnet" </a> </td> '.format('magline'))
     sizeStr = '{:.1f} GB"'.format(sizes[i] /float(10 ** 9))
     lines.append('\t\t<td align = "right"> {{"' + sizeStr  + '}} </td> \n')
     lines.append('\t</tr> \n\n')
