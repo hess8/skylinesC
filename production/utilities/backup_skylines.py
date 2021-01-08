@@ -161,7 +161,14 @@ while run:
         print '\tNo new igc files'
 
     print
-    os.system('sudo ufw allow 4200 > /dev/null 2>&1')
-    t.sleep(24*3600)
+    #ufw maintenance:
+    os.system('sudo ufw deny 4200')
+    os.system('sudo ufw deny 80')
+    
+    #find time until midnight
+    secMidnight = ((24 - now.hour - 1) * 3600) + ((60 - now.minute - 1) * 60) + (60 - now.second)
+    
+    #wait until 1 am:  
+    t.sleep(secMidnight + 3600)
 
 
