@@ -1,4 +1,8 @@
-# Options:
+#Notes on ***magnet links***, which are created in landscapes.py:
+# npm install -g magnet-link
+# magnet-link /home/bret/Downloads/AA2.v0.7.7z.torrent > magnet.txt
+
+# Options or mktorent:
 # -a <url>[,<url>]* : specify the full announce URLs
 #                     at least one is required
 #                     additional -a adds backup trackers
@@ -41,8 +45,7 @@ count = 0
 for zipped in zippedForTorrent:
     webSeed = 'http://199.192.98.227:8080/{}'.format(zipped)
     try:
-        os.system('mktorrent -a {} -l {} -c {} -w {} {}'\
-            .format(tracker,sizeExp,comment,webSeed,zipped))
+        os.system('mktorrent -a {} -l {} -c {} -w {} {}'.format(tracker,sizeExp,comment,webSeed,zipped))
         print '{}.torrent created'.format(zipped)
         count +=1
     except:
