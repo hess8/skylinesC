@@ -77,3 +77,6 @@ coverage.xml
 /.idea
 .idea*
 /node_modules/
+
+# landscape page
+/ember/app/templates/landscapes.hbs
