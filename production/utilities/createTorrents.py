@@ -53,7 +53,7 @@ for zipped in zippedForTorrent:
     # remove old version files with same landscape
     land = zipped.split('.')[0]
     for item in oldZipped:
-        if item.split('.')[0] == land:
+        if item.split('.')[0] == land and land!='WestGermany3':
             zipVersion = '{}/{}'.format(zipDir,item)
             os.remove(zipVersion)
             print 'removed',zipVersion
