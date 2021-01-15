@@ -27,7 +27,7 @@ while keepRunning: #loops infinitely
     allLands = []
     allLandPaths = []
     allZips = []
-    
+
     #update symbolic links
     mainList = os.listdir(mainDir)
     otherList = os.listdir(otherDir)
@@ -37,23 +37,23 @@ while keepRunning: #loops infinitely
             mainPath = '{}\\{}'.format(mainDir,item)
             otherPath = '{}\\{}'.format(otherDir,item)
             os.system('mklink /D "{}" "{}"'.format(mainPath,otherPath))
-    
+
     #landscapes
     for item in os.listdir(mainDir):
         if 'WestGermany3' not in item:
             allLands.append(item)
             allLandPaths.append('{}\\{}'.format(mainDir,item))
-    
+
     for item in os.listdir(otherDir):
         if item not in allLands:
             allLands.append(item)
             allLandPaths.append('{}\\{}'.format(otherDir, item))
-    
+
     #zips
     for item in os.listdir(zipDir):
         if item.split('.')[-1] =='7z':
             allZips.append('{}\{}'.format(zipDir,item))
-    
+
     #remove old temp zip files
     for item in os.listdir(mainDir):
         if 'temp' in item:
@@ -61,7 +61,7 @@ while keepRunning: #loops infinitely
             os.remove(tempPath)
     count = 0
     #create zips
-    
+
     for i, landPath, in enumerate(allLandPaths):
         land = allLands[i]
     #     print (land)
@@ -69,7 +69,7 @@ while keepRunning: #loops infinitely
         if os.path.exists(iniPath):
             lines = readfile(iniPath)
             if len(lines) > 1:
-                version = lines[1].split('=')[1].split(',')[0].replace('00','0').replace('.10.','.1.')
+                version = lines[1].split('=')[1].split(',')[0].replace('00','0').replace('.10.','.1.').replace(' ','')
             else:
                 print ('lines', lines)
                 sys.exit('Stop: version line does not exist')
@@ -90,7 +90,7 @@ while keepRunning: #loops infinitely
                     count += 1
                 except:
                     print ('Error creating {}'.format(zipPath))
-    
+
         else:
             print('Skipping: {} does not exist'.format(iniPath))
     if count>0:

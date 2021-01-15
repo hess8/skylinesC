@@ -24,9 +24,16 @@ lines.append('  <div class="page-header"> \n')
 lines.append('    <h1>{{t "landscapes"}}</h1> \n')
 lines.append('  </div> \n')
 lines.append('  <p> {{t "landscapes-download"}} </p> \n')
-lines.append('  <p> {{t "install"}} <a href="https://www.fosshub.com/qBittorrent.html">  {{"qBittorrent"}}</a> {{t "qbittorent"}} <b> {{t "torrent"}} </b> {{t "torrent-after"}}</p> \n')
+# lines.append('  <p> {{t "install"}} <a href="https://www.fosshub.com/qBittorrent.html">  {{"qBittorrent"}}</a> {{t "qbittorent"}} <b> {{t "torrent"}} </b> {{t "torrent-after"}}</p> \n')
+lines.append('  <p> {{t "install"}} <a href="https://www.fosshub.com/qBittorrent.html">  {{"qBittorrent"}}</a> {{t "qbittorent"}} <b> {{t "torrent"}} </b> </p> \n')
+
 lines.append('  <p> {{t "extract-with"}}  <a href="https://www.7-zip.org/download.html"> 7-zip </a>  {{t "landscapes-paste"}} </p> \n')
 lines.append('  <hr> \n')
+lines.append('  <p> <b> {{t "torrent-share"}} </b> {{t "torrent-seed"}} <b> {{t "torrent-easy"}} </b> {{t "torrent-run"}}</p> \n')
+
+lines.append('  <hr> \n')
+lines.append('  <p> {{t "torrent-magnet"}}  <b> {{t "torrent-maglink"}} </b> {{t "torrent-magopen"}}  </p> \n')
+lines.append('  <p> <hr> </p> \n')
 
 lines.append('  <div class ="col-md-4" > \n')
 lines.append('  <p> {{fa-icon "envelope"}} <a href = "mailto:{{' + "'skylinescondor@gmail.com'}}" + '"> {{t "contact-admin"}} </a> {{" "}} {{t "contact-torrents"}} </p>   \n')
@@ -50,7 +57,7 @@ for i, name in enumerate(names):
     if os.path.exists(magfilepath):
         magline = readfileNoStrip(magfilepath)[0].strip()
         # print 'mag',magline
-        lines.append('\t<td> <a href={} download> "magnet" </a> </td> '.format('magline'))
+        lines.append('\t<td> <a href={} download> magnet </a> </td> '.format(magline))
     sizeStr = '{:.1f} GB"'.format(sizes[i] /float(10 ** 9))
     lines.append('\t\t<td align = "right"> {{"' + sizeStr  + '}} </td> \n')
     lines.append('\t</tr> \n\n')
