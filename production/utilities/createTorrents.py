@@ -66,6 +66,10 @@ for zipped in zippedForTorrent:
             if os.path.exists(torrentVersion):
                 os.remove(torrentVersion)
                 print 'removed',torrentVersion
+            magnetVersion = '{}/{}.magnet'.format(zipDir,item)
+            if os.path.exists(magnetVersion):
+                os.remove(magnetVersion)
+                print 'removed',magnetVersion
 #create all magnet links
 makeAllMagnets = False #needed only occasionally
 if makeAllMagnets:

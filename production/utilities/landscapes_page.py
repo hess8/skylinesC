@@ -4,7 +4,7 @@ def readfileNoStrip(filepath):
     with open(filepath) as f:
         lines = f.read().splitlines(True) #keeplinebreaks=True.  Does not strip the lines of \n
     return lines
-
+trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
 landPage = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
 dir = '/media/sf_landscapes-zip'
 dirlist = os.listdir(dir)
@@ -55,7 +55,8 @@ for i, name in enumerate(names):
     magfilepath = dir+'/{}.magnet'.format(name)
     # print magfilepath
     if os.path.exists(magfilepath):
-        magline = readfileNoStrip(magfilepath)[0].strip()
+        print name, readfileNoStrip(magfilepath)
+        magline = readfileNoStrip(magfilepath)[0].strip() + trackerStr
         # print 'mag',magline
         lines.append('\t<td> <a href={} download> magnet </a> </td> '.format(magline))
     sizeStr = '{:.1f} GB"'.format(sizes[i] /float(10 ** 9))
