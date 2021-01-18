@@ -49,7 +49,7 @@ gitflask = "*"
 
 [dev-packages]
 fabric = "==1.14.0"
-pytest = "==4.4.1"
+pytest = "==6.2.1"
 pytest-cov = "==2.6.1"
 pytest-voluptuous = "*"
 mock = "==2.0.0"
