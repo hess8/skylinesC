@@ -10,7 +10,7 @@ python_version = "2.7"
 manage = "./manage.py"
 
 [packages]
-requests = "==2.10.*"
+requests = "==2.25.*"
 flask = "==1.0.*"
 babel = "==2.7.0"
 flask-caching = "==1.7.*"
