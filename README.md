@@ -1,7 +1,7 @@
 
 
 # SkyLines
-*SkyLinesCondor* is a version of Skylines for the Condor soaring simulator. <http://skylinescondor.com>. For SkylinesCondor information, contact [Bret Hess]: mailto:skylinescondor@gmail.com
+*SkyLinesCondor* is a version of *SkyLines* for the Condor soaring simulator. <http://skylinescondor.com>. For SkylinesCondor information, contact [Bret Hess]: mailto:skylinescondor@gmail.com
 
 *SkyLines* is a web platform where pilots can share their flights with others
 after, or even during flight via live tracking.  *SkyLines* is a sort of social
