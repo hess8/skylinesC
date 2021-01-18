@@ -1,3 +1,5 @@
+*SkyLinesCondor* is a recent branch for the Condor soaring simulator. <http://skylinescondor.com>.
+
 # SkyLines
 
 *SkyLines* is a web platform where pilots can share their flights with others
@@ -12,8 +14,6 @@ sharing some code with XCSoar in the algorithmic areas and is providing the
 base for XCSoar's live tracking functionalities.
 
 *SkyLines* is at <http://skylines.aero>.
-
-*SkyLinesCondor* is a recent branch for Condor simulator igcs. <http://skylinescondor.com>.
 
 Build Status: [![Build Status](https://travis-ci.org/skylines-project/skylines.png?branch=master)](https://travis-ci.org/skylines-project/skylines)
 
