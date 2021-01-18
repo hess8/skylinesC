@@ -1075,6 +1075,11 @@
   resolved "https://registry.yarnpkg.com/@ember/edition-utils/-/edition-utils-1.1.1.tgz#d5732c3da593f202e6e1ac6dbee56a758242403f"
   integrity sha512-GEhri78jdQp/xxPpM6z08KlB0wrHfnfrJ9dmQk7JeQ4XCiMzXsJci7yooQgg/IcTKCM/PxE/IkGCQAo80adMkw==
 
+"@ember/edition-utils@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@ember/edition-utils/-/edition-utils-1.2.0.tgz#a039f542dc14c8e8299c81cd5abba95e2459cfa6"
+  integrity sha512-VmVq/8saCaPdesQmftPqbFtxJWrzxNGSQ+e8x8LLe3Hjm36pJ04Q8LeORGZkAeOhldoUX9seLGmSaHeXkIqoog==
+
 "@ember/jquery@1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@ember/jquery/-/jquery-1.1.0.tgz#33d062610a5ceaa5c5c8a3187f870d47d6595940"
@@ -2487,6 +2492,11 @@ babel-plugin-htmlbars-inline-precompile@^3.0.0:
   resolved "https://registry.yarnpkg.com/babel-plugin-htmlbars-inline-precompile/-/babel-plugin-htmlbars-inline-precompile-3.0.0.tgz#95aa0d2379347cda9a7127c028fe35cb39179fa2"
   integrity sha512-dR12lOqIcBLOTwgnI5iG+bSrZhR8JIZ7zAHW43YhcD5q8G8iipvSuRo8Fah6NPPh6C8cATd827bgPikphbF09w==
 
+babel-plugin-htmlbars-inline-precompile@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-htmlbars-inline-precompile/-/babel-plugin-htmlbars-inline-precompile-3.2.0.tgz#c4882ea875d0f5683f0d91c1f72e29a4f14b5606"
+  integrity sha512-IUeZmgs9tMUGXYu1vfke5I18yYJFldFGdNFQOWslXTnDWXzpwPih7QFduUqvT+awDpDuNtXpdt5JAf43Q1Hhzg==
+
 babel-plugin-inline-environment-variables@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/babel-plugin-inline-environment-variables/-/babel-plugin-inline-environment-variables-1.0.1.tgz#1f58ce91207ad6a826a8bf645fafe68ff5fe3ffe"
@@ -3602,6 +3612,13 @@ broccoli-node-info@^2.1.0:
   resolved "https://registry.yarnpkg.com/broccoli-node-info/-/broccoli-node-info-2.1.0.tgz#ca84560e8570ff78565bea1699866ddbf58ad644"
   integrity sha512-l6qDuboJThHfRVVWQVaTs++bFdrFTP0gJXgsWenczc1PavRVUmL1Eyb2swTAXXMpDOnr2zhNOBLx4w9AxkqbPQ==
 
+broccoli-output-wrapper@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/broccoli-output-wrapper/-/broccoli-output-wrapper-2.0.0.tgz#f1e0b9b2f259a67fd41a380141c3c20b096828e6"
+  integrity sha512-V/ozejo+snzNf75i/a6iTmp71k+rlvqjE3+jYfimuMwR1tjNNRdtfno+NGNQB2An9bIAeqZnKhMDurAznHAdtA==
+  dependencies:
+    heimdalljs-logger "^0.1.10"
+
 broccoli-output-wrapper@^3.2.1:
   version "3.2.5"
   resolved "https://registry.yarnpkg.com/broccoli-output-wrapper/-/broccoli-output-wrapper-3.2.5.tgz#514b17801c92922a2c2f87fd145df2a25a11bc5f"
@@ -3676,6 +3693,19 @@ broccoli-plugin@^3.0.0:
   integrity sha512-aEtobBvzAlUIAaY5z+LwW2W3IJ9pruJtrT571CyfjoDFTGa8LZx0qjQG97Z7Guk5YzuxDoDNlM3hGsgBnnReTw==
   dependencies:
     broccoli-node-api "^1.6.0"
+    promise-map-series "^0.2.1"
+    quick-temp "^0.1.3"
+    rimraf "^2.3.4"
+    symlink-or-copy "^1.1.8"
+
+broccoli-plugin@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/broccoli-plugin/-/broccoli-plugin-3.1.0.tgz#54ba6dd90a42ec3db5624063292610e326b1e542"
+  integrity sha512-7w7FP8WJYjLvb0eaw27LO678TGGaom++49O1VYIuzjhXjK5kn2+AMlDm7CaUFw4F7CLGoVQeZ84d8gICMJa4lA==
+  dependencies:
+    broccoli-node-api "^1.6.0"
+    broccoli-output-wrapper "^2.0.0"
+    fs-merger "^3.0.1"
     promise-map-series "^0.2.1"
     quick-temp "^0.1.3"
     rimraf "^2.3.4"
@@ -5793,23 +5823,22 @@ ember-cli-htmlbars-inline-precompile@^2.1.0:
     heimdalljs-logger "^0.1.9"
     silent-error "^1.1.0"
 
-ember-cli-htmlbars@4.0.8, ember-cli-htmlbars@^4.0.2, ember-cli-htmlbars@^4.0.5:
-  version "4.0.8"
-  resolved "https://registry.yarnpkg.com/ember-cli-htmlbars/-/ember-cli-htmlbars-4.0.8.tgz#e87b62e7040bd478a2d007053bdb1644dd1685b0"
-  integrity sha512-B6fzlqmv2E2dl8P6UIYu3bY8nZU2kKfl1VkEIgxFAINfsu9fP65kX/bKzHqGhHF8nAtWBoXZWw6tomHKfUT/Jg==
+ember-cli-htmlbars@4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/ember-cli-htmlbars/-/ember-cli-htmlbars-4.4.0.tgz#7ca17d5ca8f7550984346d9e6e93da0c3323f8d9"
+  integrity sha512-ohgctqk7dXIZR4TgN0xRoUYltWhghFJgqmtuswQTpZ7p74RxI9PKx+E8WV/95mGcPzraesvMNBg5utQNvcqgNg==
   dependencies:
-    "@ember/edition-utils" "^1.1.1"
-    babel-plugin-htmlbars-inline-precompile "^3.0.0"
+    "@ember/edition-utils" "^1.2.0"
+    babel-plugin-htmlbars-inline-precompile "^3.2.0"
     broccoli-debug "^0.6.5"
     broccoli-persistent-filter "^2.3.1"
-    broccoli-plugin "^3.0.0"
+    broccoli-plugin "^3.1.0"
     common-tags "^1.8.0"
     ember-cli-babel-plugin-helpers "^1.1.0"
-    fs-copy-file-sync "^1.1.1"
+    fs-tree-diff "^2.0.1"
     hash-for-dep "^1.5.1"
     heimdalljs-logger "^0.1.10"
     json-stable-stringify "^1.0.1"
-    mkdirp "^0.5.1"
     semver "^6.3.0"
     strip-bom "^4.0.0"
     walk-sync "^2.0.2"
@@ -5833,6 +5862,27 @@ ember-cli-htmlbars@^3.0.0, ember-cli-htmlbars@^3.0.1:
     hash-for-dep "^1.5.1"
     json-stable-stringify "^1.0.1"
     strip-bom "^3.0.0"
+
+ember-cli-htmlbars@^4.0.2, ember-cli-htmlbars@^4.0.5:
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/ember-cli-htmlbars/-/ember-cli-htmlbars-4.0.8.tgz#e87b62e7040bd478a2d007053bdb1644dd1685b0"
+  integrity sha512-B6fzlqmv2E2dl8P6UIYu3bY8nZU2kKfl1VkEIgxFAINfsu9fP65kX/bKzHqGhHF8nAtWBoXZWw6tomHKfUT/Jg==
+  dependencies:
+    "@ember/edition-utils" "^1.1.1"
+    babel-plugin-htmlbars-inline-precompile "^3.0.0"
+    broccoli-debug "^0.6.5"
+    broccoli-persistent-filter "^2.3.1"
+    broccoli-plugin "^3.0.0"
+    common-tags "^1.8.0"
+    ember-cli-babel-plugin-helpers "^1.1.0"
+    fs-copy-file-sync "^1.1.1"
+    hash-for-dep "^1.5.1"
+    heimdalljs-logger "^0.1.10"
+    json-stable-stringify "^1.0.1"
+    mkdirp "^0.5.1"
+    semver "^6.3.0"
+    strip-bom "^4.0.0"
+    walk-sync "^2.0.2"
 
 ember-cli-import-polyfill@^0.2.0:
   version "0.2.0"
@@ -7941,7 +7991,7 @@ fs-extra@^9.0.1:
     jsonfile "^6.0.1"
     universalify "^1.0.0"
 
-fs-merger@^3.1.0:
+fs-merger@^3.0.1, fs-merger@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/fs-merger/-/fs-merger-3.1.0.tgz#f30f74f6c70b2ff7333ec074f3d2f22298152f3b"
   integrity sha512-RZ9JtqugaE8Rkt7idO5NSwcxEGSDZpLmVFjtVQUm3f+bWun7JAU6fKyU6ZJUeUnKdJwGx8uaro+K4QQfOR7vpA==
