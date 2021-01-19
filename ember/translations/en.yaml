@@ -231,6 +231,13 @@ timeline: Timeline
 title: Public comment or title
 torrent: Download one or many torrent files, and open them all together in qBittorrent; your downloads will start.
 torrent-after: After you have downloaded and extracted your landscape files, leave the .7z files on your computer and qBittorrent will help the next guy get them faster!
+torrent-share: Please share
+torrent-seed: ("seed") at least one of these .7z files yourself to help others get them faster. You can see on qBittorrent (Seeds column) that many files have only two or three people seeding them ("0(2)" or "0(3)") at the moment.  Let's increase that!
+torrent-easy: It's easy to seed.
+torrent-run: Just run qBittorent when your computer is on (set to run when computer starts), and leave the .7z files where they are, and you will be seeding them for others!
+torrent-magnet: Option. Instead of downloading the torrent file, click on "magnet" and it will open a
+torrent-maglink: magnet link
+torrent-magopen: which should open directly in qBittorrent and start downloading.
 total: Total
 total-score: Total Score
 tracking-callsign: Tracking Callsign
@@ -334,7 +341,7 @@ scoringinfo:
   distance: The program finds five turnpoints in your track that give you the most distance along line segments between the turnpoints.
   triangle: If your path makes one or more loops, the program finds the largest triangle on your track that is symmetric enough that the smallest side is at least 28% of the total.  About 1/3 of the triangle perimeter is added to your score.
   index: These lengths are divided by your glider's performance index.
-  score: Your score is in units of km.  Score = (distance + 0.3 * triangle)/index
+  score: Your score is in units of km.  Score = (distance + 0.3 * triangle)/index * 100
 search:
   search: Search
   search-for-TEXT: Search <small>for "{text}"</small>

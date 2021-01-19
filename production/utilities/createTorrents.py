@@ -2,7 +2,8 @@
 # npm install -g magnet-link
 # magnet-link /home/bret/Downloads/AA2.v0.7.7z.torrent > magnet.txt
 
-# Options or mktorent:
+# Options for mktorrent:
+
 # -a <url>[,<url>]* : specify the full announce URLs
 #                     at least one is required
 #                     additional -a adds backup trackers
@@ -41,15 +42,19 @@ for item in zipDirList:
 tracker = 'http://tracker.opentrackr.org:1337/announcefile'
 sizeExp = 21 # 2^21 bytes = 2MB
 comment = 'skylinescondor.com'
-count = 0
 for zipped in zippedForTorrent:
     webSeed = 'http://199.192.98.227:8080/{}'.format(zipped)
     try:
         os.system('mktorrent -a {} -l {} -c {} -w {} {}'.format(tracker,sizeExp,comment,webSeed,zipped))
         print '{}.torrent created'.format(zipped)
-        count +=1
     except:
         print 'Error in torrent {}'.format(zipped)
+    #create magnet link
+    try:
+        os.system('magnet-link {}.torrent > {}.magnet'.format(zipped, zipped))
+        print '{}.magnet created'.format(zipped)
+    except:
+        print 'Error in magnet link for {}'.format(zipped)
     # remove old version files with same landscape
     land = zipped.split('.')[0]
     for item in oldZipped:
@@ -61,6 +66,26 @@ for zipped in zippedForTorrent:
             if os.path.exists(torrentVersion):
                 os.remove(torrentVersion)
                 print 'removed',torrentVersion
+            magnetVersion = '{}/{}.magnet'.format(zipDir,item)
+            if os.path.exists(magnetVersion):
+                os.remove(magnetVersion)
+                print 'removed',magnetVersion
+#create all magnet links
+makeAllMagnets = False #needed only occasionally
+if makeAllMagnets:
+    zipDirList = os.listdir(zipDir)
+    torrents  = []
+    for item in zipDirList:
+        if item.split('.')[-1] == 'torrent':
+            torrents.append(item)
+    for torrent in torrents:
+        try:
+            os.system('magnet-link {} > {}.magnet'.format(torrent, torrent.replace('.torrent','')))
+            print '{}.magnet created'.format(torrent.replace('.torrent',''))
+        except:
+            print 'Error in magnet link for {}'.format(torrent)
+
+
 
 #run update for skylinesC page.
 os.system('python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/landscapes_page.py')
