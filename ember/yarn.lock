@@ -7585,10 +7585,10 @@ ember-cli@^2.18.2:
     walk-sync "^0.3.0"
     yam "0.0.22"
 
-ember-click-outside@1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/ember-click-outside/-/ember-click-outside-1.3.0.tgz#70f16c94c4137d863e52b9deb8407c2640ba8543"
-  integrity sha512-WMZ4k2rzpzUae5aJf7bkR+BrsunbpAIveW9kk65j151u6UI8CoXXtdn7D2LpEWw/K54Cm5mnQS6TrGJ1/aT02A==
+ember-click-outside@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/ember-click-outside/-/ember-click-outside-1.2.0.tgz#a959ed22d3ef9cfb96ed35dabb1a0a26c4556f94"
+  integrity sha512-C1R+scOm08v3epfMg+ayEMNCgx0DsRwPI6hQFQZvFAkH9DCzSsmezm61U4wREmOPEauH7/4ATfCiofkTd7grFg==
   dependencies:
     ember-cli-babel "^7.10.0"
     ember-cli-htmlbars "^4.0.2"
@@ -7611,7 +7611,15 @@ ember-concurrency@1.3.0, "ember-concurrency@^0.8.0 || ^0.9.0 || ^0.10.0", "ember
     ember-compatibility-helpers "^1.2.0"
     ember-maybe-import-regenerator "^0.1.6"
 
-ember-cookies@0.4.0, "ember-cookies@^0.3.0 || ^0.4.0":
+ember-cookies@0.5.2:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/ember-cookies/-/ember-cookies-0.5.2.tgz#06e33463f2f83254fefaf224cc944dec3fb9d3ba"
+  integrity sha512-nZ7oG97kBcO9UHjO95ryABpnVx62Bhxo7lIsBJNmWvFXleILm9DGueiAynzXxuYWWPuKIeeSbYakrS1869tNTw==
+  dependencies:
+    ember-cli-babel "^7.1.0"
+    ember-getowner-polyfill "^1.1.0 || ^2.0.0"
+
+"ember-cookies@^0.3.0 || ^0.4.0":
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/ember-cookies/-/ember-cookies-0.4.0.tgz#472f405bedd47c7c6f6a4e76ac927b8e7a3605ef"
   integrity sha512-KXFxmaxEMlSqYQdyAaM/Rs84PxBJCqBQEPkLqhBStC9LwEovUSTEXzhd3FHVbMHch/THI4JzjoYEsj4CrdxVgQ==
