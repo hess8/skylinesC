@@ -162,8 +162,8 @@ while run:
 
     print
     #ufw maintenance:
-    os.system('sudo ufw deny 4200')
-    os.system('sudo ufw deny 80')
+    os.system('sudo ufw deny 4200') > /dev/null 2>&1
+    os.system('sudo ufw deny 80') > /dev/null 2>&1
     
     #find time until midnight
     secMidnight = ((24 - now.hour - 1) * 3600) + ((60 - now.minute - 1) * 60) + (60 - now.second)
