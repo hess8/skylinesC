@@ -1,4 +1,9 @@
+
+
 # SkyLines
+*SkyLinesCondor* is a version of *SkyLines* for the Condor soaring simulator. It is at <http://skylinescondor.com>. 
+
+For *SkylinesCondor* information, contact [Bret Hess]: mailto:skylinescondor@gmail.com
 
 *SkyLines* is a web platform where pilots can share their flights with others
 after, or even during flight via live tracking.  *SkyLines* is a sort of social
@@ -12,8 +17,6 @@ sharing some code with XCSoar in the algorithmic areas and is providing the
 base for XCSoar's live tracking functionalities.
 
 *SkyLines* is at <http://skylines.aero>.
-
-*SkyLinesCondor* is a recent branch for Condor simulator igcs. <http://skylinescondor.com>.
 
 Build Status: [![Build Status](https://travis-ci.org/skylines-project/skylines.png?branch=master)](https://travis-ci.org/skylines-project/skylines)
 
