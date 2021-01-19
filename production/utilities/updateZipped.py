@@ -20,6 +20,7 @@ def sevenzip(tempPath,landPath):
 
 mainDir = 'Z:\\Condor\\Landscapes'
 otherDir = 'E:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
+<<<<<<< HEAD
 zipDir = 'S:\\Skylines-C\landscapes-zip'
 
 keepRunning = True
@@ -90,6 +91,62 @@ while keepRunning: #loops infinitely
                     count += 1
                 except:
                     print ('Error creating {}'.format(zipPath))
+=======
+zipDir = 'S:\\Skylines-C\\landscapes-zip'
+
+excludeStr = 'empty'
+if len(excludeStr) > 0:
+    print ('Excluding landscapes with string {}'.format(excludeStr))
+
+# keepRunning = True
+# while keepRunning: #loops infinitely
+allLands = []
+allLandPaths = []
+allZips = []
+
+#update symbolic links
+mainList = os.listdir(mainDir)
+otherList = os.listdir(otherDir)
+for item in otherList:
+    if item not in mainList:
+        print ('Updated symlink for {}.'.format(item))
+        mainPath = '{}\\{}'.format(mainDir,item)
+        otherPath = '{}\\{}'.format(otherDir,item)
+        os.system('mklink /D "{}" "{}"'.format(mainPath,otherPath))
+
+#landscapes
+for item in os.listdir(mainDir):
+    if 'WestGermany3' not in item and excludeStr not in item:
+        allLands.append(item)
+        allLandPaths.append('{}\\{}'.format(mainDir,item))
+
+for item in os.listdir(otherDir):
+    if item not in allLands:
+        allLands.append(item)
+        allLandPaths.append('{}\\{}'.format(otherDir, item))
+
+#zips
+for item in os.listdir(zipDir):
+    if item.split('.')[-1] =='7z':
+        allZips.append('{}\{}'.format(zipDir,item))
+
+#remove old temp zip files
+for item in os.listdir(mainDir):
+    if 'temp' in item:
+        tempPath = mainDir+'\\{}'.format(item)
+        os.remove(tempPath)
+count = 0
+#create zips
+
+for i, landPath, in enumerate(allLandPaths):
+    land = allLands[i]
+#     print (land)
+    iniPath = os.path.join(landPath,'{}.ini'.format(land))
+    if os.path.exists(iniPath):
+        lines = readfile(iniPath)
+        if len(lines) > 1:
+            version = lines[1].replace(' ','').split('=')[1].split(',')[0].replace('00','0').replace('.10.','.1.')
+>>>>>>> 676f13e... Small change to backup_skylines
         else:
             print ('lines', lines)
             sys.exit('Stop: version line does not exist')
