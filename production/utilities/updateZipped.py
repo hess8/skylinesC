@@ -73,7 +73,7 @@ for i, landPath, in enumerate(allLandPaths):
     if os.path.exists(iniPath):
         lines = readfile(iniPath)
         if len(lines) > 1:
-            version = lines[1].split('=')[1].split(',')[0].replace('00','0').replace('.10.','.1.')
+            version = lines[1].replace(' ','').split('=')[1].split(',')[0].replace('00','0').replace('.10.','.1.')
         else:
             print ('lines', lines)
             sys.exit('Stop: version line does not exist')
