@@ -6951,7 +6951,7 @@ ember-cli-babel@^5.1.6:
     ember-cli-version-checker "^1.0.2"
     resolve "^1.1.2"
 
-ember-cli-babel@^6.0.0, ember-cli-babel@^6.0.0-beta.4, ember-cli-babel@^6.1.0, ember-cli-babel@^6.11.0, ember-cli-babel@^6.16.0, ember-cli-babel@^6.17.0, ember-cli-babel@^6.3.0, ember-cli-babel@^6.6.0, ember-cli-babel@^6.8.1, ember-cli-babel@^6.8.2, ember-cli-babel@^6.9.2:
+ember-cli-babel@^6.0.0, ember-cli-babel@^6.0.0-beta.4, ember-cli-babel@^6.11.0, ember-cli-babel@^6.16.0, ember-cli-babel@^6.17.0, ember-cli-babel@^6.3.0, ember-cli-babel@^6.6.0, ember-cli-babel@^6.8.1, ember-cli-babel@^6.8.2, ember-cli-babel@^6.9.2:
   version "6.18.0"
   resolved "https://registry.yarnpkg.com/ember-cli-babel/-/ember-cli-babel-6.18.0.tgz#3f6435fd275172edeff2b634ee7b29ce74318957"
   integrity sha512-7ceC8joNYxY2wES16iIBlbPSxwKDBhYwC8drU3ZEvuPDMwVv1KzxCNu1fvxyFEBWhwaRNTUxSCsEVoTd9nosGA==
@@ -7093,14 +7093,6 @@ ember-cli-get-component-path-option@^1.0.0:
   resolved "https://registry.yarnpkg.com/ember-cli-get-component-path-option/-/ember-cli-get-component-path-option-1.0.0.tgz#0d7b595559e2f9050abed804f1d8eff1b08bc771"
   integrity sha1-DXtZVVni+QUKvtgE8djv8bCLx3E=
 
-ember-cli-head@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/ember-cli-head/-/ember-cli-head-0.4.0.tgz#348f7595cee5bcb024a87d1c72c8d55fedda32f7"
-  integrity sha512-Z1Sfs7edjwsarksQdNIR7kSDKQ7jMapoeSmrTHXBGyFd43MjiMTaFd2BeZtXVxDEifHn7qOdCJmIJikvlbp71A==
-  dependencies:
-    ember-cli-babel "^6.1.0"
-    ember-cli-htmlbars "^2.0.1"
-
 ember-cli-htmlbars-inline-precompile@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/ember-cli-htmlbars-inline-precompile/-/ember-cli-htmlbars-inline-precompile-2.1.0.tgz#61b91ff1879d44ae504cadb46fb1f2604995ae08"
@@ -7133,7 +7125,7 @@ ember-cli-htmlbars@5.3.1, ember-cli-htmlbars@^5.1.0, ember-cli-htmlbars@^5.2.0, 
     strip-bom "^4.0.0"
     walk-sync "^2.2.0"
 
-ember-cli-htmlbars@^2.0.1, ember-cli-htmlbars@^2.0.2:
+ember-cli-htmlbars@^2.0.2:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/ember-cli-htmlbars/-/ember-cli-htmlbars-2.0.4.tgz#0bcda483f14271663c38756e1fd1cb89da6a50cf"
   integrity sha512-WSGODKKG65M/Q7QcLflmxnJKMA32JqFLyX0a5ghMRDWRqvUVkKWSZDbjJsNsCw/OCeBbPWQLQWq0wtpCnTTjwA==
@@ -7566,13 +7558,6 @@ ember-cookies@0.5.2:
     ember-cli-babel "^7.1.0"
     ember-getowner-polyfill "^1.1.0 || ^2.0.0"
 
-ember-copy@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/ember-copy/-/ember-copy-1.0.0.tgz#426554ba6cf65920f31d24d0a3ca2cb1be16e4aa"
-  integrity sha512-aiZNAvOmdemHdvZNn0b5b/0d9g3JFpcOsrDgfhYEbfd7SzE0b69YiaVK2y3wjqfjuuiA54vOllGN4pjSzECNSw==
-  dependencies:
-    ember-cli-babel "^6.6.0"
-
 ember-cp-validations@3.5.6:
   version "3.5.6"
   resolved "https://registry.yarnpkg.com/ember-cp-validations/-/ember-cp-validations-3.5.6.tgz#4392fc271acf9ed454529bdce1c3e50e53a40332"
@@ -7832,15 +7817,12 @@ ember-on-helper@^0.1.0:
   dependencies:
     ember-cli-babel "^7.7.3"
 
-ember-page-title@5.2.3:
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/ember-page-title/-/ember-page-title-5.2.3.tgz#63b039d70d4a5d7db9c00de5b2108823fb90bb9d"
-  integrity sha512-2ErWCJsTawaKJy7fzZqIsrUTNaNtDgEboiiL4OcqEg2A3gKmuuaDFSWz0w9njFRxWISvfPfRw1df0kpYAr98ng==
+ember-page-title@6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/ember-page-title/-/ember-page-title-6.2.0.tgz#d79f7422299ebb8f8ac819399596e8f54f01a0e9"
+  integrity sha512-mgzI59rVH6Q00uG1OnsbrSfic+MxFQbtsjX3BuDWGgU7hWahDhAAgaQrKIFx99aEqWoiL+OiX4tQLPnxyZEceA==
   dependencies:
-    ember-cli-babel "^7.7.3"
-    ember-cli-head "^0.4.0"
-    ember-cli-htmlbars "^3.0.1"
-    ember-copy "^1.0.0"
+    ember-cli-babel "^7.22.1"
 
 ember-percy@1.6.0:
   version "1.6.0"
