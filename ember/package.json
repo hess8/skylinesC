@@ -17,6 +17,7 @@
     "test": "ember test"
   },
   "dependencies": {
+    "intl": "andyearnshaw/Intl.js",
     "remarkable": "1.7.2"
   },
   "devDependencies": {

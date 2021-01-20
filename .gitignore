@@ -75,6 +75,7 @@ coverage.xml
 
 # ide projects
 /.idea
+/.idea/
 .idea*
 /node_modules/
 

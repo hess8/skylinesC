@@ -1,3 +1,5 @@
+# Run with: sudo -u bret bash installFirst.sh
+
 # set environment variables
 
 cat >> ~/.profile << EOF
@@ -150,8 +152,8 @@ sudo chown $USER -R ~/.config/*
 #pipenv run ./manage.py import welt2000 --commit
 
 # production server
-sudo ufw enable
-systemctl status nginx
+#sudo ufw enable
+#systemctl status nginx
 
 #pgadmin
 
