@@ -6927,7 +6927,8 @@ ember-cli-babel-plugin-helpers@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ember-cli-babel-plugin-helpers/-/ember-cli-babel-plugin-helpers-1.1.1.tgz#5016b80cdef37036c4282eef2d863e1d73576879"
   integrity sha512-sKvOiPNHr5F/60NLd7SFzMpYPte/nnGkq/tMIfXejfKHIhaiIkYFqX8Z9UFTKWLLn+V7NOaby6niNPZUdvKCRw==
-ember-cli-babel@7.23.1, ember-cli-babel@^7.0.0, ember-cli-babel@^7.12.0, ember-cli-babel@^7.13.0, ember-cli-babel@^7.18.0, ember-cli-babel@^7.22.1, ember-cli-babel@^7.23.0:
+
+ember-cli-babel@7.23.1, ember-cli-babel@^7.0.0, ember-cli-babel@^7.12.0, ember-cli-babel@^7.13.0, ember-cli-babel@^7.13.2, ember-cli-babel@^7.22.1, ember-cli-babel@^7.23.0:
   version "7.23.1"
   resolved "https://registry.yarnpkg.com/ember-cli-babel/-/ember-cli-babel-7.23.1.tgz#d1517228ede08a5d4b045c78a7429728e956b30b"
   integrity sha512-qYggmt3hRs6QJ6cRkww3ahMpyP8IEV2KFrIRO/Z6hu9MkE/8Y28Xd5NjQl6fPV3oLoG0vwuHzhNe3Jr7Wec8zw==
@@ -7694,12 +7695,12 @@ ember-getowner-polyfill@^1.2.2:
     ember-cli-version-checker "^1.2.0"
     ember-factory-for-polyfill "^1.1.0"
 
-ember-href-to@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/ember-href-to/-/ember-href-to-3.1.0.tgz#704f66c2b555a2685fac9ddc74eb9c95abaf5b8f"
-  integrity sha512-rV9KWDMHgkQsEXuPQekxZ9BbJ75jJqkErWHzWscjmmYwbrMAFxjAt7/oeuiaDxMqHlatNXA0lTkPDZKEBTxoFQ==
+ember-href-to@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/ember-href-to/-/ember-href-to-4.1.0.tgz#daa8b398bc5a51ba3ba5ff736e099f0a0d010b7b"
+  integrity sha512-h8xSzt9lQAUzk4JvXNnZjRj29hOWKo92VIHzH68io13UurDBaMmJ4WtXa0iy/awlSFs6h8BwpEWQeaCYIZDRuQ==
   dependencies:
-    ember-cli-babel "^7.1.2"
+    ember-cli-babel "^7.13.2"
 
 ember-in-element-polyfill@^1.0.0:
   version "1.0.0"
