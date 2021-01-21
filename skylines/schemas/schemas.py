@@ -1,4 +1,4 @@
-from marshmallow import Schema as _Schema
+from marshmallow import Schema as _Schema, pre_load, post_load, ValidationError
 
 from . import fields, validate
 
@@ -160,6 +160,9 @@ class IGCFileSchema(Schema):
 
     date = fields.Date(attribute="date_utc")
 
+    weglideStatus = fields.Integer(attribute="weglide_status")
+    weglideData = fields.Raw(attribute="weglide_data")
+
     class Meta(Schema.Meta):
         load_only = ("ownerId",)
         dump_only = ("owner",)
@@ -230,7 +233,16 @@ class FlightSchema(Schema):
     igcFile = fields.Nested(
         IGCFileSchema,
         attribute="igc_file",
-        only=("owner", "filename", "registration", "competitionId", "model", "date"),
+        only=(
+            "owner",
+            "filename",
+            "registration",
+            "competitionId",
+            "model",
+            "date",
+            "weglideStatus",
+            "weglideData",
+        ),
     )
 
     class Meta(Schema.Meta):
@@ -253,6 +265,42 @@ class FlightSchema(Schema):
             "score",
             "igcFile",
         )
+
+
+class FlightUploadSchema(Schema):
+    pilotId = fields.Integer(attribute="pilot_id", allow_none=True)
+    pilotName = fields.String(
+        attribute="pilot_name",
+        strip=True,
+        allow_none=True,
+        validate=validate.Length(max=255),
+    )
+    weglideBirthday = fields.Date()
+    weglideUserId = fields.Integer()
+
+    @pre_load
+    def pre_load(self, in_data, **kwargs):
+        data = in_data.copy()
+        if data.get("pilotId") == "":
+            del data["pilotId"]
+        if data.get("pilotName") == "":
+            del data["pilotName"]
+        if data.get("weglideBirthday") == "":
+            del data["weglideBirthday"]
+        if data.get("weglideUserId") == "":
+            del data["weglideUserId"]
+
+        if not data.get("pilotId") and not data.get("pilotName"):
+            raise ValidationError("Either pilotName or pilotId must be set")
+
+        return data
+
+    @post_load
+    def remove_name_if_id_is_set(self, data, **kwargs):
+        if data.get("pilot_id") and data.get("pilot_name"):
+            del data["pilot_name"]
+
+        return data
 
 
 class FlightCommentSchema(Schema):

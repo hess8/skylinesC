@@ -28,6 +28,7 @@ club-has-been-changed: Your club has been changed.
 club-was-registered: Your club was successfully registered.
 clubs: Clubs
 comments: Comments
+comment-error: An error occured while adding your comment. Please try again later.
 competition-id: Competition Id
 competitions: Competitions
 confirm-password: Confirm password
@@ -82,6 +83,7 @@ followers: Followers
 following: Following
 forgot-password: Forgot password?
 friends: Friends
+fullscreen-not-supported: Sorry, your browser does not support fullscreen mode. 😢
 generate-new-key: Generate new key
 generating-new-key: Generating new key...
 glide-rate: Glide Rate
@@ -261,7 +263,7 @@ tracking:
   clients: Clients
   xcsoar-description: available starting with {release}
   instructions-below: Instructions below.
-  available-in-gaggle: now available in the current version of Gaggle
+  skylines-tracker-description: now available in the current version of SkyLines Tracker
   lt24-clients: LiveTrack24 clients
   lt24-description: You can also use all available applications that use the {livetrack24} protocol for sending your locations to SkyLines. Just use your Live Tracking Key as username, choose any password you want and configure {skylines} as the server.
   your-live-tracking-key-is-KEY: 'Your Live Tracking key is: {key}'
@@ -324,3 +326,7 @@ errors:
   email: '{description} must be a valid email address'
   phone: '{description} must be a valid phone number'
   url: '{description} must be a valid url'
+weglide:
+  upload-failed: Upload to WeGlide was unsuccessful!
+  upload-in-progress: Upload to WeGlide still in progress…
+  weglide: WeGlide

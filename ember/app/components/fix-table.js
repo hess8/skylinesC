@@ -1,13 +1,10 @@
-import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { action, computed } from '@ember/object';
+import Component from '@glimmer/component';
 
-export default Component.extend({
-  flights: null,
-  fixes: null,
-  selection: null,
-
-  data: computed('fixes.@each.flight', function() {
-    return this.fixes.map((fix, i) => {
+export default class extends Component {
+  @computed('args.fixes.@each.flight')
+  get data() {
+    return this.args.fixes.map((fix, i) => {
       let flight = fix.get('flight');
       let id = flight.get('id');
       let color = flight.get('color');
@@ -15,15 +12,15 @@ export default Component.extend({
       let removable = i !== 0;
       return { id, color, competitionId, removable, fix };
     });
-  }),
+  }
 
-  selectable: computed('data.[]', function() {
+  @computed('data.[]')
+  get selectable() {
     return this.data.length > 1;
-  }),
+  }
 
-  actions: {
-    select(id) {
-      this.set('selection', this.selection === id ? null : id);
-    },
-  },
-});
+  @action
+  select(id) {
+    this.args.onSelectionChange(this.args.selection === id ? null : id);
+  }
+}

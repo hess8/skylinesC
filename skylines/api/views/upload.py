@@ -30,6 +30,7 @@ from skylines.schemas import (
     AirspaceSchema,
     AircraftModelSchema,
     FlightSchema,
+    FlightUploadSchema,
     UserSchema,
     Schema,
     ValidationError,
@@ -190,20 +191,18 @@ def _encode_flight_path(fp, qnh):
 def index_post():
     current_user = User.get(request.user_id)
 
-    form = request.form
-
-    if form.get("pilotId") == u"":
-        form = form.copy()
-        form.pop("pilotId")
-
     try:
-        data = FlightSchema(only=("pilotId", "pilotName")).load(form).data
+        data = FlightUploadSchema().load(request.form).data
     except ValidationError as e:
         return jsonify(error="validation-failed", fields=e.messages), 422
 
     pilot_id = data.get("pilot_id")
-    pilot = pilot_id and User.get(pilot_id)
-    pilot_id = pilot and pilot.id
+    if pilot_id:
+        pilot = User.get(pilot_id)
+        if not pilot:
+            return jsonify(error="unknown-pilot"), 422
+    else:
+        pilot = None
 
     club_id = (pilot and pilot.club_id) or current_user.club_id
 
@@ -290,6 +289,18 @@ def index_post():
 
         # flush data to make sure we don't get duplicate files from ZIP files
         db.session.flush()
+
+        # Queue WeGlide upload if requested
+        weglide_user_id = data.get("weglideUserId")
+        weglide_birthday = data.get("weglideBirthday")
+        if weglide_user_id and weglide_birthday:
+            tasks.upload_to_weglide.delay(
+                igc_file.id, weglide_user_id, weglide_birthday.isoformat()
+            )
+
+            # Update `weglide_status` in the database
+            igc_file.weglide_status = 1
+            db.session.flush()
 
         # Store data in cache for image creation
         cache_key = hashlib.sha1(

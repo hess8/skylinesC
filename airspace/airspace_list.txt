@@ -6,7 +6,8 @@
 # cz 2014 file can't be read by ogr...
 #cz openair http://soaringweb.org/Airspace/CZ/CZ_2013.txt
 
-de openair https://www.daec.de/fileadmin/user_upload/files/2018/Fachbereiche/Luftraum_und_Flugbetrieb/Airspace_Germany_week13_2018_V2_ohneFIS.txt
+# de openair https://www.daec.de/fileadmin/user_upload/files/2018/Fachbereiche/Luftraum_und_Flugbetrieb/Airspace_Germany_week13_2018_V2_ohneFIS.txt
+de openair https://www.daec.de/fileadmin/user_upload/files/2020/Fachbereiche/Luftraum_und_Flugbetrieb/20200428_Airspace_Germany_DAeC.txt
 at openair https://www.austrocontrol.at/jart/prj3/austro_control/data/dokumente/aV5XF_AustriaAirspaceMainFileeffdate01052015-27052015V.1.00.txt
 
 # "Winpilot COLOR-Table" is breaking "be" airspace
@@ -22,8 +23,8 @@ es openair http://soaringweb.org/Airspace/ES/SUASpain201712.txt
 pl openair http://soaringweb.org/Airspace/PL/2017_05_08_Poland_Airspaces.txt
 no openair http://soaringweb.org/Airspace/NO/NorwayAirspace20140413.txt
 dk openair http://soaringweb.org/Airspace/DK/DK-OpenAir-AllinOne-20170508.txt
-us openair http://soaringweb.org/Airspace/NA/allusa.v17.08-17.2.txt
+us openair http://soaringweb.org/Airspace/NA/allusa.v20.02-27.2.txt
 za openair http://soaringweb.org/Airspace/ZA/RSA_Airspace_17AUG2017.txt
-au openair http://soaringweb.org/Airspace/AU/australia_class_all_no_ctaf_e_class_freq.bnd_area_freq.bnd_17_11_09.txt
+au openair http://soaringweb.org/Airspace/AU/australia_class_all_NO_fia_and_e_class_freq.bnd_20_05_21.txt
 ca openair http://soaringweb.org/Airspace/NA/canadian_airspace_noE_below12500_265.air
 fi openair http://www.hansto.fi/seeyou/files/Ilmatila2012.txt

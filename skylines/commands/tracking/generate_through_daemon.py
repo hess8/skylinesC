@@ -10,7 +10,6 @@ from skylines.tracking.server import (
     datetime,
     FLAG_LOCATION,
     FLAG_ALTITUDE,
-    TrackingFix,
     MAGIC,
     TYPE_FIX,
     set_crc,
@@ -23,13 +22,13 @@ from time import sleep
 class GenerateThroughDaemon(Command):
     """ Generate fake live tracks for debugging on daemon """
 
-    UDP_IP = "127.0.0.1"
-    UDP_PORT = 5597
-    ADDRESS = (UDP_IP, UDP_PORT)
+    option_list = (
+        Option("--host", type=str, default="127.0.0.1"),
+        Option("--port", type=int, default=5597),
+        Option("user_id", type=int, help="a user ID"),
+    )
 
-    option_list = (Option("user_id", type=int, help="a user ID"),)
-
-    def run(self, user_id):
+    def run(self, user_id, **kwargs):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         user = User.get(user_id)
@@ -55,10 +54,6 @@ class GenerateThroughDaemon(Command):
             altitude = sin(i / 20.0) * 300 + _altitude
 
             flags = FLAG_LOCATION | FLAG_ALTITUDE
-            fix = TrackingFix()
-            fix.pilot_id = user.id
-            fix.set_location(longitude, latitude)
-            fix.altitude = altitude
 
             data = struct.pack(
                 "!IHHQIIiiIHHHhhH",
@@ -79,7 +74,7 @@ class GenerateThroughDaemon(Command):
                 0,
             )
             data = set_crc(data)
-            sock.sendto(data, self.ADDRESS)
+            sock.sendto(data, (kwargs.get("host"), kwargs.get("port")))
 
             print(".", end="")
             sys.stdout.flush()

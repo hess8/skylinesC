@@ -21,10 +21,9 @@ const Validations = buildValidations({
 });
 
 export default Component.extend(Validations, {
+  tagName: '',
   ajax: service(),
   account: service(),
-
-  classNames: ['panel', 'panel-default'],
 
   name: null,
   messageKey: null,
@@ -39,7 +38,7 @@ export default Component.extend(Validations, {
     },
   },
 
-  saveTask: task(function*() {
+  saveTask: task(function* () {
     let json = this.getProperties('name');
 
     try {

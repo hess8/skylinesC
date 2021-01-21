@@ -53,6 +53,8 @@ def expected_basic_flight_json(flight):
             u"competitionId": None,
             u"model": None,
             u"date": u"2011-06-18",
+            u"weglideStatus": None,
+            u"weglideData": None,
         },
     }
 
@@ -73,7 +75,7 @@ def test_basic_flight_json(db_session, client):
     db_session.commit()
 
     # upload flight
-    data = dict(files=(igcs.simple_path,))
+    data = dict(pilotId=john.id, files=(igcs.simple_path,))
     res = client.post("/flights/upload", headers=auth_for(john), data=data)
     assert res.status_code == 200
     flight_id = res.json["results"][0]["flight"]["id"]
@@ -177,6 +179,8 @@ def test_filled_flight(db_session, client):
                 u"competitionId": u"TH",
                 u"model": u"Hornet",
                 u"date": u"2017-01-15",
+                u"weglideStatus": None,
+                u"weglideData": None,
             },
         }
     }
@@ -269,6 +273,8 @@ def test_meetings(db_session, client):
                         },
                         u"model": None,
                         u"competitionId": None,
+                        u"weglideStatus": None,
+                        u"weglideData": None,
                     },
                 },
                 u"times": [
