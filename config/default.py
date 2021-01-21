@@ -29,7 +29,7 @@ SENTRY_DSN = 'https://foo:bar@sentry.io/appid'
 # This should probably be changed for a multi-threaded production server
 CACHE_TYPE = "simple"
 
-SQLALCHEMY_DATABASE_URI = "postgresql:///skylines"
+SQLALCHEMY_DATABASE_URI = "postgresql:///skylines2" #bch reroute to new database skylines2
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 ASSETS_LOAD_DIR = os.path.join(base, "skylines", "frontend", "static")
