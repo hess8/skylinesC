@@ -155,7 +155,7 @@ export default Component.extend({
   },
 
   addReliefLayer() {
-    let url = 'http://maps-for-free.com/layer/relief/z{z}/row{y}/{z}_{x}-{y}.jpg';
+    let url = 'https://maps-for-free.com/layer/relief/z{z}/row{y}/{z}_{x}-{y}.jpg';
 
     let relief_layer = new ol.layer.Tile({
       source: new ol.source.XYZ({
@@ -163,7 +163,7 @@ export default Component.extend({
           new ol.Attribution({
             html:
               'SRTM relief maps from <a target="_blank" rel="noopener" ' +
-              'href="http://maps-for-free.com/">maps-for-free.com</a>',
+              'href="https://maps-for-free.com/">maps-for-free.com</a>',
           }),
         ],
         url,
