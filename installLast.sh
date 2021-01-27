@@ -24,7 +24,6 @@ sudo apt-get install build-essential
 # add PPAs
 
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-# sudo add-apt-repository -y ppa:jonathonf/python-2.7 #not compa
 
 # update apt-get repository
 
@@ -32,8 +31,7 @@ sudo apt-get update
 
 # install base dependencies
 
-sudo apt-get install -y --no-install-recommends \
-   python python-dev \
+sudo apt-get install -y --no-install-recommends python python-dev 
     
 sudo apt-get install -y --no-install-recommends \
     g++-6 pkg-config libcurl4-openssl-dev redis-server\
