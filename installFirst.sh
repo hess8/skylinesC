@@ -28,7 +28,7 @@ sudo apt update
 
 # sudo apt install -y git
 sudo apt install -y curl
-git clone https://github.com/hess8/skylinesC
+# git clone https://github.com/hess8/skylinesC
 cd skylinesC
 
 # set environment variables
@@ -42,13 +42,15 @@ apt-get install -y python
 
 # install pip
 echo 'export PATH="${HOME}/.local/bin:$PATH"' >> ~/.bashrc
-sudo apt install -y python-pip
+# sudo apt install -y python-pip
+sudo pip install --upgrade pip==20.3. #pip 21 does not support python 2. 
 
 
 # install pipenv
-python -m pip install --user pipenv
+# python -m pip install --user pipenv
 # sudo -H pip install pipenv
 # sudo chown $USER -R /home/$USER
+sudo pip install pipenv==2020.11.15  # python 2 not supported in 2021q
 pip install zipp
 
 pipenv shell
