@@ -36,22 +36,22 @@ sudo apt-get install -y --no-install-recommends python python-dev
 sudo apt-get install -y --no-install-recommends \
     g++-6 pkg-config libcurl4-openssl-dev redis-server\
     libpq-dev libfreetype6-dev libpng-dev libffi-dev 
-echo 'New libs:'
-sudo apt-get install -y --no-install-recommends \
-    ibgeos-c1 liblwgeom-2.2-5
+# echo 'New libs:'
+# sudo apt-get install -y --no-install-recommends \
+#     ibgeos-c1 liblwgeom-2.2-5
 
-sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt bionic-pgdg main" >> /etc/apt/sources.lis't
-wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | sudo apt-key add -
-sudo apt update
-sudo apt install -y postgresql-10
-sudo apt install -y postgresql-10-postgis-2.4
-sudo apt install -y postgresql-10-postgis-scripts
-sudo apt install -y postgis
-sudo apt install -y postgresql-10-pgrouting
+# sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt bionic-pgdg main" >> /etc/apt/sources.lis't
+# wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | sudo apt-key add -
+# sudo apt update
+# sudo apt install -y postgresql-10
+# sudo apt install -y postgresql-10-postgis-2.4
+# sudo apt install -y postgresql-10-postgis-scripts
+# sudo apt install -y postgis
+# sudo apt install -y postgresql-10-pgrouting
 
-# set GCC 6 as default
+# # set GCC 6 as default
 
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6
+# sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6
 
 # sudo -H pip install pipenv
 # sudo apt-get install -y pkg-config
