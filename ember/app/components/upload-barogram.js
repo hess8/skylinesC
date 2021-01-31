@@ -35,7 +35,7 @@ export default BarogramComponent.extend({
     this._super(...arguments);
     let units = this.units;
 
-    let height = decodeDeltas(this.get('trace.barogram_h'), 1, 1);
+    let height = decodeDeltas(this.get('trace.barogram_h'), 1, 1); // decodeDeltas is just a utility
     let time = decodeDeltas(this.get('trace.barogram_t'), 1, 1);
     let enl = decodeDeltas(this.get('trace.enl'), 1, 1);
     let _elev_h = decodeDeltas(this.get('trace.elevations_h'), 1, 1);

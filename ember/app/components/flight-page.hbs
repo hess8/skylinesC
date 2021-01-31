@@ -73,11 +73,11 @@
       @flights={{fixCalc.flights}}
       @selection={{selectedFlightId}}
       @hoverMode={{not fixCalc.isRunning}}
-      @timeInterval={{timeInterval}}
+      @timeInterval={{timeInterval}} {{!--cutting leaves empty BG --}}
       @timeHighlight={{this.highlightedTimeInterval}}
-      @time={{fixCalc.time}}
-      @defaultTime={{fixCalc.defaultTime}}
-      @onTimeChange={{this.fixCalc.setTime}}
+      @time={{fixCalc.time}} {{!--#puts red line on mouse hover --}}
+      @defaultTime={{fixCalc.defaultTime}} {{!--cutting doesn't seem to do anything --}}
+      @onTimeChange={{this.fixCalc.setTime}} {{!--cutting doesn't seem to do anything --}}
       local-class="barogram"
     />
   </div>

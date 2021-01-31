@@ -146,6 +146,13 @@ sudo chown $USER -R ~/.config/*
 # management
 #pipenv run ./manage.py import welt2000 --commit
 
+# elevation data.  Make sure that you have 48 GB extra available for postgresql to grow!
+# don't want to do the download and extracting each time. Importing takes a long time
+cd htdocs/srtm
+#wget -i tiles.txt -P downloads -c --quiet
+#unzip -j -d unzipped "downloads/*.zip"
+#import to database .  Use tail to check progress.  Make sure disks are not saturated by other usage
+raster2pgsql -a -e -s 4326 -t 100x100 unzipped/*.hgt elevations | psql -d skylines > elevationsImportLog.txt
 # production server
 # sudo ufw enable
 # systemctl status nginx
