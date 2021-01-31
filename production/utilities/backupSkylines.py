@@ -37,7 +37,7 @@ while run:
         try:
             dumpFileName = 'skylinesdump{}.custom'.format(nowStr)
             dumpFilePath = '{}/skylinesdump{}.custom'.format(dbBUdir,nowStr)
-            os.system('sudo -u bret pg_dump --format=custom skylines > {}'.format(dumpFilePath))
+            os.system('sudo -u bret pg_dump --exclude-table-data=elevations --format=custom skylines > {}'.format(dumpFilePath))
             dumpSize = os.stat(dumpFilePath).st_size
             print  '\t{:.2f} MB, {}'.format(dumpSize / float(10 ** 6), dumpFileName)
         except:
@@ -172,5 +172,3 @@ while run:
 
     #wait until 1 am:
     t.sleep(secMidnight + 3600)
-
-
