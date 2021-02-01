@@ -163,7 +163,10 @@ cd htdocs/srtm
 #wget -i tiles.txt -P downloads -c --quiet
 #unzip -j -d unzipped "downloads/*.zip"
 #import to database .  Use tail to check progress.  Make sure disks are not saturated by other usage
-raster2pgsql -a -e -s 4326 -t 100x100 unzipped/*.hgt elevations | psql -d skylines > elevationsImportLog.txt
+#raster2pgsql -a -e -s 4326 -t 100x100 unzipped/*.hgt elevations | psql -d skylines > elevationsImportLog.txt
+#if have this elevations dump, it's simpler:
+pg_restore -d skylines  --data-only  -t elevations /media/sf_srtm/srtmElevDump.custom
+
 # production server
 sudo ufw enable
 systemctl status nginx
