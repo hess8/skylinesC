@@ -34,15 +34,15 @@ sudo apt-get update
 
 sudo apt-get install -y --no-install-recommends \
    python python-dev \
-    
+
 sudo apt-get install -y --no-install-recommends \
     g++-6 pkg-config libcurl4-openssl-dev redis-server\
-    libpq-dev libfreetype6-dev libpng-dev libffi-dev 
+    libpq-dev libfreetype6-dev libpng-dev libffi-dev
 echo 'New libs:'
 sudo apt-get install -y --no-install-recommends \
     ibgeos-c1 liblwgeom-2.2-5
 
-sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt bionic-pgdg main" >> /etc/apt/sources.lis't
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt trusty-pgdg main" >> /etc/apt/sources.list'
 wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | sudo apt-key add -
 sudo apt update
 sudo apt install -y postgresql-10
@@ -50,6 +50,14 @@ sudo apt install -y postgresql-10-postgis-2.4
 sudo apt install -y postgresql-10-postgis-scripts
 sudo apt install -y postgis
 sudo apt install -y postgresql-10-pgrouting
+
+
+##Lines from vagrant file:
+#sudo apt-get install -y --no-install-recommends \
+#    python python-dev \
+#    g++-6 pkg-config libcurl4-openssl-dev git redis-server \
+#    libpq-dev postgresql-9.5-postgis-2.2 postgresql-9.5-postgis-2.2-scripts postgresql-contrib-9.5 \
+#    libfreetype6-dev libpng-dev libffi-dev
 
 # set GCC 6 as default
 
@@ -141,7 +149,7 @@ sudo npm install -y -g bower
 sudo npm install -y -g ember-cli
 
 cd ember
-yarn -d #npm packgas including dev
+yarn -d #npm packages including dev
 sudo bower install --allow-root
 cd ../
 sudo chown $USER -R ~/.config/*
@@ -149,9 +157,19 @@ sudo chown $USER -R ~/.config/*
 # management
 #pipenv run ./manage.py import welt2000 --commit
 
+## elevation data.  Make sure that you have 48 GB extra available for postgresql to grow!
+## don't want to do the download and extracting each time. Importing takes a long time
+#wget -i tiles.txt -P downloads -c --quiet
+#unzip -j -d unzipped "downloads/*.zip"
+##import to database.  Make sure disks are not saturated by other usage.  Will run while database is running
+#raster2pgsql -a -e -s 4326 -t 100x100 /media/sf_srtmSkylinesCondor/*.hgt elevations | psql -d skylines > elevationsImportLog.txt
+##if have this elevations dump, it might be faster, but I'm not sure it can run when the database is running:
+#pg_restore -d skylines  --data-only  -t elevations /media/sf_srtm/srtmElevDump.custom
+
+
 # production server
-sudo ufw enable
-systemctl status nginx
+# sudo ufw enable
+# systemctl status nginx
 
 #pgadmin
 
