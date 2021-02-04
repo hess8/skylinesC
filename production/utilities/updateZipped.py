@@ -19,7 +19,8 @@ def sevenzip(tempPath,landPath):
 #                     archive.writeall(landPath, 'base')  #This seems slow, but uses threads well
 
 mainDir = 'Z:\\Condor\\Landscapes'
-otherDir = 'E:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
+otherDir1 = 'E:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
+otherDir2 = 'F:\\landscapes_for_symlinks2'
 zipDir = 'S:\\Skylines-C\landscapes-zip'
 
 # keepRunning = False
@@ -30,24 +31,22 @@ allZips = []
 
 #update symbolic links
 mainList = os.listdir(mainDir)
-otherList = os.listdir(otherDir)
-for item in otherList:
-    if item not in mainList:
-        print ('Updated symlink for {}.'.format(item))
-        mainPath = '{}\\{}'.format(mainDir,item)
-        otherPath = '{}\\{}'.format(otherDir,item)
-        os.system('mklink /D "{}" "{}"'.format(mainPath,otherPath))
+otherList1 = os.listdir(otherDir1)
+otherList2 = os.listdir(otherDir2)
+
+for dir in [otherDir1, otherDir2]:
+    for item in os.listdir(dir) :
+        if item not in mainList:
+            print ('Updated symlink for {}.'.format(item))
+            mainPath = '{}\\{}'.format(mainDir,item)
+            otherPath = '{}\\{}'.format(dir,item)
+            os.system('mklink /D "{}" "{}"'.format(mainPath,otherPath))
 
 #landscapes
 for item in os.listdir(mainDir):
     if 'WestGermany3' not in item:
         allLands.append(item)
         allLandPaths.append('{}\\{}'.format(mainDir,item))
-
-for item in os.listdir(otherDir):
-    if item not in allLands:
-        allLands.append(item)
-        allLandPaths.append('{}\\{}'.format(otherDir, item))
 
 #zips
 for item in os.listdir(zipDir):
@@ -92,7 +91,7 @@ for i, landPath, in enumerate(allLandPaths):
                 print ('Error creating {}'.format(zipPath))
     else:
         print ('lines', lines)
-        sys.exit('Stop2: version line does not exist')
+        sys.exit('Stop2: version line does not exist for {}'.format(landPath))
 if count>0:
     print ('Moved {} zip files to {}'.format(count, zipDir))
 else:
