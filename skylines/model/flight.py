@@ -10,7 +10,6 @@ from sqlalchemy.types import (
     Integer,
     Float,
     DateTime,
-    String,
     Date,
     Boolean,
     SmallInteger,
@@ -38,14 +37,10 @@ class Flight(db.Model):
     id = db.Column(Integer, autoincrement=True, primary_key=True)
     time_created = db.Column(DateTime, nullable=False, default=datetime.utcnow)
     time_modified = db.Column(DateTime, nullable=False, default=datetime.utcnow)
-    time_igc_upload = db.Column(DateTime, nullable=False, default=datetime.utcnow)
-    flight_plan_md5 = db.Column(String(32), nullable=False)
-    landscape = db.Column(String(32), nullable=False)
-    groupflight_id = db.Column(Integer) #set if it contributes to a group flight
+
     pilot_id = db.Column(
         Integer, db.ForeignKey("users.id", ondelete="SET NULL"), index=True
     )
-
     pilot = db.relationship("User", foreign_keys=[pilot_id])
 
     # Fallback if the pilot is not registered
@@ -63,8 +58,6 @@ class Flight(db.Model):
         Integer, db.ForeignKey("clubs.id", ondelete="SET NULL"), index=True
     )
     club = db.relationship("Club", backref="flights")
-
-
 
     model_id = db.Column(Integer, db.ForeignKey("models.id", ondelete="SET NULL"))
     model = db.relationship("AircraftModel")

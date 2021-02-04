@@ -1,7 +1,4 @@
-## SkylinesCondor Developer
-* Bret Hess (<skylinescondor@gmail.com>)
-
-## Skylines Developers
+## Developers
 
 * Andrey Lebedev (<andrey@lebedev.lt>)
 * Bruno Bonamin (<bruno@bonamin.org>)

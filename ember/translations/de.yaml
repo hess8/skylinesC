@@ -28,8 +28,9 @@ club-has-been-changed: Dein Verein wurde geändert.
 club-was-registered: Dein Verein wurde erfolgreich registriert.
 clubs: Vereine
 comments: Kommentare
+comment-error: Ein Fehler ist aufgetreten bei der Erstellung deines Kommentars. Bitte versuch es später nochmal.
 competition-id: Wettbewerbskennzeichen
-competitions:
+competitions: Wettbewerbe
 confirm-password: Passwort bestätigen
 copilot: Copilot
 count: Anzahl
@@ -81,6 +82,7 @@ followers: Verfolger
 following: Verfolgen
 forgot-password: Passwort vergessen?
 friends: Freunde
+fullscreen-not-supported: Dein Browser unterstützt leider keinen Vollbildmodus. 😢
 generate-new-key: Generiere neuen Key
 generating-new-key: Generiere neuen Key...
 glide-rate: Gleitzahl
@@ -253,7 +255,7 @@ tracking:
   clients: Software
   xcsoar-description: verfügbar ab {release}
   instructions-below: Eine Anleitung findest du weiter unten.
-  available-in-gaggle: jetzt in der aktuellen Version von Gaggle verfügbar
+  skylines-tracker-description: jetzt in der aktuellen Version von SkyLines Tracker verfügbar
   lt24-clients: LiveTrack24 clients
   lt24-description: Du kannst auch jede Software nutzen, die das {livetrack24} Protokoll zum Senden der Positionen an SkyLines benutzt. Trage deinen Live Tracking Key als Benutzernamen ein, wähle ein beliebiges Passwort und nutze {skylines} als Server.
   your-live-tracking-key-is-KEY: 'Dein Live Tracking Key ist: {key}'
@@ -316,3 +318,12 @@ errors:
   email: '{description} muss eine valide Email Adresse sein'
   phone: '{description} muss eine gültige Telefonnummer sein'
   url: '{description} muss eine gültige URL sein'
+weglide:
+  birthday: Geburtstag
+  checkbox-label: Auf WeGlide hochladen
+  example-prefix: 'Beispiel:'
+  upload-failed: Beim Hochladen auf WeGlide ist ein Fehler aufgetreten!
+  upload-in-progress: Hochladen auf WeGlide in Arbeit…
+  user-id: WeGlide Benutzer ID
+  user-id-help: 'Öffne die "Profil" Seite auf <a href="{weglideUrl}" target="_blank" rel="noopener noreferrer">WeGlide</a> und gib dann die ID Nummer aus der URL hier ein.'
+  weglide: WeGlide

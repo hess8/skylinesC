@@ -10,6 +10,7 @@ from flask_oauthlib.provider.oauth2 import log
 from flask_oauthlib.utils import decode_base64
 from oauthlib.common import to_unicode
 from oauthlib.oauth2.rfc6749.tokens import random_token_generator
+from sentry_sdk import set_user as set_sentry_user
 
 from skylines.database import db
 from skylines.model import User, Client, RefreshToken, AccessToken
@@ -55,12 +56,15 @@ class CustomProvider(OAuth2Provider):
             user = User.by_credentials(username, password)
 
             request.user_id = user.id if user else None
+            set_sentry_user({"id": request.user_id})
+
             return (user is not None), None
 
         else:
             valid, req = super(CustomProvider, self).verify_request(scopes)
 
             request.user_id = req.access_token.user_id if valid else None
+            set_sentry_user({"id": request.user_id})
 
             return valid, req
 
@@ -119,7 +123,7 @@ class CustomRequestValidator(OAuth2RequestValidator):
 
     @staticmethod
     def tokensetter(token, request, *args, **kwargs):
-        """ Save a new token to the database.
+        """Save a new token to the database.
 
         :param token: Token dictionary containing access and refresh tokens, plus token type.
         :param request: Request dictionary containing information about the client and user.

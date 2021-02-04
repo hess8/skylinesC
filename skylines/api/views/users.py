@@ -99,7 +99,7 @@ def recover_step1_post(json):
 
     current_user = User.get(request.user_id) if request.user_id else None
     if current_user and current_user.admin:
-        url = u"http://skylinescondor.com/users/recover?key=%x" % user.recover_key
+        url = u"http://skylines.aero/users/recover?key=%x" % user.recover_key
         return jsonify(url=url)
 
     try:
@@ -116,7 +116,7 @@ def send_recover_mail(user):
 you have asked to recover your password (from IP %s).  To enter a new
 password, click on the following link:
 
- http://skylinescondor.com/users/recover?key=%x
+ http://skylines.aero/users/recover?key=%x
 
 The SkyLines Team
 """ % (
@@ -210,7 +210,7 @@ def _distance_flight(user, distance, schema):
 
 
 def _distance_flights(user):
-    schema = FlightSchema(only=("id", "flightDate", "distance"))
+    schema = FlightSchema(only=("id", "scoreDate", "distance"))
 
     return {
         "50km": _distance_flight(user, 50000, schema),
@@ -276,8 +276,6 @@ def read(user_id):
     if request.user_id:
         current_user = User.get(request.user_id)
         user_json["followed"] = current_user.follows(user)
-        if current_user.admin: #include email of user for admins
-            user_json["email_address"] = user.email_address
 
     if "extended" in request.args:
         user_json["distanceFlights"] = _distance_flights(user)

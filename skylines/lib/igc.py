@@ -8,9 +8,8 @@ from datetime import datetime
 from . import base36
 from .string import import_ascii, import_alnum
 from skylines.lib.types import is_string, is_bytes
-from skylines.lib.files import read_file, write_file
 
-hfdte_re = re.compile(br"HFDTE(\d{6})", re.IGNORECASE)
+hfdte_re = re.compile(br"HFDTE(?:DATE:?)?(\d{6})", re.IGNORECASE)
 hfgid_re = re.compile(br"HFGID\s*GLIDER\s*ID\s*:(.*)", re.IGNORECASE)
 hfgty_re = re.compile(br"HFGTY\s*GLIDER\s*TYPE\s*:(.*)", re.IGNORECASE)
 hfcid_re = re.compile(br"HFCID.*:(.*)", re.IGNORECASE)
@@ -18,8 +17,8 @@ afil_re = re.compile(br"AFIL(\d*)FLIGHT", re.IGNORECASE)
 
 
 def read_igc_headers(f):
-    """ Read IGC file headers from a file-like object, a list of strings or a
-    file if the parameter is a path. """
+    """Read IGC file headers from a file-like object, a list of strings or a
+    file if the parameter is a path."""
 
     if is_string(f):
         try:
@@ -59,18 +58,6 @@ def read_igc_headers(f):
 
     return igc_headers
 
-def read_condor_fpl(file):
-    lines = read_file(file)
-    fpl_lines = []
-    landscape = None
-    strsExcluded = ['Class','Name=','Water','Fixed','CGBia','RandS'] #5 characters
-    for line in lines[-400:]:
-        if line.startswith(b"LCONFPL") and line[7:12] not in strsExcluded: #first 5 characters after LCONFPLg
-            fpl_lines.append(line)
-            if "landscape" in line.lower():
-                landscape = line.split("=")[1].strip()
-
-    return fpl_lines, landscape
 
 def parse_logger_id(line):
     # non IGC loggers may use more than 3 characters as unique ID.

@@ -1,4 +1,4 @@
-from marshmallow import Schema as _Schema
+from marshmallow import Schema as _Schema, pre_load, post_load, ValidationError
 
 from . import fields, validate
 
@@ -11,8 +11,6 @@ from skylines.lib.formatter.units import (
 from skylines.lib.string import isnumeric
 from skylines.model.flight_phase import FlightPhase
 
-'''Schemas is for mapping variables between front and back end, not with database'''
-
 AIRCRAFT_MODEL_TYPES = {
     0: "unspecified",
     1: "glider",
@@ -22,10 +20,12 @@ AIRCRAFT_MODEL_TYPES = {
     5: "ul",
 }
 
+
 class Schema(_Schema):
     class Meta(_Schema.Meta):
         ordered = True
         strict = True
+
 
 class AircraftModelSchema(Schema):
     id = fields.Integer(dump_only=True)
@@ -73,11 +73,7 @@ class ClubSchema(Schema):
     owner = fields.Nested(
         "skylines.schemas.schemas.UserSchema", only=("id", "name"), dump_only=True
     )
-    email = fields.String(
-        attribute="email_address",
-        allow_none=True,
-        validate=(validate.Email(), validate.Length(max=255)),
-    )
+
 
 class UserSchema(Schema):
     id = fields.Integer(dump_only=True)
@@ -155,17 +151,17 @@ class IGCFileSchema(Schema):
     owner = fields.Nested(UserSchema, only=("id", "name"))
 
     filename = fields.String(strip=True)
-    time_file_modified = fields.DateTime()
+
     registration = fields.String(strip=True, validate=validate.Length(max=32))
     competitionId = fields.String(
         attribute="competition_id", strip=True, validate=validate.Length(max=5)
     )
-    model = fields.String(strip=True, validate=validate.Length(max=64)) #glider model
+    model = fields.String(strip=True, validate=validate.Length(max=64))
 
     date = fields.Date(attribute="date_utc")
-    flight_plan_md5 = fields.String()
-    landscape = fields.String()
-    md5 = fields.String()
+
+    weglideStatus = fields.Integer(attribute="weglide_status")
+    weglideData = fields.Raw(attribute="weglide_data")
 
     class Meta(Schema.Meta):
         load_only = ("ownerId",)
@@ -174,7 +170,8 @@ class IGCFileSchema(Schema):
 
 class FlightSchema(Schema):
     id = fields.Integer()
-    groupflight_id = fields.Integer()
+    timeCreated = fields.DateTime(attribute="time_created")
+
     pilotId = fields.Integer(attribute="pilot_id", allow_none=True)
     pilot = fields.Nested(UserSchema, only=("id", "name"))
     pilotName = fields.String(
@@ -208,14 +205,13 @@ class FlightSchema(Schema):
         validate=validate.Length(max=5),
     )
 
-    flightDate = fields.Date(attribute="date_local")
-    timeCreated = fields.DateTime(attribute="time_created")
-    time_igc_upload = fields.DateTime()
+    scoreDate = fields.Date(attribute="date_local")
+
     takeoffTime = fields.DateTime(attribute="takeoff_time")
     scoreStartTime = fields.DateTime(attribute="scoring_start_time")
     scoreEndTime = fields.DateTime(attribute="scoring_end_time")
     landingTime = fields.DateTime(attribute="landing_time")
-    landscape = fields.String()
+
     takeoffAirportId = fields.Integer(attribute="takeoff_airport_id", allow_none=True)
     takeoffAirport = fields.Nested(
         AirportSchema, attribute="takeoff_airport", only=("id", "name", "countryCode")
@@ -237,7 +233,16 @@ class FlightSchema(Schema):
     igcFile = fields.Nested(
         IGCFileSchema,
         attribute="igc_file",
-        only=("owner", "filename", "registration", "competitionId", "model", "date", "flight_plan_md5", "time_modified"),
+        only=(
+            "owner",
+            "filename",
+            "registration",
+            "competitionId",
+            "model",
+            "date",
+            "weglideStatus",
+            "weglideData",
+        ),
     )
 
     class Meta(Schema.Meta):
@@ -261,27 +266,47 @@ class FlightSchema(Schema):
             "igcFile",
         )
 
-class GroupflightSchema(Schema):
-    id = fields.Integer()
-    club_id = fields.Integer()
-    club = fields.Nested(ClubSchema, only=("id", "name"))
-    flight_plan_md5 = fields.String()
-    time_created = fields.DateTime()
-    time_modified = fields.DateTime()
-    date_flight = fields.DateTime()
-    landscape = fields.String()
-    takeoffAirportId = fields.Integer(attribute="takeoff_airport_id", allow_none=True)
-    takeoffAirport = fields.Nested(
-        AirportSchema, attribute="takeoff_airport", only=("id", "name", "countryCode")
+
+class FlightUploadSchema(Schema):
+    pilotId = fields.Integer(attribute="pilot_id", allow_none=True)
+    pilotName = fields.String(
+        attribute="pilot_name",
+        strip=True,
+        allow_none=True,
+        validate=validate.Length(max=255),
     )
+    weglideBirthday = fields.Date()
+    weglideUserId = fields.Integer()
+
+    @pre_load
+    def pre_load(self, in_data, **kwargs):
+        data = in_data.copy()
+        if data.get("pilotId") == "":
+            del data["pilotId"]
+        if data.get("pilotName") == "":
+            del data["pilotName"]
+        if data.get("weglideBirthday") == "":
+            del data["weglideBirthday"]
+        if data.get("weglideUserId") == "":
+            del data["weglideUserId"]
+
+        if not data.get("pilotId") and not data.get("pilotName"):
+            raise ValidationError("Either pilotName or pilotId must be set")
+
+        return data
+
+    @post_load
+    def remove_name_if_id_is_set(self, data, **kwargs):
+        if data.get("pilot_id") and data.get("pilot_name"):
+            del data["pilot_name"]
+
+        return data
+
 
 class FlightCommentSchema(Schema):
     user = fields.Nested(UserSchema, only=("id", "name"))
     text = fields.String(required=True)
 
-class GroupflightCommentSchema(Schema):
-    user = fields.Nested(UserSchema, only=("id", "name"))
-    text = fields.String(required=True)
 
 class TrackingFixSchema(Schema):
     time = fields.DateTime()

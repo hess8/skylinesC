@@ -30,9 +30,9 @@ def test_deserialization_passes_for_valid_name():
 
 
 def test_deserialization_passes_for_valid_website():
-    data = ClubSchema(partial=True).load(dict(website="https://skylinescondor.com")).data
+    data = ClubSchema(partial=True).load(dict(website="https://skylines.aero")).data
 
-    assert data["website"] == "https://skylinescondor.com"
+    assert data["website"] == "https://skylines.aero"
 
 
 def test_deserialization_passes_for_empty_website():

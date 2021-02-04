@@ -3,7 +3,8 @@ from fabric.api import env, task, local, cd, lcd, run, sudo, put
 from tempfile import NamedTemporaryFile
 
 env.use_ssh_config = True
-env.hosts = ["skylines@skylinescondor.com"]
+env.hosts = ["skylines@skylines"]
+env.timeout = 30
 
 APP_DIR = "/home/skylines"
 SRC_DIR = "%s/src" % APP_DIR
@@ -18,7 +19,7 @@ def deploy(branch="master", force=False):
 @task
 def deploy_ember():
     with lcd("ember"):
-        local("node_modules/.bin/ember deploy production -v")
+        local("node_modules/.bin/ember deploy production -v --activate")
 
 
 @task

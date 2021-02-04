@@ -33,7 +33,7 @@ def expected_basic_flight_json(flight):
         u"model": None,
         u"registration": None,
         u"competitionId": None,
-        u"flightDate": u"2011-06-18",
+        u"scoreDate": u"2011-06-18",
         u"takeoffTime": u"2011-06-18T09:11:23+00:00",
         u"scoreStartTime": None,
         u"scoreEndTime": None,
@@ -53,6 +53,8 @@ def expected_basic_flight_json(flight):
             u"competitionId": None,
             u"model": None,
             u"date": u"2011-06-18",
+            u"weglideStatus": None,
+            u"weglideData": None,
         },
     }
 
@@ -73,7 +75,7 @@ def test_basic_flight_json(db_session, client):
     db_session.commit()
 
     # upload flight
-    data = dict(files=(igcs.simple_path,))
+    data = dict(pilotId=john.id, files=(igcs.simple_path,))
     res = client.post("/flights/upload", headers=auth_for(john), data=data)
     assert res.status_code == 200
     flight_id = res.json["results"][0]["flight"]["id"]
@@ -149,7 +151,7 @@ def test_filled_flight(db_session, client):
             },
             u"registration": u"D-1234",
             u"competitionId": u"701",
-            u"flightDate": u"2011-06-18",
+            u"scoreDate": u"2011-06-18",
             u"takeoffTime": u"2016-12-30T11:12:23+00:00",
             u"scoreStartTime": u"2016-12-30T11:17:23+00:00",
             u"scoreEndTime": u"2016-12-30T16:04:40+00:00",
@@ -177,6 +179,8 @@ def test_filled_flight(db_session, client):
                 u"competitionId": u"TH",
                 u"model": u"Hornet",
                 u"date": u"2017-01-15",
+                u"weglideStatus": None,
+                u"weglideData": None,
             },
         }
     }
@@ -269,6 +273,8 @@ def test_meetings(db_session, client):
                         },
                         u"model": None,
                         u"competitionId": None,
+                        u"weglideStatus": None,
+                        u"weglideData": None,
                     },
                 },
                 u"times": [

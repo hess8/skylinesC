@@ -1,17 +1,15 @@
-from datetime import datetime, date, timedelta
+from datetime import datetime
 from tempfile import TemporaryFile
 from zipfile import ZipFile
 from enum import IntEnum
 import hashlib
-import os, re
-import dateutil.parser as dparser
+import os
 
 from collections import namedtuple
 
 from flask import Blueprint, request, current_app, abort, make_response
 from redis.exceptions import ConnectionError
 from sqlalchemy.sql.expression import func
-from typing import Any, Union
 
 from skylines.api.json import jsonify
 from skylines.api.cache import cache
@@ -32,12 +30,12 @@ from skylines.schemas import (
     AirspaceSchema,
     AircraftModelSchema,
     FlightSchema,
+    FlightUploadSchema,
     UserSchema,
     Schema,
     ValidationError,
 )
 from skylines.worker import tasks
-from skylines.api.views.groupflights import groupflight_actions
 
 from geoalchemy2.shape import from_shape
 from sqlalchemy.sql import literal_column
@@ -63,8 +61,6 @@ class UploadStatus(IntEnum):
     PARSER_ERROR = 3  # _('Failed to parse file')
     NO_FLIGHT = 4  # _('No flight found in file')
     FLIGHT_IN_FUTURE = 5  # _('Date of flight in future')
-    NOT_CONDOR = 6 # _('File is not a Condor flight')
-    DATE_NOT_IN_FILENAME = 7  # _('File is not a Condor flight')
 
 
 class UploadResult(
@@ -92,14 +88,6 @@ class UploadResult(
     @classmethod
     def for_future_flight(cls, name, prefix):
         return cls(name, None, UploadStatus.FLIGHT_IN_FUTURE, prefix, None, None, None)
-
-    @classmethod
-    def not_condor(cls, name, prefix):
-        return cls(name, None, UploadStatus.NOT_CONDOR, prefix, None, None, None)
-
-    @classmethod
-    def date_not_in_filename(cls, name, prefix):
-        return cls(name, None, UploadStatus.DATE_NOT_IN_FILENAME, prefix, None, None, None)
 
 
 class TraceSchema(Schema):
@@ -197,71 +185,35 @@ def _encode_flight_path(fp, qnh):
         igc_end_time=fp[-1].datetime,
     )
 
-def get_date_from_name(filename):
-    #Local date must be somewhere in the file name.  It will guess a date if ambiguous
-    now = datetime.utcnow()
-    condorCreation = dparser.parse('2005-04-05')
-    filename = filename.replace(".igc", "").replace('_', '-').replace(' ', '-').replace('.', '-').replace(',', '-')
-    filename = re.sub("[A-Za-z]", "", filename)  # keep only digits and separators
-    try:
-        trialDate = dparser.parse(filename, fuzzy=True)
-        if condorCreation <= trialDate <= now + timedelta(hours=24): #reasonable dates
-            return trialDate  # success
-        else:
-            raise Exception('Bad date')
-    except: #run through 10-character segments of string (maximum length of date YYYYxMMxDD):
-        for istart in range(0,len(filename)-10):
-            if filename[istart].isdigit(): #check only strings starting with digit, not separator
-                try:
-                    # print 'test', filename[istart:istart + 10]
-                    trialDate = dparser.parse(filename[istart:istart+10], fuzzy=True)
-                except:
-                    continue
-                else:
-                    if condorCreation <= trialDate <= now + timedelta(hours=24): #reasonable dates
-                        return trialDate #success
-            else:
-                continue
-        return dparser.parse('', fuzzy=True) #this line will throw an error
-
 
 @upload_blueprint.route("/flights/upload", methods=("POST",), strict_slashes=False)
 @oauth.required()
 def index_post():
     current_user = User.get(request.user_id)
 
-    form = request.form
-
-    if form.get("pilotId") == u"":
-        form = form.copy()
-        form.pop("pilotId")
     try:
-        data = FlightSchema(only=("pilotId", "pilotName")).load(form).data
+        data = FlightUploadSchema().load(request.form).data
     except ValidationError as e:
         return jsonify(error="validation-failed", fields=e.messages), 422
 
     pilot_id = data.get("pilot_id")
-    pilot = pilot_id and User.get(pilot_id)
-    pilot_id = pilot and pilot.id
+    if pilot_id:
+        pilot = User.get(pilot_id)
+        if not pilot:
+            return jsonify(error="unknown-pilot"), 422
+    else:
+        pilot = None
 
     club_id = (pilot and pilot.club_id) or current_user.club_id
 
     results = []
+    weglide_uploads = []
 
     _files = request.files.getlist("files")
 
     prefix = 0
     for name, f in iterate_upload_files(_files):
-        igc_file = IGCFile()
         prefix += 1
-        try:
-            igc_file.date_condor = get_date_from_name(name) #name differs from filename which has _1 etc appended
-            igc_file.time_created = igc_file.date_condor
-            igc_file.time_modified = datetime.utcnow()
-        except:
-            files.delete_file(name)
-            results.append(UploadResult.date_not_in_filename(name, str(prefix)))
-            continue
         filename = files.sanitise_filename(name)
         filename = files.add_file(filename, f)
 
@@ -274,39 +226,33 @@ def index_post():
                 results.append(UploadResult.for_duplicate(name, other, str(prefix)))
                 continue
 
+        igc_file = IGCFile()
         igc_file.owner = current_user
         igc_file.filename = filename
         igc_file.md5 = md5
-        igc_file.update_igc_headers() #gets condor flight plan and flight_plan_md5
-        if not igc_file.is_condor_file:
-            files.delete_file(filename)
-            results.append(UploadResult.not_condor(name, str(prefix)))
-            continue
-
-        igc_file.date_utc = igc_file.date_condor
+        igc_file.update_igc_headers()
 
         if igc_file.date_utc is None:
             files.delete_file(filename)
             results.append(UploadResult.for_missing_date(name, str(prefix)))
             continue
 
-        flight = Flight() #instance
-        flight.pilot_id = pilot_id or current_user.id
-        flight.pilot_name = data.get("pilot_name") or current_user.name
+        flight = Flight()
+        flight.pilot_id = pilot_id
+        flight.pilot_name = data.get("pilot_name")
         flight.club_id = club_id
-        flight.landscape = igc_file.landscape
-        flight.flight_plan_md5 = igc_file.flight_plan_md5
-        flight.time_created = igc_file.date_condor
-        flight.time_modified = datetime.utcnow()
-        flight.time_igc_upload = igc_file.time_modified
-        flight.date_local = igc_file.date_condor
-        flight.model_id = igc_file.get_model()
         flight.igc_file = igc_file
-        flight.registration = igc_file.registration
+
+        flight.model_id = igc_file.guess_model()
+
+        if igc_file.registration:
+            flight.registration = igc_file.registration
+        else:
+            flight.registration = igc_file.guess_registration()
+
         flight.competition_id = igc_file.competition_id
 
-        # fp = flight_path(flight.igc_file, add_elevation=True, max_points=None)
-        fp = flight_path(igc_file, add_elevation=True, max_points=None)
+        fp = flight_path(flight.igc_file, add_elevation=True, max_points=None)
 
         analyzed = False
         try:
@@ -324,7 +270,7 @@ def index_post():
             results.append(UploadResult.for_no_flight(name, str(prefix)))
             continue
 
-        if flight.time_created > datetime.utcnow():
+        if flight.landing_time > datetime.now():
             files.delete_file(filename)
             results.append(UploadResult.for_future_flight(name, str(prefix)))
             continue
@@ -334,8 +280,7 @@ def index_post():
             results.append(UploadResult.for_no_flight(name, str(prefix)))
             continue
 
-        # flight.privacy_level = Flight.PrivacyLevel.PRIVATE
-        flight.privacy_level = Flight.PrivacyLevel.PUBLIC #bch
+        flight.privacy_level = Flight.PrivacyLevel.PRIVATE
 
         trace = _encode_flight_path(fp, qnh=flight.qnh)
         infringements = get_airspace_infringements(fp, qnh=flight.qnh)
@@ -345,6 +290,21 @@ def index_post():
 
         # flush data to make sure we don't get duplicate files from ZIP files
         db.session.flush()
+
+        # Queue WeGlide upload if requested
+        weglide_user_id = data.get("weglideUserId")
+        weglide_birthday = data.get("weglideBirthday")
+        if weglide_user_id and weglide_birthday:
+            # Save `upload_to_weglide` task parameters for later. We can't start
+            # the task directly here, because the DB transaction has not been
+            # committed at this point.
+            weglide_uploads.append(
+                (igc_file.id, weglide_user_id, weglide_birthday.isoformat())
+            )
+
+            # Update `weglide_status` in the database
+            igc_file.weglide_status = 1
+            db.session.flush()
 
         # Store data in cache for image creation
         cache_key = hashlib.sha1(
@@ -374,12 +334,13 @@ def index_post():
             )
         )
 
-
-        groupflight_actions(flight, igc_file)
-
         create_flight_notifications(flight)
 
     db.session.commit()
+
+    # Schedule the deferred WeGlide upload tasks from above
+    for weglide_upload in weglide_uploads:
+        tasks.upload_to_weglide.delay(*weglide_upload)
 
     results = UploadResultSchema().dump(results, many=True).data
 
@@ -489,7 +450,7 @@ def verify():
             flight.club_id = users[flight.pilot_id].club_id
 
         flight.privacy_level = Flight.PrivacyLevel.PUBLIC
-
+        flight.time_modified = datetime.utcnow()
 
     db.session.commit()
 

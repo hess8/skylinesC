@@ -20,9 +20,8 @@ def _list():
     airspaces = airspace_list_schema.dump(
         Airspace.by_location(location).all(), many=True
     ).data
-    # waves = wave_list_schema.dump(
-    #     MountainWaveProject.by_location(location), many=True
-    # ).data
+    waves = wave_list_schema.dump(
+        MountainWaveProject.by_location(location), many=True
+    ).data
 
-    return jsonify(airspaces=airspaces)
-    # return jsonify(airspaces=airspaces, waves=waves)
+    return jsonify(airspaces=airspaces, waves=waves)

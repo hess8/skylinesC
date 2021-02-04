@@ -1,6 +1,6 @@
 # Installing SkyLines
 
-*SkyLines* has many dependencies and is not always easy to install for
+*SkyLines* has quite many dependencies and is not always easy to install for
 new developers. Please don't hesitate to
 [ask for help](README.md#contact-and-contributing) if you hit any roadblocks.
 
@@ -9,10 +9,9 @@ our developers use Ubuntu or Debian too. We recommend to use either one of
 those systems for development, but it may also be possible to make it work on
 OS X or Windows.
 
-There is also a [Vagrant](http://www.vagrantup.com/) environment for
-*SkyLines*. This makes it possible to run a virtual machine with Ubuntu
-dedicated to *SkyLines* development on OS X or Windows. More information
-can be found in [INSTALL.vagrant.md](INSTALL.vagrant.md).
+There is also a [Docker](http://www.docker.com/) environment for *SkyLines*. 
+This makes it possible to run a containerized *SkyLines* development 
+environment. More information can be found in [INSTALL.docker.md](INSTALL.docker.md).
 
 
 ## Python, Flask and other dependencies

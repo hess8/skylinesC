@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import { computed } from '@ember/object';
 import { oneWay, equal } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 
@@ -24,10 +25,10 @@ const Validations = buildValidations({
 });
 
 export default Component.extend(Validations, {
+  tagName: '',
+
   ajax: service(),
   account: service(),
-
-  classNames: ['panel-body'],
 
   clubMembers: null,
   pilotName: null,
@@ -38,21 +39,55 @@ export default Component.extend(Validations, {
 
   showPilotNameInput: equal('pilotId', null),
 
+  uploadToWeGlide: false,
+  weglideUserId: null,
+  weglideBirthday: null,
+
+  weglideBirthdayIsValid: computed('weglideBirthday', function () {
+    return /^\d{4}-\d{2}-\d{2}$/.test(this.weglideBirthday);
+  }),
+
+  submitDisabled: computed(
+    'uploadToWeGlide',
+    'weglideUserId',
+    'weglideBirthday',
+    'uploadTask.isRunning',
+    'validations.isValid',
+    function () {
+      if (this.uploadToWeGlide && (!this.weglideUserId || !this.weglideBirthday)) return true;
+
+      return this.uploadTask.isRunning || !this.validations.isValid;
+    },
+  ),
+
   actions: {
     setFilesFromEvent(event) {
-      this.set('files', event.target.value);
+      this.set('files', event.target.files);
     },
 
-    async submit() {
+    async submit(event) {
+      event.preventDefault();
+
       let { validations } = await this.validate();
       if (validations.get('isValid')) {
-        this.uploadTask.perform();
+        this.uploadTask.perform(event.target);
       }
+    },
+
+    toggleWeGlide(event) {
+      this.set('uploadToWeGlide', event.target.checked);
+    },
+
+    updateWeGlideUserId(userId) {
+      this.set('weglideUserId', userId);
+    },
+
+    updateWeGlideBirthday(event) {
+      this.set('weglideBirthday', event.target.value);
     },
   },
 
-  uploadTask: task(function*() {
-    let form = this.element.querySelector('form');
+  uploadTask: task(function* (form) {
     let data = new FormData(form);
 
     try {

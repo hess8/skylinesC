@@ -1,6 +1,4 @@
 # SkyLines
-*SkyLinesCondor* is a version of *SkyLines* for the Condor soaring simulator. It is at <http://skylinescondor.com>
-For *SkylinesCondor* information, contact [Bret Hess]: mailto:skylinescondor@gmail.com
 
 *SkyLines* is a web platform where pilots can share their flights with others
 after, or even during flight via live tracking.  *SkyLines* is a sort of social
@@ -13,9 +11,9 @@ other similar platforms.
 sharing some code with XCSoar in the algorithmic areas and is providing the
 base for XCSoar's live tracking functionalities.
 
-*SkyLines* is at <http://skylines.aero>.
-
-*SkyLinesCondor* is a recent branch for Condor simulator igcs. <http://skylinescondor.com>.
+*SkyLines* is far from finished yet, but it has been running in production for
+quite some time now. You can reach the official server at
+<http://www.skylines.aero>.
 
 Build Status: [![Build Status](https://travis-ci.org/skylines-project/skylines.png?branch=master)](https://travis-ci.org/skylines-project/skylines)
 
@@ -24,7 +22,7 @@ Build Status: [![Build Status](https://travis-ci.org/skylines-project/skylines.p
 The *SkyLines* source code is managed with [git](http://www.git-scm.com/).
 It can be downloaded with the following command:
 
-    $ git clone git://github.com/hess8/skylinesC.git
+    $ git clone git://github.com/skylines-project/skylines.git
 
 For more information, please refer to the [git documentation](http://git-scm.com/documentation).
 
@@ -45,14 +43,19 @@ development is described in the [INSTALL.md](INSTALL.md) file.
 
 ## Contact and Contributing
 
-For SkylinesCondor information, contact [Bret Hess]: mailto:skylinescondor@gmail.com
-
-For Skylines (real glider flights) join [Slack](https://skylines-slack.herokuapp.com/) community.
+You read about news on [Facebook](https://www.facebook.com/skylines.project) and
+[Twitter](https://twitter.com/skylinesproject). If you want to talk to us directly
+join our [Slack](https://skylines-slack.herokuapp.com/) community.
 
 Bugs and feature request can be submitted here on
-[GitHub](https://github.com/hess8/skylinesC/issues). New ideas can
+[GitHub](https://github.com/skylines-project/skylines/issues). New ideas can
 also be discussed in the
-[Wiki](https://github.com/hess8/skylinesC/wiki) first.
+[Wiki](https://github.com/skylines-project/skylines/wiki) first.
+
+Patches should be submitted using the
+[Pull Request](https://github.com/skylines-project/skylines/pulls) system of
+GitHub because of the integration with
+[TravisCI](https://travis-ci.org/skylines-project/skylines).
 
 Here are a few guidelines for creating patches:
 

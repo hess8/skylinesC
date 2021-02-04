@@ -1,9 +1,11 @@
-<HeadLayout />
-{{title "SkyLines"}}
+{{page-title "SkyLines"}}
+
+<ProgressBar/>
+<NotificationContainer @zindex="7000"/>
 
 {{#if onFreestyleRoute}}
   {{outlet}}
 {{else}}
-  <NavBar @onSearch={{action "search"}} />
+  <NavBar @onSearch={{this.search}} />
   {{outlet}}
 {{/if}}
