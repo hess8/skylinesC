@@ -37,7 +37,6 @@ confirm-password: Confirm password
 contact: Contact
 contact-admin: Email admin
 contact-content: with questions or suggestions.
-contact-torrents: if you see errors or have questions.
 copilot: Copilot
 count: Count
 create: Create
@@ -69,7 +68,6 @@ DISTANCE-on-DATE: '{distance} on {date}'
 DISTANCE-on-DATE-by-PILOT: '{distance} on {date} by {pilot}'
 DISTANCE-on-DATE-by-PILOT-and-COPILOT: '{distance} on {date} by {pilot} and {copilot}'
 dont-have-an-account: Don't have an account?
-download-torrent: Download torrent files
 duplicate-file: Duplicate file
 duration: Duration
 edit: Edit
@@ -80,7 +78,6 @@ email-exists-already: This email address exists already.
 email-for-info: Email for info
 email-unknown: This email address is unknown.
 error-text: There was an error while loading this page. Please try again later!
-extract-with: Extract with
 fai-triangle-distance: FAI Triangle Distance
 failed-to-parse-file: Failed to parse file
 file-upload-field: File upload field
@@ -121,8 +118,6 @@ landing: Landing
 landing-time: Landing time
 landscape: Landscape
 landscapes: Landscapes
-landscapes-download: All landscapes are for Condor 2, and download as a single file.
-landscapes-paste: and paste each folder in Condor2/Landscapes.
 last-12-months: Last 12 Months
 last-fix: Last Fix
 last-name: Last name
@@ -194,7 +189,6 @@ publish-flight: Publish Flight
 publish-flight-confirmation-text: Confirm to publish this flight...
 publish-flights: '{num, plural, =1 {Publish Flight} other {Publish Flights}}'
 publishing: Publishing
-qbittorent: which is a great download manager for these large files.
 ranking: Ranking
 recover-password: Recover Password
 recovering: Recovering...
@@ -229,15 +223,6 @@ time: Time
 TIME-by-USER: '{time}<br>by <a href="{userURL}">{user}</a>'
 timeline: Timeline
 title: Public comment or title
-torrent: Download one or many torrent files, and open them all together in qBittorrent; your downloads will start.
-torrent-after: After you have downloaded and extracted your landscape files, leave the .7z files on your computer and qBittorrent will help the next guy get them faster!
-torrent-share: Please share
-torrent-seed: ("seed") at least one of these .7z files yourself to help others get them faster. You can see on qBittorrent (Seeds column) that many files have only two or three people seeding them ("0(2)" or "0(3)") at the moment.  Let's increase that!
-torrent-easy: It's easy to seed.
-torrent-run: Just run qBittorent when your computer is on (set to run when computer starts), and leave the .7z files where they are, and you will be seeding them for others!
-torrent-magnet: Option. Instead of downloading the torrent file, click on "magnet" and it will open a
-torrent-maglink: magnet link
-torrent-magopen: which should open directly in qBittorrent and start downloading.
 total: Total
 total-score: Total Score
 tracking-callsign: Tracking Callsign
@@ -288,6 +273,24 @@ circling-direction:
   right: Right
   mixed: Mixed
   total: Total
+landscapesPage:
+  download: All landscapes are for Condor 2, and download as a single file.
+  paste: and paste each folder in Condor2/Landscapes.
+  qbittorent: which is a great download manager for these large files,
+  before: before clicking on the links.
+  extract-with: Extract with
+  after: After you have downloaded and extracted your landscape files, leave the .7z files on your computer and qBittorrent will help the next guy get them faster!
+  contact: if you see errors or have questions.
+  share: Please share
+  seed: ("seed") at least one of these .7z files yourself to help others get them faster. You can see on qBittorrent (Seeds column) that many files have only two or three people seeding them ("0(2)" or "0(3)") at the moment.  Let's increase that!
+  easy: It's easy to seed.
+  run: Just run qBittorent when your computer is on (set to run when computer starts), and leave the .7z files where they are, and you will be seeding them for others!  "Ratio" shows what fraction of a file you have shared.
+  magnet: These are "magnet links", and should open directly in qBittorrent or other torrent manager and start downloading immediately.
+  maglink: magnet link
+  magopen: which should open directly in qBittorrent and start downloading.
+  see: See this
+  map: world map
+  locations: for the location of all landscapes.
 errors:
   description: This field
   inclusion: '{description} is not included in the list'
