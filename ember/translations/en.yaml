@@ -158,7 +158,7 @@ no-flights-found: No flights found.
 no-live-tracks-of-pilots: '{num, plural, =1 {There is currently no live track of this pilot available.} other {There are currently no live tracks of these pilots available.}}'
 no-pilots-found: No pilots found.
 no-data: No data found...
-not-condor: File is not a Condor flight.  Submit real-life flights to skylines.aero.
+not-condor: You submitted a file that is not a Condor .igc file.  Submit real-life flights to skylines.aero.
 notifications: Notifications
 olc-distance: OLC Distance
 older: Older
@@ -277,7 +277,8 @@ landscapesPage:
   download: All landscapes are for Condor 2, and download as a single file.
   paste: and paste each folder in Condor2/Landscapes.
   qbittorent: which is a great download manager for these large files,
-  before: before clicking on the links.
+  before: before clicking on the links.  
+  many: You can download many landscapes at the same time.  Downloads are fast if you have fast internet. Works with slow internet and always resumes after interruptions. 
   extract-with: Extract with
   after: After you have downloaded and extracted your landscape files, leave the .7z files on your computer and qBittorrent will help the next guy get them faster!
   contact: if you see errors or have questions.
