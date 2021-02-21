@@ -21,7 +21,24 @@ def sevenzip(tempPath,landPath):
 mainDir = 'Z:\\Condor\\Landscapes'
 otherDir1 = 'E:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
 otherDir2 = 'F:\\landscapes_for_symlinks2'
+iniOnlyDir1 = 'E:\\landscapes_ini_only'
+iniOnlyDir2 = 'F:\\landscapes_ini_only2'
 zipDir = 'S:\\Skylines-C\landscapes-zip'
+
+#remove extra files from ini_only dirs:
+for dir in [iniOnlyDir1,iniOnlyDir2]:
+    for landscape in os.listdir(dir):
+        for item in os.listdir(os.path.join(dir,landscape)):
+            if not '.ini' in item:
+                print ('Removing all but .ini in {}'.format(landscape))
+                break
+        for item in os.listdir(os.path.join(dir,landscape)):
+            if not '.ini' in item:   
+                if os.path.isdir(os.path.join(dir,landscape,item)):
+#                     shutil.rmtree(os.path.join(dir,landscape,item))
+                    os.system('rmdir /S /Q "{}"'.format(os.path.join(dir,landscape,item)))
+                else:
+                    os.remove(os.path.join(dir,landscape,item))
 
 # keepRunning = False
 # while keepRunning: #loops infinitely
@@ -34,7 +51,7 @@ mainList = os.listdir(mainDir)
 otherList1 = os.listdir(otherDir1)
 otherList2 = os.listdir(otherDir2)
 
-for dir in [otherDir1, otherDir2]:
+for dir in [otherDir1, otherDir2,iniOnlyDir1,iniOnlyDir2]:
     for item in os.listdir(dir) :
         if item not in mainList:
             print ('Updated symlink for {}.'.format(item))
@@ -42,7 +59,7 @@ for dir in [otherDir1, otherDir2]:
             otherPath = '{}\\{}'.format(dir,item)
             os.system('mklink /D "{}" "{}"'.format(mainPath,otherPath))
 
-#landscapes
+#landscapes are all represented in mainDir now.
 for item in os.listdir(mainDir):
     if 'WestGermany3' not in item:
         allLands.append(item)
@@ -58,9 +75,12 @@ for item in os.listdir(mainDir):
     if 'temp' in item:
         tempPath = mainDir+'\\{}'.format(item)
         os.remove(tempPath)
-count = 0
-#create zips
 
+#remove extra files, dirs from ini_only landscapes
+
+
+#create zips
+count = 0
 for i, landPath, in enumerate(allLandPaths):
     land = allLands[i]
 #     print (land)
