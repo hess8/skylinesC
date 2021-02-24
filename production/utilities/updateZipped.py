@@ -48,16 +48,19 @@ allZips = []
 
 #update symbolic links
 mainList = os.listdir(mainDir)
-otherList1 = os.listdir(otherDir1)
-otherList2 = os.listdir(otherDir2)
+# otherList1 = os.listdir(otherDir1)
+# otherList2 = os.listdir(otherDir2)
 
 for dir in [otherDir1, otherDir2,iniOnlyDir1,iniOnlyDir2]:
     for item in os.listdir(dir) :
-        if item not in mainList:
+        if os.path.isdir(os.path.join(dir,item)) and item not in mainList:
             print ('Updated symlink for {}.'.format(item))
             mainPath = '{}\\{}'.format(mainDir,item)
             otherPath = '{}\\{}'.format(dir,item)
             os.system('mklink /D "{}" "{}"'.format(mainPath,otherPath))
+        elif item not in mainList:
+            print ('not added', dir, item)
+            print ('isdir', os.path.isdir(os.path.join(dir,item)))
 
 #landscapes are all represented in mainDir now.
 for item in os.listdir(mainDir):
