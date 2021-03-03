@@ -36,15 +36,16 @@
         <p>{{t "about.groupflights" htmlSafe=true joinURL=(href-to "settings")}}</p>
       </div>
       <div class="col-md-4">
-        <h2>{{fa-icon "address-card"}} {{t "social-network"}}</h2>
-        <p>{{t "about.notifications" htmlSafe=true url=(href-to notificationsTarget)}}</p>
+        <h2><LinkTo @route="landscapes">{{fa-icon "map"}} {{t "landscapes"}}</LinkTo> </h2>
+        <p>{{t "about.landscapes" htmlSafe=true landURL=(href-to "landscapes")}}</p>
       </div>
     </div>
     <div class="row">
       <div class="col-md-4">
-        <h2><LinkTo @route="landscapes">{{fa-icon "map"}} {{t "landscapes"}}</LinkTo> </h2>
-        <p>{{t "about.landscapes" htmlSafe=true landURL=(href-to "landscapes")}}</p>
+        <h2>{{fa-icon "address-card"}} {{t "social-network"}}</h2>
+        <p>{{t "about.notifications" htmlSafe=true url=(href-to notificationsTarget)}}</p>
       </div>
+      
       <div class="col-md-4">
         <h2>{{fa-icon "envelope"}} {{t "contact"}}</h2>
         <p><a href="mailto:{{'skylinescondor@gmail.com'}}">{{t "contact-admin"}}</a>{{" "}}{{t "contact-content"}}</p>
