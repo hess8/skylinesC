@@ -77,7 +77,7 @@ email-address: Email address
 email-exists-already: This email address exists already.
 email-for-info: Email for info
 email-unknown: This email address is unknown.
-error-text: There was an error while loading this page. Please try again later!
+error-text: There was an error while loading this page. Please refresh the page.
 fai-triangle-distance: FAI Triangle Distance
 failed-to-parse-file: Failed to parse file
 file-upload-field: File upload field
@@ -193,6 +193,7 @@ ranking: Ranking
 recover-password: Recover Password
 recovering: Recovering...
 recovery-mail-sent: Check your email! We have sent you a link to recover your password.
+refresh: Please refresh this page.
 register: Register
 registering: Registering...
 register-club: Register new group
@@ -339,6 +340,7 @@ gflights:
   change-groups: If you fly with multiple groups, just change your group in Settings before you upload to a different group.
   overlay-not-in-group: Overlaying flights not in your group
   pin-flight: If you "star" other flights before you "show" a flight, it will overlay the flights.  This is not a "group flight", but it is displayed almost the same.
+  refresh: To refresh the groupflight for very recent tracks, click the "Groupflight" button again. 
 scoringinfo:
   olc+: OLC+ Scoring
   olc-history: OLC+ scoring was developed by the "On-line Contest" group for any soaring flight. It is based on distances, not speed.

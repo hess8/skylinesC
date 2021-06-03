@@ -19,7 +19,7 @@ dbBUdir = '/home/bret/servers/database_backups'
 remoteBUdir = '/media/sf_Google_Drive'
 igcsOutDir = os.path.join(remoteBUdir,'igcsBackup')
 
-nkeep = 3
+nkeep = 8
 timeFormat = '%Y-%m-%d.%H.%M.%S'
 
 files = os.listdir(remoteBUdir)
@@ -166,9 +166,12 @@ while run:
     os.system('sudo ufw deny 4200 > /dev/null 2>&1')
     os.system('sudo ufw deny 80 > /dev/null 2>&1')
     os.system('sudo ufw allow from 192.168.1.39 to any port 4200 > /dev/null 2>&1') 
+    #utsoar maintenance:
+    os.system('cp /media/sf_landscapes-zip/utsoar-* ember/app/templates/')
+
 
     #find time until midnight
     secMidnight = ((24 - now.hour - 1) * 3600) + ((60 - now.minute - 1) * 60) + (60 - now.second)
 
-    #wait until 1 am:
-    t.sleep(secMidnight + 3600)
+    #wait until 3 am:
+    t.sleep(secMidnight + 3 * 3600)
