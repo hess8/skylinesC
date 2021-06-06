@@ -34,7 +34,6 @@ export default Component.extend({
 
   init() {
     this._super(...arguments);
-
     let ajax = this.ajax;
     let units = this.units;
 
