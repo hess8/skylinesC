@@ -14,7 +14,6 @@ Router.map(function() {
     this.route('map-redirect', { path: '/map' });
   });
 
-
   this.route('club', { path: '/clubs/:club_id' }, function() {
     this.route('pilots');
     this.route('edit');
@@ -74,6 +73,10 @@ Router.map(function() {
   });
 
   this.route('landscapes');
+  this.route('utsoar-dist');
+  this.route('utsoar-speed');
+  this.route('utsoar-recent');
+  this.route('utsoar-personal');
 
   this.route('tracking', function() {
     this.route('info');

@@ -7,6 +7,7 @@
 import os,sys,time
 import py7zr
 import shutil
+import winsound
 
 def readfile(filepath):
     with open(filepath) as f:
@@ -48,8 +49,6 @@ allZips = []
 
 #update symbolic links
 mainList = os.listdir(mainDir)
-# otherList1 = os.listdir(otherDir1)
-# otherList2 = os.listdir(otherDir2)
 
 for dir in [otherDir1, otherDir2,iniOnlyDir1,iniOnlyDir2]:
     for item in os.listdir(dir) :
@@ -120,7 +119,7 @@ if count>0:
 else:
     print ('No new landscapes to zip'.format(count, zipDir))
 # time.sleep(60)
-
+winsound.PlaySound("SystemHand", winsound.SND_ALIAS)
 print ("Done")
 
 
