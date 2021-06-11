@@ -168,7 +168,7 @@ while run:
     os.system('sudo ufw allow from 192.168.1.39 to any port 4200 > /dev/null 2>&1') 
     #utsoar maintenance:
     os.system('cp /media/sf_landscapes-zip/utsoar-* ember/app/templates/')
-    os.system('cp /media/sf_landscapes-zip/flights.cvs /media/sf_Google_Drive/')
+    os.system('cp /media/sf_landscapes-zip/flights.csv /media/sf_Google_Drive/')
 
 
     #find time until midnight
