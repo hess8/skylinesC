@@ -174,5 +174,5 @@ while run:
     #find time until midnight
     secMidnight = ((24 - now.hour - 1) * 3600) + ((60 - now.minute - 1) * 60) + (60 - now.second)
 
-    #wait until 3 am:
-    t.sleep(secMidnight + 3 * 3600)
+    #wait until 10 min after midnight:
+    t.sleep(secMidnight + 10 * 60)
