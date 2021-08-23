@@ -80,3 +80,4 @@ coverage.xml
 
 # landscape page
 /ember/app/templates/landscapes.hbs
+

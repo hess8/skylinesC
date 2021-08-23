@@ -14,7 +14,6 @@ Router.map(function() {
     this.route('map-redirect', { path: '/map' });
   });
 
-
   this.route('club', { path: '/clubs/:club_id' }, function() {
     this.route('pilots');
     this.route('edit');
@@ -39,7 +38,7 @@ Router.map(function() {
   });
 
   this.route('flight-upload', { path: '/flights/upload' });
-//note: the route (template, other files are named 'flight, but the path of the routs is flights.
+//note: the route (template, other files are named 'flight, but the path of the route is flights.
   this.route('flight', { path: '/flights/:flight_ids' }, function() {
     this.route('change-aircraft', { path: '/change_aircraft' });
     this.route('change-pilot', { path: '/change_pilot' });
@@ -74,6 +73,11 @@ Router.map(function() {
   });
 
   this.route('landscapes');
+  this.route('utsoar-dist');
+  this.route('utsoar-totals');
+  this.route('utsoar-speed');
+  this.route('utsoar-recent');
+  this.route('utsoar-personal');
 
   this.route('tracking', function() {
     this.route('info');

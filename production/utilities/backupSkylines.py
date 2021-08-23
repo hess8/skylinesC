@@ -1,4 +1,4 @@
-import os, sys, datetime
+import os, sys, datetime, time
 import time as t
 # import paramiko
 import tarfile
@@ -19,7 +19,7 @@ dbBUdir = '/home/bret/servers/database_backups'
 remoteBUdir = '/media/sf_Google_Drive'
 igcsOutDir = os.path.join(remoteBUdir,'igcsBackup')
 
-nkeep = 3
+nkeep = 8
 timeFormat = '%Y-%m-%d.%H.%M.%S'
 
 files = os.listdir(remoteBUdir)
@@ -162,13 +162,19 @@ while run:
 
     print
     #ufw maintenance:
-    os.system('sudo ufw enable > /dev/null 2>&1') 
+    os.system('sudo ufw enable > /dev/null 2>&1')
     os.system('sudo ufw deny 4200 > /dev/null 2>&1')
     os.system('sudo ufw deny 80 > /dev/null 2>&1')
-    os.system('sudo ufw allow from 192.168.1.39 to any port 4200 > /dev/null 2>&1') 
+    os.system('sudo ufw allow from 192.168.1.39 to any port 4200 > /dev/null 2>&1')
+    #utsoar maintenance:
+    freshUTSoarHrs = 2.0  #copy files automatically only if the files are less that freshUTSoarHrs hrs old.
+    if (time.time() - os.path.getmtime('/media/sf_landscapes-zip/utsoar-dist.hbs'))/3600.0 < freshUTSoarHrs:
+        os.system('cp /media/sf_landscapes-zip/utsoar-* ember/app/templates/')
+        os.system('cp /media/sf_landscapes-zip/flights.csv /media/sf_Google_Drive/')
+
 
     #find time until midnight
     secMidnight = ((24 - now.hour - 1) * 3600) + ((60 - now.minute - 1) * 60) + (60 - now.second)
 
-    #wait until 1 am:
-    t.sleep(secMidnight + 3600)
+    #wait until 10 min after midnight.  Groupflights runs at midnight.
+    t.sleep(secMidnight + 10 * 60)
