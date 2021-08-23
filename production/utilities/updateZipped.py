@@ -86,14 +86,18 @@ count = 0
 for i, landPath, in enumerate(allLandPaths):
     land = allLands[i]
 #     print (land)
-    iniPath = os.path.join(landPath,'{}.ini'.format(land))
+    files = os.listdir(landPath)
+    for file in files:
+        if '.ini' in file:
+            iniFile = file
+    iniPath = os.path.join(landPath,iniFile)
     if os.path.exists(iniPath):
         lines = readfile(iniPath)
         if len(lines) > 1:
-            version = lines[1].split('=')[1].split(',')[0].replace('00','0').replace('.10.','.1.').replace(' ','')
+            version = lines[1].split('=')[1].split('(')[0].split(',')[0].replace('00','0').replace('.10.','.1.').replace(' ','')
         else:
             print ('lines', lines)
-            sys.exit('Stop1: version line does not exist')
+            sys.exit('Stop:  does not exist or cannot be parsed')
         zipName = '{}.v{}.7z'.format(land.replace(' ','_'),version) #no zips will have spaces, but landscapes folders might
         zipPath = '{}\\{}'.format(zipDir,zipName) #no zips will have spaces, but landscapes folders might
         if zipPath not in allZips:
@@ -113,7 +117,7 @@ for i, landPath, in enumerate(allLandPaths):
                 print ('Error creating {}'.format(zipPath))
     else:
         print ('lines', lines)
-        sys.exit('Stop2: version line does not exist for {}'.format(landPath))
+        sys.exit('Stop2:  does not exist for {}'.format(landPath))
 if count>0:
     print ('Moved {} zip files to {}'.format(count, zipDir))
 else:
