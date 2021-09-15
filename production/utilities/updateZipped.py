@@ -90,6 +90,10 @@ for i, landPath, in enumerate(allLandPaths):
     for file in files:
         if '.ini' in file:
             iniFile = file
+            break
+    if not iniFile:
+            sys.exit('Stop0.  No .ini file for {}'.format(landPath))
+        
     iniPath = os.path.join(landPath,iniFile)
     if os.path.exists(iniPath):
         lines = readfile(iniPath)
