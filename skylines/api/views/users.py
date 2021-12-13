@@ -130,16 +130,15 @@ The SkyLines Team
 
     # context = ssl.create_default_context()
     try:
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.login(email_from, email_pw)
-        print ('Email login successful')
+        smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        smtp.login(email_from, email_pw)
         message = MIMEText(text.encode("utf-8"), "plain", "utf-8")
         message["Subject"] = "SkyLines password recovery"
         message["From"] = email_from
         message["To"] = user.email_address.encode("ascii")
-        server.sendmail(
+        smtp.sendmail(
             email_from, user.email_address.encode("ascii"), message.as_string())
-        server.quit()
+        smtp.quit()
 
     except:
         raise ServiceUnavailable(
