@@ -86,10 +86,18 @@ count = 0
 for i, landPath, in enumerate(allLandPaths):
     land = allLands[i]
 #     print (land)
-    files = os.listdir(landPath)
-    for file in files:
-        if '.ini' in file:
-            iniFile = file
+    try:
+        files = os.listdir(landPath)
+        for file in files:
+            if '.ini' in file:
+                iniFile = file
+                break
+        if not iniFile:
+                sys.exit('Stop0.  No .ini file for {}'.format(landPath))
+    except: #it's probably a broken link from moving files from _for_symlinks to _ini_only
+        print ('Removing broken link {}.  Run this program again'.format(landPath))
+        os.rmdir(landPath)
+#         break
     iniPath = os.path.join(landPath,iniFile)
     if os.path.exists(iniPath):
         lines = readfile(iniPath)
@@ -115,9 +123,9 @@ for i, landPath, in enumerate(allLandPaths):
                 count += 1
             except:
                 print ('Error creating {}'.format(zipPath))
-    else:
-        print ('lines', lines)
-        sys.exit('Stop2:  does not exist for {}'.format(landPath))
+#     else:
+#         print ('lines', lines)
+#         sys.exit('Stop2:  does not exist for {}'.format(landPath))
 if count>0:
     print ('Moved {} zip files to {}'.format(count, zipDir))
 else:
