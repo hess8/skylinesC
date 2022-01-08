@@ -119,39 +119,32 @@ fi
 export PS1='\W> '
 export POSTGIS_GDAL_ENABLED_DRIVERS=GTiff
 export POSTGIS_ENABLE_OUTDB_RASTERS=1
-export PATH="${HOME}/.local/bin:$PATH"
-
 alias skyl='cd /home/bret/servers/repo-skylinesC/skylinesC/'
 alias esky='cd /home/bret/servers/repo-skylinesC/skylinesC/ember'
-alias eserve5='esky;sudo ember serve --environment=production --port 80 --proxy http://localhost:5000/'
-alias eserve42-5='esky; ember serve --environment=production --port 4200 --proxy http://localhost:5000/'
+#alias eserve5='esky;sudo ember serve --environment=production --port 80 --proxy http://localhost:5000/'
+alias eserve42-5='esky;sudo ember serve --environment=production --port 4200 --proxy http://localhost:5000/'
 alias mserve='skyl; pipenv run ./manage.py runserver'
 alias dbrecreate='pipenv run ./manage.py db recreate'
 alias dbcreate='pipenv run ./manage.py db create'
 alias pycharm='./pycharm/bin/pycharm.sh'
 alias pgadmin='python ~/.local/share/virtualenvs/pgadmin-WsDn56it/lib/python2.7/site-packages/pgadmin4/pgAdmin4.py'
 alias pips='pipenv shell'
-
-alias ngstart="sudo systemctl start nginx"
-alias ngstop="sudo systemctl stop nginx"
-alias ngrestart="sudo systemctl restart nginx"
-alias ngstatus="systemctl status nginx"
+alias ngstart="sudo service nginx start"
+alias ngstop="sudo service nginx stop"
+alias ngrestart="sudo service nginx restart"
+alias ngstatus="sudo service nginx status"
 alias ngreload="sudo kill -HUP `cat /var/run/nginx.pid`"
 alias ngvim-default="sudo vim /etc/nginx/sites-available/default"
-alias ngvim-skylinesC='sudo vim /etc/nginx/sites-available/skylinescondor.com'
+alias ngvim-skylines='sudo vim /etc/nginx/sites-available/skylinescondor.com'
 alias ngvim-nginx.conf="sudo vim /etc/nginx/nginx.conf"
-alias ngerror.log="sudo tail -f -n200 /var/log/nginx/error.log"
-alias ngaccess.log="sudo tail -f -n200 /var/log/nginx/access.log"
+alias ngtail-error.log="sudo tail -f -n200 /var/log/nginx/error.log"
+alias ngtail-access.log="sudo tail -f -n200 /var/log/nginx/access.log"
 alias ngcd="cd /etc/nginx/"
-alias ngt="sudo nginx -t"
-
+alias ngtest="sudo nginx -t"
 alias ngbackup-config-skylines.conf=nginxconfigbackup
-
+alias bu='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/backupSkylines.py'
+alias ct='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/createTorrents.py'
 nginxconfigbackup() { 
   sudo cp /etc/nginx/sites-available/skylinescondor /etc/nginx/sites-available/skylinescondor.$(date "+%Y-%m-%d_%H:%M")-$1
-}
-
-#the parameter ending is the comment use dashes "-" between words
-
+} #the parameter ending is the comment use dashes "-" between words
 #end bch
-
