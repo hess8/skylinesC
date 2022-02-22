@@ -1,11 +1,12 @@
-# '''run in windows cmd window (no admin needed)
+# '''run in windows cmd window as ADMIN
 #         SET PATH=%PATH%;"C:\Program Files\7-Zip"
 #         python d:\skylinesC\production\utilities\updateZipped.py
+#         Writes to final destination
 #
 #         '''
 
 import os,sys,time
-import py7zr
+# import py7zr
 import shutil
 import winsound
 
@@ -16,6 +17,7 @@ def readfile(filepath):
 
 def sevenzip(tempPath,landPath):
     os.system('7z a -t7z "{}" "{}"'.format(tempPath,landPath)) #quotes to handle spaces in windows file names
+#     os.system('py7zr c "{}" "{}"'.format(tempPath,landPath))
 #     with py7zr.SevenZipFile(tempPath, 'w') as archive:
 #                     archive.writeall(landPath, 'base')  #This seems slow, but uses threads well
 
@@ -72,20 +74,9 @@ for item in os.listdir(zipDir):
     if item.split('.')[-1] =='7z':
         allZips.append('{}\{}'.format(zipDir,item))
 
-#remove old temp zip files
-for item in os.listdir(mainDir):
-    if 'temp' in item:
-        tempPath = mainDir+'\\{}'.format(item)
-        os.remove(tempPath)
-
-#remove extra files, dirs from ini_only landscapes
-
-
 #create zips
-count = 0
 for i, landPath, in enumerate(allLandPaths):
     land = allLands[i]
-#     print (land)
     try:
         files = os.listdir(landPath)
         for file in files:
@@ -93,11 +84,11 @@ for i, landPath, in enumerate(allLandPaths):
                 iniFile = file
                 break
         if not iniFile:
-                sys.exit('Stop0.  No .ini file for {}'.format(landPath))
+            sys.exit('Stop0.  No .ini file for {}'.format(landPath))
     except: #it's probably a broken link from moving files from _for_symlinks to _ini_only
         print ('Removing broken link {}.  Run this program again'.format(landPath))
         os.rmdir(landPath)
-#         break
+# #         break
     iniPath = os.path.join(landPath,iniFile)
     if os.path.exists(iniPath):
         lines = readfile(iniPath)
@@ -107,6 +98,7 @@ for i, landPath, in enumerate(allLandPaths):
             print ('lines', lines)
             sys.exit('Stop:  does not exist or cannot be parsed')
         zipName = '{}.v{}.7z'.format(land.replace(' ','_'),version) #no zips will have spaces, but landscapes folders might
+        zipPathTemp = '{}\\{}'.format(mainDir,zipName)
         zipPath = '{}\\{}'.format(zipDir,zipName) #no zips will have spaces, but landscapes folders might
         if zipPath not in allZips:
             print()
@@ -115,21 +107,20 @@ for i, landPath, in enumerate(allLandPaths):
             try:
                 #create new zip
                 landZip = zipPath.split('.')[0].split('\\')[-1]
-                tempPathZip = mainDir+'\\temp_{}.7z'.format(landZip)
+#                 tempPathZip = mainDir+'\\temp_{}.7z'.format(landZip)
                 print ('***Creating {}***'.format(zipName))
-                sevenzip(tempPathZip,landPath)
+                sevenzip(zipPathTemp,landPath)
                 print('Moving to zip directory')
-                shutil.move(tempPathZip,zipPath)
-                count += 1
+                os.system('move {} {}'.format(zipPathTemp,zipPath))
+#                 shutil.move(zipPathTemp,zipPath)
+
             except:
                 print ('Error creating {}'.format(zipPath))
-#     else:
-#         print ('lines', lines)
-#         sys.exit('Stop2:  does not exist for {}'.format(landPath))
-if count>0:
-    print ('Moved {} zip files to {}'.format(count, zipDir))
+    else:
+        print ('lines', lines)
+        sys.exit('Stop2: ini.txt does not exist for {}'.format(landPath))
 else:
-    print ('No new landscapes to zip'.format(count, zipDir))
+    print ('No new landscapes to zip')
 # time.sleep(60)
 winsound.PlaySound("SystemHand", winsound.SND_ALIAS)
 print ("Done")
