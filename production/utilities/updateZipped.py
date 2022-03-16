@@ -2,13 +2,14 @@
 #         SET PATH=%PATH%;"C:\Program Files\7-Zip"
 #         python d:\skylinesC\production\utilities\updateZipped.py
 #         Writes to final destination
+#   conda activate bchenv
 #
 #         '''
 
 import os,sys,time
 # import py7zr
-import shutil
 import winsound
+import paramiko
 
 def readfile(filepath):
     with open(filepath) as f:
@@ -27,6 +28,9 @@ otherDir2 = 'F:\\landscapes_for_symlinks2'
 iniOnlyDir1 = 'E:\\landscapes_ini_only'
 iniOnlyDir2 = 'F:\\landscapes_ini_only2'
 zipDir = 'S:\\Skylines-C\landscapes-zip'
+slcServerIP = '192.168.1.122'
+user = 'bret'
+keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 
 #remove extra files from ini_only dirs:
 for dir in [iniOnlyDir1,iniOnlyDir2]:
@@ -36,7 +40,7 @@ for dir in [iniOnlyDir1,iniOnlyDir2]:
                 print ('Removing all but .ini in {}'.format(landscape))
                 break
         for item in os.listdir(os.path.join(dir,landscape)):
-            if not '.ini' in item:   
+            if not '.ini' in item:
                 if os.path.isdir(os.path.join(dir,landscape,item)):
 #                     shutil.rmtree(os.path.join(dir,landscape,item))
                     os.system('rmdir /S /Q "{}"'.format(os.path.join(dir,landscape,item)))
@@ -75,6 +79,7 @@ for item in os.listdir(zipDir):
         allZips.append('{}\{}'.format(zipDir,item))
 
 #create zips
+Ncreated = 0
 for i, landPath, in enumerate(allLandPaths):
     land = allLands[i]
     try:
@@ -112,7 +117,7 @@ for i, landPath, in enumerate(allLandPaths):
                 sevenzip(zipPathTemp,landPath)
                 print('Moving to zip directory')
                 os.system('move {} {}'.format(zipPathTemp,zipPath))
-#                 shutil.move(zipPathTemp,zipPath)
+                Ncreated += 1
 
             except:
                 print ('Error creating {}'.format(zipPath))
@@ -123,6 +128,29 @@ else:
     print ('No new landscapes to zip')
 # time.sleep(60)
 winsound.PlaySound("SystemHand", winsound.SND_ALIAS)
+
+# run createTorrents on skylinesC server
+if Ncreated > 0:
+    k = paramiko.Ed25519Key.from_private_key_file(keyFile)
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    try:
+        ssh.connect(hostname=slcServerIP, username=user, pkey=k)
+    except:
+        print('ssh.connect failed to {}'.format(slcServerIP))
+    print('Connecting to {} to create torrents'.format(slcServerIP))
+    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/createTorrents.py')
+    stdout = ssh_stdout.readlines()
+    stderr = ssh_stderr.readlines()
+    if len(stderr) > 0:
+        print('Errors in createTorrents command:')
+        for line in stderr:
+            print(line)
+    else:
+        print('Results:')
+        for line in stderr:
+            print(line)
+
 print ("Done")
 
 

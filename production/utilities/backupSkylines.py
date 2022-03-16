@@ -165,7 +165,9 @@ while run:
     os.system('sudo ufw enable > /dev/null 2>&1')
     os.system('sudo ufw deny 4200 > /dev/null 2>&1')
     os.system('sudo ufw deny 80 > /dev/null 2>&1')
+    os.system('sudo ufw deny 22 > /dev/null 2>&1')
     os.system('sudo ufw allow from 192.168.1.39 to any port 4200 > /dev/null 2>&1')
+    os.system('sudo ufw allow from 192.168.1.10 proto tcp to any port 22 > /dev/null 2>&1')
     #utsoar maintenance:
     freshUTSoarHrs = 2.0  #copy files automatically only if the files are less that freshUTSoarHrs hrs old.
     if (time.time() - os.path.getmtime('/media/sf_landscapes-zip/utsoar-dist.hbs'))/3600.0 < freshUTSoarHrs:
