@@ -24,7 +24,7 @@ lines.append('  <div class="page-header"> \n')
 lines.append('    <h1>{{t "landscapes"}}</h1> \n')
 lines.append('  </div> \n')
 lines.append('  <p> {{t "landscapesPage.download"}} </p> \n')
-lines.append('  <p> {{t "install"}} <a href="https://www.qbittorrent.org/download.php">  {{"qBittorrent"}}</a> {{t "landscapesPage.qbittorent"}} <b> {{t "landscapesPage.before"}} </b> {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
+lines.append('  <p> {{t "landscapesPage.before"}} {{t "install"}} <a href="https://www.fosshub.com/qBittorrent.html?dwl=qbittorrent_4.4.2_x64_setup.exe"> qBittorrent 64-bit </a> {{t "or"}} <a href="https://www.fosshub.com/qBittorrent.html?dwl=qbittorrent_4.4.2_setup.exe">. qBittorrent 32-bit </a> {{t "landscapesPage.qbittorent"}} {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
 
 lines.append('  <p> {{t "landscapesPage.extract-with"}}  <a href="https://www.7-zip.org/download.html"> 7-zip </a>  {{t "landscapesPage.paste"}} </p> \n')
 

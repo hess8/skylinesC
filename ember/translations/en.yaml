@@ -277,9 +277,9 @@ circling-direction:
 landscapesPage:
   download: All landscapes are for Condor 2, and download as a single file.
   paste: and paste each folder in Condor2/Landscapes.
-  qbittorent: which is a great download manager for these large files,
-  before: before clicking on the links.  
-  many: You can download many landscapes at the same time.  Downloads are fast if you have fast internet. Works with slow internet and always resumes after interruptions. 
+  qbittorent: qBittorret is a nice download manager for these large files, or you can use a similar torrent program.
+  before: Before clicking on the links,
+  many: You can download many landscapes at the same time.  Downloads are fast if you have fast internet. Works with slow internet and always resumes after interruptions.
   extract-with: Extract with
   after: After you have downloaded and extracted your landscape files, leave the .7z files on your computer and qBittorrent will help the next guy get them faster!
   contact: if you see errors or have questions.
@@ -340,7 +340,7 @@ gflights:
   change-groups: If you fly with multiple groups, just change your group in Settings before you upload to a different group.
   overlay-not-in-group: Overlaying flights not in your group
   pin-flight: If you "star" other flights before you "show" a flight, it will overlay the flights.  This is not a "group flight", but it is displayed almost the same.
-  refresh: To refresh the groupflight for very recent tracks, click the "Groupflight" button again. 
+  refresh: To refresh the groupflight for very recent tracks, click the "Groupflight" button again.
 scoringinfo:
   olc+: OLC+ Scoring
   olc-history: OLC+ scoring was developed by the "On-line Contest" group for any soaring flight. It is based on distances, not speed.

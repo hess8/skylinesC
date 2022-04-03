@@ -151,6 +151,6 @@ if Ncreated > 0:
         for line in stderr:
             print(line)
 
-print ("Done")
+print ("Done.  Copy torrents into qBittorrent")
 
 

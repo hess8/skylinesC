@@ -7,7 +7,7 @@ from shutil import copy2
 """
 
 Ember server runs this script and saves to Nginx server, which saves to Google Drive
-1. Database:  Keep nkeep dumps.  If the size of the current database is greater than the oldest dump, 
+1. Database:  Keep nkeep dumps.  If the size of the current database is greater than the oldest dump,
 then delete the oldest dump.
 2. htdocs:  Incremental: Add the igc files that are newer than the last backup to a new tar file.
 3. htdocs: remove .fpl files that are more than an hour old.
@@ -169,7 +169,7 @@ while run:
     os.system('sudo ufw allow from 192.168.1.39 to any port 4200 > /dev/null 2>&1')
     os.system('sudo ufw allow from 192.168.1.10 proto tcp to any port 22 > /dev/null 2>&1')
     #utsoar maintenance:
-    freshUTSoarHrs = 2.0  #copy files automatically only if the files are less that freshUTSoarHrs hrs old.
+    freshUTSoarHrs = 2.0  #copy files automatically only if the files are less than freshUTSoarHrs hrs old so this happens only after groupflights has run during the night
     if (time.time() - os.path.getmtime('/media/sf_landscapes-zip/utsoar-dist.hbs'))/3600.0 < freshUTSoarHrs:
         os.system('cp /media/sf_landscapes-zip/utsoar-* ember/app/templates/')
         os.system('cp /media/sf_landscapes-zip/flights.csv /media/sf_Google_Drive/')
