@@ -113,7 +113,7 @@ igc-or-zip-files: IGC or ZIP file(s)
 imprint: Imprint
 index-INDEX: 'Handicap: {index}'
 index: Index
-install: Install
+install: install
 landing: Landing
 landing-time: Landing time
 landscape: Landscape
@@ -162,6 +162,7 @@ not-condor: You submitted a file that is not a Condor .igc file.  Submit real-li
 notifications: Notifications
 olc-distance: OLC Distance
 older: Older
+or: or
 open-data: Open Data
 open-source: Open Source
 other-pilots: Other pilots
@@ -277,14 +278,14 @@ circling-direction:
 landscapesPage:
   download: All landscapes are for Condor 2, and download as a single file.
   paste: and paste each folder in Condor2/Landscapes.
-  qbittorent: qBittorret is a nice download manager for these large files, or you can use a similar torrent program.
+  qbittorent: Click on "qBittorrent Windows x64" or "qBittorrent Windows" links, not the page's ad. qBittorrent (or similar torrent manager) works well for these large files.
   before: Before clicking on the links,
   many: You can download many landscapes at the same time.  Downloads are fast if you have fast internet. Works with slow internet and always resumes after interruptions.
   extract-with: Extract with
   after: After you have downloaded and extracted your landscape files, leave the .7z files on your computer and qBittorrent will help the next guy get them faster!
   contact: if you see errors or have questions.
-  share: Please share
-  seed: ("seed") at least one of these .7z files yourself to help others get them faster. You can see on qBittorrent (Seeds column) that many files have only two or three people seeding them ("0(2)" or "0(3)") at the moment.  Let's increase that!
+  share: You can share
+  seed: ("seed") one or more of these .7z files yourself to help others get them faster. On qBittorrent (Seeds column) you'll see that many files have only two or three people seeding them ("0(2)" or "0(3)") at the moment.  Let's increase that!
   easy: It's easy to seed.
   run: Just run qBittorent when your computer is on (set to run when computer starts), and leave the .7z files where they are, and you will be seeding them for others!  "Ratio" shows what fraction of a file you have shared.
   magnet: These are "magnet links", and should open directly in qBittorrent or other torrent manager and start downloading immediately.
