@@ -168,12 +168,6 @@ while run:
     os.system('sudo ufw deny 22 > /dev/null 2>&1')
     os.system('sudo ufw allow from 192.168.1.39 to any port 4200 > /dev/null 2>&1')
     os.system('sudo ufw allow from 192.168.1.10 proto tcp to any port 22 > /dev/null 2>&1')
-    #utsoar maintenance:
-    freshUTSoarHrs = 2.0  #copy files automatically only if the files are less than freshUTSoarHrs hrs old so this happens only after groupflights has run during the night
-    if (time.time() - os.path.getmtime('/media/sf_landscapes-zip/utsoar-dist.hbs'))/3600.0 < freshUTSoarHrs:
-        os.system('cp /media/sf_landscapes-zip/utsoar-* ember/app/templates/')
-        os.system('cp /media/sf_landscapes-zip/flights.csv /media/sf_Google_Drive/')
-
 
     #find time until midnight
     secMidnight = ((24 - now.hour - 1) * 3600) + ((60 - now.minute - 1) * 60) + (60 - now.second)
