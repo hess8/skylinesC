@@ -22,7 +22,9 @@
 
 import os, sys
 
-zipDir = '/media/sf_landscapes-zip/'
+zipDir = '/media/sf_landscapes-zip'
+sotoWatchDir = zipDir + '/QBTwatchSotoXXX'
+einsteinWatchDir = zipDir + '/QBTwatchEinstein'
 workDir = zipDir
 os.chdir(workDir)
 
@@ -55,6 +57,11 @@ for zipped in zippedForTorrent:
         print '{}.magnet created'.format(zipped)
     except:
         print 'Error in magnet link for {}'.format(zipped)
+    try:
+        os.system ('cp {}.torrent {} {}'.format(zipped,sotoWatchDir,einsteinWatchDir))
+        print('Copied torrents to qBitTorrent watch files')
+    except:
+        sys.exit('Error copying')
     # remove old version files with same landscape
     land = zipped.split('.')[0]
     for item in oldZipped:
@@ -84,8 +91,6 @@ if makeAllMagnets:
             print '{}.magnet created'.format(torrent.replace('.torrent',''))
         except:
             print 'Error in magnet link for {}'.format(torrent)
-
-
 
 #run update for skylinesC page.
 os.system('python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/landscapesPage.py')

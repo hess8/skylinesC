@@ -79,7 +79,7 @@ for item in os.listdir(zipDir):
         allZips.append('{}\{}'.format(zipDir,item))
 
 #create zips
-Ncreated = 0
+newZipped = []
 for i, landPath, in enumerate(allLandPaths):
     land = allLands[i]
     try:
@@ -116,9 +116,11 @@ for i, landPath, in enumerate(allLandPaths):
                 print ('***Creating {}***'.format(zipName))
                 sevenzip(zipPathTemp,landPath)
                 print('Moving to zip directory')
-                os.system('move {} {}'.format(zipPathTemp,zipPath))
-                Ncreated += 1
-
+                try:
+                    os.system('move {} {}'.format(zipPathTemp,zipPath))
+                    newZipped.append(zipPath)
+                except:
+                    sys.exit('Stop.  Problem with moving file')
             except:
                 print ('Error creating {}'.format(zipPath))
     else:
@@ -130,7 +132,7 @@ else:
 winsound.PlaySound("SystemHand", winsound.SND_ALIAS)
 
 # run createTorrents on skylinesC server
-if Ncreated > 0:
+if len(newZipped) > 0:
     k = paramiko.Ed25519Key.from_private_key_file(keyFile)
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -151,6 +153,4 @@ if Ncreated > 0:
         for line in stderr:
             print(line)
 
-print ("Done.  Copy torrents into qBittorrent")
-
-
+print ("Done")
