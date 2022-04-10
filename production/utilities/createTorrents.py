@@ -23,7 +23,7 @@
 import os, sys
 
 zipDir = '/media/sf_landscapes-zip'
-sotoWatchDir = zipDir + '/QBTwatchSotoXXX'
+sotoWatchDir = zipDir + '/QBTwatchSoto'
 einsteinWatchDir = zipDir + '/QBTwatchEinstein'
 workDir = zipDir
 os.chdir(workDir)
