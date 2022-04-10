@@ -1,15 +1,18 @@
-# '''run in windows cmd window as ADMIN
-#         SET PATH=%PATH%;"C:\Program Files\7-Zip"
-#         python d:\skylinesC\production\utilities\updateZipped.py
-#         Writes to final destination
-#   conda activate bchenv
-#
-#         '''
+# '''
+# 1. run in windows cmd window as ADMIN python d:\skylinesC\production\utilities\updateZipped.py
+# 2. conda activate bchenv
+# 3. SET PATH=%PATH%;"C:\Program Files\7-Zip"
+# 4. confirmation that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
+# link target eg C:\Users\Bret\AppData\Local\qBittorrent\logs\qbittorrent.log
+#   sample line:  (N) 2022-04-03T19:07:50 - 'Falkland_Islands.v1.0.7z' added to download list.
+# '''
 
 import os,sys,time
 # import py7zr
 import winsound
+import win32com.client
 import paramiko
+from subprocess import Popen, PIPE
 
 def readfile(filepath):
     with open(filepath) as f:
@@ -31,6 +34,7 @@ zipDir = 'S:\\Skylines-C\landscapes-zip'
 slcServerIP = '192.168.1.122'
 user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
+qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 
 #remove extra files from ini_only dirs:
 for dir in [iniOnlyDir1,iniOnlyDir2]:
@@ -112,7 +116,6 @@ for i, landPath, in enumerate(allLandPaths):
             try:
                 #create new zip
                 landZip = zipPath.split('.')[0].split('\\')[-1]
-#                 tempPathZip = mainDir+'\\temp_{}.7z'.format(landZip)
                 print ('***Creating {}***'.format(zipName))
                 sevenzip(zipPathTemp,landPath)
                 print('Moving to zip directory')
@@ -150,7 +153,19 @@ if len(newZipped) > 0:
             print(line)
     else:
         print('Results:')
-        for line in stderr:
+        for line in stdout:
             print(line)
-
+#check that new torrents have been added to the qbittorrent servers
+time.sleep(5)
+shell = win32com.client.Dispatch("WScript.Shell")
+for logfile in qbtLogLinks:
+    shortcut = shell.CreateShortCut('{}\\{}'.format(zipDir,logfile))
+    lines = readfile(shortcut.Targetpath)
+    for zipped in newZipped:
+        for line in lines:
+            if 'added to download list' in line and zipped in line:
+                print('New torrent {} found in {}').format(zipped,logfile)
+                break
+        else:
+            print('Error. {} not found in {}').format(zipped,logfile)
 print ("Done")

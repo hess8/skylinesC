@@ -39,7 +39,7 @@ for item in zipDirList:
             zippedForTorrent.append(item)
         else:
             oldZipped.append(item)
-
+created = []
 #create torrents
 tracker = 'http://tracker.opentrackr.org:1337/announcefile'
 sizeExp = 21 # 2^21 bytes = 2MB
@@ -49,6 +49,7 @@ for zipped in zippedForTorrent:
     try:
         os.system('mktorrent -a {} -l {} -c {} -w {} {}'.format(tracker,sizeExp,comment,webSeed,zipped))
         print '{}.torrent created'.format(zipped)
+        created.append(zipped)
     except:
         print 'Error in torrent {}'.format(zipped)
     #create magnet link
@@ -57,11 +58,14 @@ for zipped in zippedForTorrent:
         print '{}.magnet created'.format(zipped)
     except:
         print 'Error in magnet link for {}'.format(zipped)
-    try:
-        os.system ('cp {}.torrent {} {}'.format(zipped,sotoWatchDir,einsteinWatchDir))
-        print('Copied torrents to qBitTorrent watch files')
-    except:
-        sys.exit('Error copying')
+    for dir in [sotoWatchDir,einsteinWatchDir]:
+        try:
+            os.system ('cp {}.torrent {}'.format(zipped,dir))
+            print('Copied {}.torrent to {}'.format(zipped,dir))
+        except:
+            sys.exit('Error copying {}.torrent to {}'.format(zipped,dir))
+    with open("test.txt", "a") as myfile:
+        myfile.write("appended text")
     # remove old version files with same landscape
     land = zipped.split('.')[0]
     for item in oldZipped:
