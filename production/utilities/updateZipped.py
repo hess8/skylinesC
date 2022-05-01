@@ -46,7 +46,6 @@ for dir in [iniOnlyDir1,iniOnlyDir2]:
         for item in os.listdir(os.path.join(dir,landscape)):
             if not '.ini' in item:
                 if os.path.isdir(os.path.join(dir,landscape,item)):
-#                     shutil.rmtree(os.path.join(dir,landscape,item))
                     os.system('rmdir /S /Q "{}"'.format(os.path.join(dir,landscape,item)))
                 else:
                     os.remove(os.path.join(dir,landscape,item))
@@ -59,6 +58,11 @@ allZips = []
 
 #update symbolic links
 mainList = os.listdir(mainDir)
+#remove broken symbolic links
+for item in mainList:
+    if not os.path.exists('{}\\{}\\{}.ini'.format(mainDir,item,item)):
+        os.rmdir('{}\\{}'.format(mainDir,item))
+
 
 for dir in [otherDir1, otherDir2,iniOnlyDir1,iniOnlyDir2]:
     for item in os.listdir(dir) :
@@ -86,19 +90,23 @@ for item in os.listdir(zipDir):
 newZipped = []
 for i, landPath, in enumerate(allLandPaths):
     land = allLands[i]
-    try:
-        files = os.listdir(landPath)
-        for file in files:
-            if '.ini' in file:
-                iniFile = file
-                break
-        if not iniFile:
-            sys.exit('Stop0.  No .ini file for {}'.format(landPath))
-    except: #it's probably a broken link from moving files from _for_symlinks to _ini_only
-        print ('Removing broken link {}.  Run this program again'.format(landPath))
-        os.rmdir(landPath)
+    iniPath = '{}/{}.ini'.format(landPath,land)
+    if not os.path.exists(iniPath):
+        sys.exit('Stop.  No .ini file for {}'.format(landPath))
+    # try:
+        # files = os.listdir(landPath)
+        # for file in files:
+        #     if '.ini' in file:
+        #         iniFile = file
+        #         if file != '{}.ini'.format(land):
+        #             print ('ini',file)
+        #         break
+        # if not iniFile:
+
+    # except: #it's probably a broken link from moving files from _for_symlinks to _ini_only
+    #     print ('Removing broken link {}.  Run this program again'.format(landPath))
+    #     os.rmdir(landPath)
 # #         break
-    iniPath = os.path.join(landPath,iniFile)
     if os.path.exists(iniPath):
         lines = readfile(iniPath)
         if len(lines) > 1:
@@ -128,8 +136,8 @@ for i, landPath, in enumerate(allLandPaths):
                 print ('Error creating {}'.format(zipPath))
     else:
         print ('lines', lines)
-        sys.exit('Stop2: ini.txt does not exist for {}'.format(landPath))
-else:
+        sys.exit('Stop: .ini file does not exist for {}'.format(landPath))
+if len(newZipped) == 0:
     print ('No new landscapes to zip')
 # time.sleep(60)
 winsound.PlaySound("SystemHand", winsound.SND_ALIAS)
@@ -156,16 +164,17 @@ if len(newZipped) > 0:
         for line in stdout:
             print(line)
 #check that new torrents have been added to the qbittorrent servers
-time.sleep(5)
-shell = win32com.client.Dispatch("WScript.Shell")
-for logfile in qbtLogLinks:
-    shortcut = shell.CreateShortCut('{}\\{}'.format(zipDir,logfile))
-    lines = readfile(shortcut.Targetpath)
-    for zipped in newZipped:
-        for line in lines:
-            if 'added to download list' in line and zipped in line:
-                print('New torrent {} found in {}').format(zipped,logfile)
-                break
-        else:
-            print('Error. {} not found in {}').format(zipped,logfile)
+# time.sleep(5)
+# shell = win32com.client.Dispatch("WScript.Shell")
+# for logfile in qbtLogLinks:
+#     shortcut = shell.CreateShortCut('{}\\{}'.format(zipDir,logfile))
+#     lines = readfile(shortcut.Targetpath)
+#     for zipped in newZipped:
+#         for line in lines:
+#             if 'added to download list' in line and zipped in line:
+#                 print('New torrent {} found in {}').format(zipped,logfile)
+#                 break
+#         else:
+#             print('Error. {} not found in {}').format(zipped,logfile)
+# time.sleep(5)
 print ("Done")
