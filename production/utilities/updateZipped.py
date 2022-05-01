@@ -7,7 +7,7 @@
 #   sample line:  (N) 2022-04-03T19:07:50 - 'Falkland_Islands.v1.0.7z' added to download list.
 # '''
 
-import os,sys,time
+import os,sys,shutil
 # import py7zr
 import winsound
 import win32com.client
@@ -36,8 +36,10 @@ user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 
+mainList0 = os.listdir(mainDir)
+
 #remove extra files from ini_only dirs:
-for dir in [iniOnlyDir1,iniOnlyDir2]:
+for dir in [iniOnlyDir1]:# iniOnlyDir2]:
     for landscape in os.listdir(dir):
         for item in os.listdir(os.path.join(dir,landscape)):
             if not '.ini' in item:
@@ -50,6 +52,21 @@ for dir in [iniOnlyDir1,iniOnlyDir2]:
                 else:
                     os.remove(os.path.join(dir,landscape,item))
 
+#if folder (not symbolic link) in mainDir begins with "-", remove all but .ini files and move to iniOnlyDir1
+for item in mainList0:
+    if item[0] == '-':
+        path = os.path.join(mainDir,item)
+        for item2 in os.listdir(path):
+            if not '.ini' in item2:
+                if os.path.isdir(os.path.join(path,item2)):
+                    os.system('rmdir /S /Q "{}"'.format(os.path.join(path,item2)))
+                else:
+                    os.remove(os.path.join(path,item2))
+        shutil.move(path,os.path.join(iniOnlyDir1,item.replace('-','')))
+        print('Moved {} to {}'.format(path,iniOnlyDir1))
+
+mainList = os.listdir(mainDir)
+
 # keepRunning = False
 # while keepRunning: #loops infinitely
 allLands = []
@@ -57,15 +74,16 @@ allLandPaths = []
 allZips = []
 
 #update symbolic links
-mainList = os.listdir(mainDir)
 #remove broken symbolic links
 for item in mainList:
     if not os.path.exists('{}\\{}\\{}.ini'.format(mainDir,item,item)):
         os.rmdir('{}\\{}'.format(mainDir,item))
 
-
 for dir in [otherDir1, otherDir2,iniOnlyDir1,iniOnlyDir2]:
-    for item in os.listdir(dir) :
+# for dir in [otherDir1, iniOnlyDir1]:
+    for item in os.listdir(dir):
+        if 'Kanta' in item:
+            print()
         if os.path.isdir(os.path.join(dir,item)) and item not in mainList:
             print ('Updated symlink for {}.'.format(item))
             mainPath = '{}\\{}'.format(mainDir,item)
@@ -90,28 +108,22 @@ for item in os.listdir(zipDir):
 newZipped = []
 for i, landPath, in enumerate(allLandPaths):
     land = allLands[i]
-    iniPath = '{}/{}.ini'.format(landPath,land)
-    if not os.path.exists(iniPath):
+    files = os.listdir(landPath)
+    for file in files:
+        if '.ini' in file:
+            iniFile = file
+            break
+    if not iniFile:
         sys.exit('Stop.  No .ini file for {}'.format(landPath))
-    # try:
-        # files = os.listdir(landPath)
-        # for file in files:
-        #     if '.ini' in file:
-        #         iniFile = file
-        #         if file != '{}.ini'.format(land):
-        #             print ('ini',file)
-        #         break
-        # if not iniFile:
-
-    # except: #it's probably a broken link from moving files from _for_symlinks to _ini_only
-    #     print ('Removing broken link {}.  Run this program again'.format(landPath))
-    #     os.rmdir(landPath)
-# #         break
+    iniPath = '{}/{}.ini'.format(landPath,land)
+    # if not os.path.exists(iniPath):
+    #     sys.exit('Stop.  No .ini file for {}'.format(landPath))
     if os.path.exists(iniPath):
         lines = readfile(iniPath)
         if len(lines) > 1:
             version = lines[1].split('=')[1].split('(')[0].split(',')[0].replace('00','0').replace('.10.','.1.').replace(' ','')
         else:
+            print('len lines',len(lines))
             print ('lines', lines)
             sys.exit('Stop:  does not exist or cannot be parsed')
         zipName = '{}.v{}.7z'.format(land.replace(' ','_'),version) #no zips will have spaces, but landscapes folders might
