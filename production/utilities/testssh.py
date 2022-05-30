@@ -4,7 +4,7 @@ import paramiko
 
 
 # print(os.path(os.curdir))
-slcServerIP = '192.168.1.122'
+slcServerIP = '192.168.1.88'
 user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519'
 k = paramiko.Ed25519Key.from_private_key_file(keyFile)

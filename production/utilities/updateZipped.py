@@ -31,7 +31,7 @@ otherDir2 = 'F:\\landscapes_for_symlinks2'
 iniOnlyDir1 = 'E:\\landscapes_ini_only'
 iniOnlyDir2 = 'F:\\landscapes_ini_only2'
 zipDir = 'S:\\Skylines-C\landscapes-zip'
-slcServerIP = '192.168.1.122'
+slcServerIP = '192.168.1.88'
 user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
@@ -76,7 +76,7 @@ allZips = []
 #update symbolic links
 #remove broken symbolic links
 for item in mainList:
-    if not os.path.exists('{}\\{}\\{}.ini'.format(mainDir,item,item)):
+    if os.path.isdir('{}\\{}'.format(mainDir,item)) and not os.path.exists('{}\\{}\\{}.ini'.format(mainDir,item,item)):
         os.rmdir('{}\\{}'.format(mainDir,item))
 
 for dir in [otherDir1, otherDir2,iniOnlyDir1,iniOnlyDir2]:
