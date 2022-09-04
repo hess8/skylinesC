@@ -26,7 +26,7 @@ files = os.listdir(remoteBUdir)
 run = True
 while run:
     # close port 4200 so can't write new data while backing up
-    os.system('sudo ufw deny 4200 > /dev/null 2>&1')
+    #os.system('sudo ufw deny 4200 > /dev/null 2>&1')
     now = datetime.datetime.now()
     nowStr = now.strftime("_{}".format(timeFormat))
     print
@@ -162,12 +162,12 @@ while run:
 
     print
     #ufw maintenance:
-    os.system('sudo ufw enable > /dev/null 2>&1')
-    os.system('sudo ufw deny 4200 > /dev/null 2>&1')
-    os.system('sudo ufw deny 80 > /dev/null 2>&1')
-    os.system('sudo ufw deny 22 > /dev/null 2>&1')
-    os.system('sudo ufw allow from 192.168.1.39 to any port 4200 > /dev/null 2>&1')
-    os.system('sudo ufw allow from 192.168.1.10 proto tcp to any port 22 > /dev/null 2>&1')
+    # os.system('sudo ufw enable > /dev/null 2>&1')
+    # os.system('sudo ufw deny 4200 > /dev/null 2>&1')
+    # os.system('sudo ufw deny 80 > /dev/null 2>&1')
+    # os.system('sudo ufw deny 22 > /dev/null 2>&1')
+    # os.system('sudo ufw allow from 192.168.1.39 to any port 4200 > /dev/null 2>&1')
+    # os.system('sudo ufw allow from 192.168.1.10 proto tcp to any port 22 > /dev/null 2>&1')
 
     #find time until midnight
     secMidnight = ((24 - now.hour - 1) * 3600) + ((60 - now.minute - 1) * 60) + (60 - now.second)
