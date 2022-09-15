@@ -98,8 +98,8 @@
 -A ufw-skip-to-policy-forward -j DROP
 -A ufw-skip-to-policy-input -j DROP
 -A ufw-skip-to-policy-output -j DROP
--A ufw-user-input -s 192.168.1.39/32 -p tcp -m tcp --dport 4200 -j ACCEPT
--A ufw-user-input -s 192.168.1.39/32 -p udp -m udp --dport 4200 -j ACCEPT
+-A ufw-user-input -s 192.168.1.59/32 -p tcp -m tcp --dport 4200 -j ACCEPT
+-A ufw-user-input -s 192.168.1.59/32 -p udp -m udp --dport 4200 -j ACCEPT
 -A ufw-user-limit -m limit --limit 3/min -j LOG --log-prefix "[UFW LIMIT BLOCK] "
 -A ufw-user-limit -j REJECT --reject-with icmp-port-unreachable
 -A ufw-user-limit-accept -j ACCEPT

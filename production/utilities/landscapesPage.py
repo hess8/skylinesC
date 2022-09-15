@@ -15,7 +15,7 @@ for item in dirlist:
         name = item.split('.torrent')[0]
         names.append(name)
         sizes.append (os.stat('{}/{}'.format(dir,name)).st_size)
-print names
+# print names
 
 lines = []
 lines.append('<BasePage> \n')
@@ -24,7 +24,7 @@ lines.append('  <div class="page-header"> \n')
 lines.append('    <h1>{{t "landscapes"}}</h1> \n')
 lines.append('  </div> \n')
 lines.append('  <p> {{t "landscapesPage.download"}} </p> \n')
-lines.append('  <p> {{t "install"}} <a href="https://www.fosshub.com/qBittorrent.html">  {{"qBittorrent"}}</a> {{t "landscapesPage.qbittorent"}} <b> {{t "landscapesPage.before"}} </b> {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
+lines.append('  <p> {{t "landscapesPage.before"}} {{t "install"}} <a href="https://www.fosshub.com/qBittorrent.html"> qBittorrent </a>. {{t "landscapesPage.qbittorent"}} {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
 
 lines.append('  <p> {{t "landscapesPage.extract-with"}}  <a href="https://www.7-zip.org/download.html"> 7-zip </a>  {{t "landscapesPage.paste"}} </p> \n')
 
@@ -52,7 +52,7 @@ for i, name in enumerate(names):
     lines.append('\t<tr> \n')
     # lines.append('\t\t<td> <a href="http://199.192.98.227:8080/landscapes-zip/{}.torrent" download>'.format(name) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
     magfilepath = dir+'/{}.magnet'.format(name)
-    print name
+    # print name
     magline = readfileNoStrip(magfilepath)[0].strip() + trackerStr
     lines.append('\t\t<td> <a href="{}">'.format(magline) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
     # lines.append('\t<td> <a href="{}"> magnet </a> </td> '.format(magline))
@@ -68,3 +68,4 @@ lines.append('</BasePage> \n')
 file = open(landPage, 'w')
 file.writelines(lines)
 file.close()
+print('New landscapes page created for {} files'.format(len(names)))

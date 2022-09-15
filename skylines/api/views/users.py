@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from email.mime.text import MIMEText
 from email.utils import formatdate
-import smtplib
+import sys, smtplib, ssl
 
 from flask import Blueprint, request, current_app
 from werkzeug.exceptions import ServiceUnavailable
@@ -26,6 +26,9 @@ from skylines.schemas import (
     UserSchema,
     ValidationError,
 )
+
+sys.path.append('/home/bret/secure')
+from emailAccount import *
 
 users_blueprint = Blueprint("users", "skylines")
 
@@ -125,20 +128,16 @@ The SkyLines Team
         user.recover_key,
     )
 
-    msg = MIMEText(text.encode("utf-8"), "plain", "utf-8")
-    msg["Subject"] = "SkyLines password recovery"
-    msg["From"] = current_app.config["EMAIL_FROM"]
-    msg["To"] = user.email_address.encode("ascii")
-    msg["Date"] = formatdate(localtime=1)
-
+    # context = ssl.create_default_context()
     try:
-        smtp = smtplib.SMTP(current_app.config["SMTP_SERVER"])
-        smtp.ehlo()
+        smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        smtp.login(email_from, email_pw)
+        message = MIMEText(text.encode("utf-8"), "plain", "utf-8")
+        message["Subject"] = "SkyLines password recovery"
+        message["From"] = email_from
+        message["To"] = user.email_address.encode("ascii")
         smtp.sendmail(
-            current_app.config["EMAIL_FROM"].encode("ascii"),
-            user.email_address.encode("ascii"),
-            msg.as_string(),
-        )
+            email_from, user.email_address.encode("ascii"), message.as_string())
         smtp.quit()
 
     except:

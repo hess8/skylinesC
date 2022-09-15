@@ -38,7 +38,7 @@ sudo rm sites-enabled/default
 sudo vim /etc/nginx/ites-available/acme-challenge
 #replace;
    server_name _;
-#with 
+#with
 	server_name skylinescondor.com;
 	location ^~ /.well-known/acme-challenge/ {
 		allow all;
@@ -49,7 +49,7 @@ sudo service nginx reload
 
 #!!!!!!!!!!!!! Make sure you forward port 80 to this machine before the below!!!!!!!!!
 sudo certbot certonly --dry-run --webroot --webroot-path=/var/www/html -d skylinescondor.com
-##### if that works, remove --dry-run and run again 
+##### if that works, remove --dry-run and run again
 #success!
 
 sudo ls -l /etc/letsencrypt/live/skylinescondor.com
@@ -62,7 +62,7 @@ sudo vim /etc/nginx/snippets/ssl-skylinescondor.com.conf
 	ssl_certificate_key /etc/letsencrypt/live/skylinescondor.com/privkey.pem;
 
 sudo vim /etc/nginx/snippets/ssl-params.conf
-#paste:	
+#paste:
 	# from https://cipherli.st/
 	# and https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
 
@@ -92,10 +92,10 @@ sudo ln -s /etc/nginx/sites-available/skylinescondor.com /etc/nginx/sites-enable
 sudo vim /etc/nginx/sites-available/skylinescondor.com
 #replace server with:
 	upstream ember {
-	    server 192.168.1.122:4200;
+	    server 192.168.1.88:4200;
 	  }
 
-	server {    
+	server {
 		    client_max_body_size 4M;
 		    listen 80;
 		    listen [::]:80;
@@ -121,17 +121,17 @@ sudo vim /etc/nginx/sites-available/skylinescondor.com
 
 sudo service nginx reload
 
-#at this point localhost points to sudo https://skylinescondor.com  and should show the ember server, which is on a Ubuntu 14 machine 
-#forward port 80 to this nginx machine (ubuntu 18+) and then test at 
-https://www.ssllabs.com/ssltest/ 
+#at this point localhost points to sudo https://skylinescondor.com  and should show the ember server, which is on a Ubuntu 14 machine
+#forward port 80 to this nginx machine (ubuntu 18+) and then test at
+https://www.ssllabs.com/ssltest/
 
 Success!
 
-See https://www.nginx.com/blog/monitoring-nginx/ 
-Go to https://amplify.nginx.com/dashboard 
+See https://www.nginx.com/blog/monitoring-nginx/
+Go to https://amplify.nginx.com/dashboard
 
 
 ### Nginx Amplify agent (run on both U14 and U18 machines)
 curl -sS -L -O https://github.com/nginxinc/nginx-amplify-agent/raw/master/packages/install.sh && API_KEY='59c5a93cf3596a889d01a0efa4754897' sh ./install.sh
-# Check status with 
+# Check status with
 ps ax | grep -i 'amplify\-'

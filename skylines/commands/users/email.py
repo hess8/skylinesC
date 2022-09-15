@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function
 from flask_script import Command, Option
 
 import io
-import smtplib
+import sys, smtplib, ssl
 from email.mime.text import MIMEText
 from email.utils import formatdate
 from flask import current_app
@@ -38,14 +38,14 @@ class Email(Command):
             try:
                 custom_text = u"Hello {},\n\n{}".format(user.name, text)
 
+                smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+                smtp.login(email_from, email_pw)
+
                 msg = MIMEText(custom_text.encode("utf-8"), "plain", "utf-8")
                 msg["Subject"] = title.encode("utf-8")
-                msg["From"] = current_app.config["EMAIL_FROM"]
+                msg["From"] = email_from
                 msg["To"] = user.email_address.encode("ascii")
-                msg["Date"] = formatdate(localtime=1)
-
-                smtp = smtplib.SMTP(current_app.config["SMTP_SERVER"])
-                smtp.ehlo()
+                # smtp.ehlo()
                 smtp.sendmail(
                     current_app.config["EMAIL_FROM"].encode("ascii"),
                     user.email_address.encode("ascii"),

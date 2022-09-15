@@ -7,7 +7,7 @@ from shutil import copy2
 """
 
 Ember server runs this script and saves to Nginx server, which saves to Google Drive
-1. Database:  Keep nkeep dumps.  If the size of the current database is greater than the oldest dump, 
+1. Database:  Keep nkeep dumps.  If the size of the current database is greater than the oldest dump,
 then delete the oldest dump.
 2. htdocs:  Incremental: Add the igc files that are newer than the last backup to a new tar file.
 3. htdocs: remove .fpl files that are more than an hour old.
@@ -16,7 +16,7 @@ then delete the oldest dump.
 # dumpOutDir = '/home/bret/google_drive/skylines_backup'
 igcsInDir = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files'
 dbBUdir = '/home/bret/servers/database_backups'
-remoteBUdir = '/media/sf_Google_Drive'
+remoteBUdir = '/media/sf_googleDrive'
 igcsOutDir = os.path.join(remoteBUdir,'igcsBackup')
 
 nkeep = 8
@@ -26,7 +26,7 @@ files = os.listdir(remoteBUdir)
 run = True
 while run:
     # close port 4200 so can't write new data while backing up
-    os.system('sudo ufw deny 4200 > /dev/null 2>&1')
+    #os.system('sudo ufw deny 4200 > /dev/null 2>&1')
     now = datetime.datetime.now()
     nowStr = now.strftime("_{}".format(timeFormat))
     print
@@ -162,16 +162,12 @@ while run:
 
     print
     #ufw maintenance:
-    os.system('sudo ufw enable > /dev/null 2>&1')
-    os.system('sudo ufw deny 4200 > /dev/null 2>&1')
-    os.system('sudo ufw deny 80 > /dev/null 2>&1')
-    os.system('sudo ufw allow from 192.168.1.39 to any port 4200 > /dev/null 2>&1')
-    #utsoar maintenance:
-    freshUTSoarHrs = 2.0  #copy files automatically only if the files are less that freshUTSoarHrs hrs old.
-    if (time.time() - os.path.getmtime('/media/sf_landscapes-zip/utsoar-dist.hbs'))/3600.0 < freshUTSoarHrs:
-        os.system('cp /media/sf_landscapes-zip/utsoar-* ember/app/templates/')
-        os.system('cp /media/sf_landscapes-zip/flights.csv /media/sf_Google_Drive/')
-
+    # os.system('sudo ufw enable > /dev/null 2>&1')
+    # os.system('sudo ufw deny 4200 > /dev/null 2>&1')
+    # os.system('sudo ufw deny 80 > /dev/null 2>&1')
+    # os.system('sudo ufw deny 22 > /dev/null 2>&1')
+    # os.system('sudo ufw allow from 192.168.1.39 to any port 4200 > /dev/null 2>&1')
+    # os.system('sudo ufw allow from 192.168.1.10 proto tcp to any port 22 > /dev/null 2>&1')
 
     #find time until midnight
     secMidnight = ((24 - now.hour - 1) * 3600) + ((60 - now.minute - 1) * 60) + (60 - now.second)
