@@ -119,18 +119,16 @@ fi
 export PS1='\W> '
 export POSTGIS_GDAL_ENABLED_DRIVERS=GTiff
 export POSTGIS_ENABLE_OUTDB_RASTERS=1
-export FLASK_ENV=development
 alias skyl='cd /home/bret/servers/repo-skylinesC/skylinesC/'
 alias esky='cd /home/bret/servers/repo-skylinesC/skylinesC/ember'
 #alias eserve5='esky;sudo ember serve --environment=production --port 80 --proxy http://localhost:5000/'
-alias eserve42-5='esky;sudo ember serve --environment=production --port 4200 --proxy http://localhost:5000/'
-#alias mserve='skyl; pipenv run ./manage.py runserver'
-alias gserve='pipenv run gunicorn -b 127.0.0.1:5000 -w 8 --no-sendfile wsgi_skylines'
+alias eserve42-5='esky; sudo ember serve --environment=production --port 4200 --proxy http://localhost:5000/'
+alias mserve='skyl; pipenv run ./manage.py runserver'
 alias dbrecreate='pipenv run ./manage.py db recreate'
 alias dbcreate='pipenv run ./manage.py db create'
 alias pycharm='./pycharm/bin/pycharm.sh'
-alias pgadmin='python ~/.local/share/virtualenvs/pgadmin-WsDn56it/lib/python2.7/site-packages/pgadmin4/pgAdmin4.py'
 alias pips='pipenv shell'
+alias pgadmin='cd /home/bret/pgadmin/; pips; python ~/.local/share/virtualenvs/pgadmin-WsDn56it/lib/python2.7/site-packages/pgadmin4/pgAdmin4.py'
 alias ngstart="sudo service nginx start"
 alias ngstop="sudo service nginx stop"
 alias ngrestart="sudo service nginx restart"
@@ -144,8 +142,7 @@ alias ngtail-access.log="sudo tail -f -n200 /var/log/nginx/access.log"
 alias ngcd="cd /etc/nginx/"
 alias ngtest="sudo nginx -t"
 alias ngbackup-config-skylines.conf=nginxconfigbackup
-alias bu='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/backupSkylines.py'
-alias ct='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/createTorrents.py'
+
 nginxconfigbackup() { 
   sudo cp /etc/nginx/sites-available/skylinescondor /etc/nginx/sites-available/skylinescondor.$(date "+%Y-%m-%d_%H:%M")-$1
 } #the parameter ending is the comment use dashes "-" between words
