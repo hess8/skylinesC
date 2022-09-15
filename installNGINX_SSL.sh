@@ -10,7 +10,7 @@ ngrestart
 # Automatic renewals.  See https://onepagezen.com/letsencrypt-auto-renew-certbot-apache/#step1
 0 0 */28 * * bash /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/renewSSL.sh # every 28 days crontab line.  sudo crontab -e
 
-renewSSL.xh #don't need sudo because crontab runs as root.  Try after sudo -i to get to root
+renewSSL.sh #don't need sudo because crontab runs as root.  Try after sudo -i to get to root
 	unlink /etc/nginx/sites-enabled/skylinescondor.com
 	ln -s /etc/nginx/sites-available/acme-challenge /etc/nginx/sites-enabled
 	systemctl restart nginx
@@ -20,7 +20,6 @@ renewSSL.xh #don't need sudo because crontab runs as root.  Try after sudo -i to
 	systemctl restart nginx
 
 #install on an Ubuntu 18+ machine
-
 sudo apt-get update
 sudo apt-get install nginx
 
