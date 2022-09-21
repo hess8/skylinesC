@@ -22,7 +22,7 @@ def turns(delta, str):
         sleep(0.5)
         print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"), '\\', str, end='\r')
         sleep(0.5)
-        print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"), '!', str, end='\r')
+        print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"), '|', str, end='\r')
         sleep(0.5)
         print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"), '/', str, end='\r')
         sleep(0.5)
