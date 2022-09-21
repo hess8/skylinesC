@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-md-12 tagline">
         <p class="lead pull-left" data-test-welcome-message>{{t "about.welcome"}}</p>
-
+        <p class="lead pull-left" data-test-welcome-message>{{t "about.note"}}</p>
         <div class="btn-group social-buttons pull-right visible-md visible-lg">
 {{!--           <a href="https://www.facebook.com/skylines.project" class="btn btn-default" target="_blank" rel="noopener">{{fa-icon "facebook-square"}}</a> --}}
 {{!--           <a href="https://twitter.com/skylinesproject" class="btn btn-default" target="_blank" rel="noopener">{{fa-icon "twitter"}}</a> --}}
@@ -45,7 +45,7 @@
         <h2>{{fa-icon "address-card"}} {{t "social-network"}}</h2>
         <p>{{t "about.notifications" htmlSafe=true url=(href-to notificationsTarget)}}</p>
       </div>
-      
+
       <div class="col-md-4">
         <h2>{{fa-icon "envelope"}} {{t "contact"}}</h2>
         <p><a href="mailto:{{'skylinescondor@gmail.com'}}">{{t "contact-admin"}}</a>{{" "}}{{t "contact-content"}}</p>
