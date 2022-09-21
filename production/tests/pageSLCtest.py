@@ -3,7 +3,11 @@ import requests
 from time import sleep
 from datetime import datetime
 from funcs import emailMessage, turns
-
+'''Run with **python3** on deSoto U18'''
+page = 'statistics'
+# page = 'clubs'
+# page = 'flights/all?page=1'
+base = 'https://skylinescondor.com/api'
 senderEmail = 'skylinesC@soardata.org'
 receiverEmail = 'bret.hess@gmail.com'
 looptime = 60 #sec
@@ -11,9 +15,9 @@ alerttime = 300
 print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"), end='\r')
 while True:
     try:
-        response = requests.get('https://skylinescondor.com/api/flights/all?page=1',timeout=2)
+        response = requests.get('{}/{}'.format(base,page),timeout=2)
         jsonr = response.json()
-        if jsonr['count']>0:
+        if len(jsonr) > 0:
             turns(looptime,'')
             continue
         else:
