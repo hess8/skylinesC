@@ -45,7 +45,7 @@ tracker = 'http://tracker.opentrackr.org:1337/announcefile'
 sizeExp = 21 # 2^21 bytes = 2MB
 comment = 'skylinescondor.com'
 for zipped in zippedForTorrent:
-    webSeed = 'http://199.192.98.227:8080/{}'.format(zipped)
+    webSeed = 'http://208.83.226.9:8080/{}'.format(zipped)
     try:
         os.system('mktorrent -a {} -l {} -c {} -w {} {}'.format(tracker,sizeExp,comment,webSeed,zipped))
         print '{}.torrent created'.format(zipped)

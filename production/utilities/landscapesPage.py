@@ -11,7 +11,7 @@ dirlist = os.listdir(dir)
 names = []
 sizes = []
 for item in dirlist:
-    if '.torrent' in item:
+    if item.split('.')[-1]=='torrent':
         name = item.split('.torrent')[0]
         names.append(name)
         sizes.append (os.stat('{}/{}'.format(dir,name)).st_size)
@@ -50,7 +50,7 @@ lines.append('  <p> {{t "landscapesPage.see"}}  <a href="https://www.condor.club
 
 for i, name in enumerate(names):
     lines.append('\t<tr> \n')
-    # lines.append('\t\t<td> <a href="http://199.192.98.227:8080/landscapes-zip/{}.torrent" download>'.format(name) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
+    # lines.append('\t\t<td> <a href="http://208.83.226.9:8080/landscapes-zip/{}.torrent" download>'.format(name) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
     magfilepath = dir+'/{}.magnet'.format(name)
     # print name
     magline = readfileNoStrip(magfilepath)[0].strip() + trackerStr
