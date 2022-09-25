@@ -201,20 +201,20 @@ def get_date_from_name(filename):
     #Local date must be somewhere in the file name.  It will guess a date if ambiguous
     now = datetime.utcnow()
     condorCreation = dparser.parse('2005-04-05')
-    filename = filename.replace(".igc", "").replace('_', '-').replace(' ', '-').replace('.', '-').replace(',', '-')
-    filename = re.sub("[A-Za-z]", "", filename)  # keep only digits and separators
+    trialStr = filename.replace(".igc", "").replace('_', '-').replace(' ', '-').replace('.', '-').replace(',', '-')
+    trialStr = re.sub("[A-Za-z]", "", trialStr)  # keep only digits and separators
     try:
-        trialDate = dparser.parse(filename, fuzzy=True)
+        trialDate = dparser.parse(trialStr, fuzzy=True)
         if condorCreation <= trialDate <= now + timedelta(hours=24): #reasonable dates
             return trialDate  # success
         else:
             raise Exception('Bad date')
     except: #run through 10-character segments of string (maximum length of date YYYYxMMxDD):
-        for istart in range(0,len(filename)-10):
-            if filename[istart].isdigit(): #check only strings starting with digit, not separator
+        for istart in range(0,len(trialStr)-10):
+            if trialStr[istart].isdigit(): #check only strings starting with digit, not separator
                 try:
-                    # print 'test', filename[istart:istart + 10]
-                    trialDate = dparser.parse(filename[istart:istart+10], fuzzy=True)
+                    # print 'test', trialStr[istart:istart + 10]
+                    trialDate = dparser.parse(trialStr[istart:istart+10], fuzzy=True)
                 except:
                     continue
                 else:
