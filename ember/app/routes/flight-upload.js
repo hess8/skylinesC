@@ -17,7 +17,7 @@ export default Route.extend(AuthenticatedRouteMixin, {
       clubMembers = users.filter(user => user.id !== accountId);
     }
     else{
-    alert("You haven't joined a group (see Settings).  Your flight won't be in any group flights")
+    alert("You haven't joined a group (see Settings to join one), so your flight won't be in any group flights.  If you want to stop this message, join the group called 'No Group'")
     }
 
     return { clubMembers };
