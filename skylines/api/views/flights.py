@@ -72,7 +72,7 @@ def create_fpl_file(igc_file):
     lines = readfileNoStrip(igc_file)
     backupdir = '/home/bret/servers/repo-skylinesC/skylinesC/filesBackup'
     filebase = igc_file.split('/')[-1].replace('.igc','')
-    shutil.copy(igc_file, backupdir + '/{}.'.format(filebase))
+    shutil.copy(igc_file, backupdir + '/{}.igc'.format(filebase))
     keep = []
     for line in lines:
         if "LCONFPL" in line:
