@@ -282,6 +282,7 @@ landscapesPage:
   paste: and paste each folder in Condor2/Landscapes.
   qbittorent: Click on "qBittorrent Windows x64" or "qBittorrent Windows" links, not the page's ad. qBittorrent (or similar torrent manager) works well for these large files.
   before: Before clicking on the links,
+  other: (or any other torrent manager)
   many: You can download many landscapes at the same time.  Downloads are fast if you have fast internet. Works with slow internet and always resumes after interruptions.
   extract-with: Extract with
   after: After you have downloaded and extracted your landscape files, leave the .7z files on your computer and qBittorrent will help the next guy get them faster!
