@@ -3,7 +3,6 @@ import time as t
 # import paramiko
 import tarfile
 from shutil import copy2
-
 """
 
 Ember server runs this script and saves to Nginx server, which saves to Google Drive
@@ -44,7 +43,6 @@ while run:
             print '\terror in pg_dump step'
         try:
             copy2(dumpFilePath, remoteBUdir)
-
         except:
             print '\tError in saving pg_dump to remote backup'
 
@@ -104,7 +102,7 @@ while run:
             try:
                 file.split('_')[1] > 0
                 tars.append(file)
-                tarTimeStamp = file.split('_')[1].split('-backto-')[0]  #.replace('.tar.gz', '')
+                tarTimeStamp = file.split('_')[1].split('-backto-')[0]
                 size = os.stat(os.path.join(igcsOutDir,file)).st_size
                 tarSizes.append(size)
                 tarTimes.append(datetime.datetime.strptime(tarTimeStamp, format(timeFormat)))
@@ -112,7 +110,7 @@ while run:
                 'skip file'
 
     allInfo = zip(tarTimes,tars,tarSizes)
-    tarsInfo =  [[tar,timeFile,size] for timeFile,tar,size in sorted(allInfo,reverse=True)] # name, timeFile, size
+    tarsInfo =  [[tar,timeFile,size] for timeFile,tar,size in sorted(allInfo,reverse=True)]
     for i in range(len(tarsInfo)):
         file = tarsInfo[i][0]
         size = tarsInfo[i][2]

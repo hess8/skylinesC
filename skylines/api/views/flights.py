@@ -67,14 +67,14 @@ def writefile(lines,filepath): #need to have \n's inserted already
     file1.close()
     return
 
-def create_fpl_file(igc_file):
+def create_fpl_file(igc_filename):
     '''Extract fpl file from igc and save in files section'''
-    lines = readfileNoStrip(igc_file)
+    lines = readfileNoStrip(igc_filename)
     keep = []
     for line in lines:
         if "LCONFPL" in line:
             keep.append(line.replace('LCONFPL',''))
-    writefile(keep, igc_file.replace('.igc','.fpl'))
+    writefile(keep, igc_filename.replace('.igc','.fpl'))
 
 def mark_user_notifications_read(pilot):
     if not request.user_id:

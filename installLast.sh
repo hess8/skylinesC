@@ -125,6 +125,7 @@ sudo pipenv install --verbose  blinker
 # create folder for downloaded files
 mkdir -p htdocs/files
 mkdir -p htdocs/srtm
+mkdir -p filesBackup
 
 # Front end
 #add-apt-repository may not be present on some Ubuntu releases:
