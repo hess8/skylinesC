@@ -8,7 +8,7 @@ base = os.path.abspath(os.path.join(here, ".."))
 DEBUG_TB_INTERCEPT_REDIRECTS = False
 
 DEBUG = True
-SECRET_KEY = "skylines"
+SECRET_KEY = "AAAAB3NzaC1yc2EAAAADAQABAAABAQD3N7z5Ir+tRxRmJD+IO+CUG2kte/ISDVRiUUrMGIQTEv+drgXutJ8tKd06Th+oDWE7kGhV+8i0NIaHz1w9wkdRr1CNpVA5r5xXYgPSrcurUVR7GFvTtgwmXjHRXAfHm7ENcrZLs0VP2sE34KSMOdXu+uiDovZCIeOPwFpO/7gAoiXLhVIowwOR9jUH/whLW0/DGXHajf0bO0uxPt/7jbHsahrCf2/h82V/QKWj+HEfsa38Z6V3vxNqYMtMUuDiaS1SeLdmWkL49sDOTpoBiAnrYJihK06MNb2+UZCsEliHKccCXSm/386yGyadHp1iXXpBmxqkM476kqC99uBwvzpP"
 
 SMTP_SERVER = "localhost"
 EMAIL_FROM = "SkyLines <no-reply@skylinescondor.com>"

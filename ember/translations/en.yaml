@@ -24,6 +24,7 @@ choose-pilot: Choose Pilot
 circling-performance: Circling performance
 climb-percentage-abbr: Climb %
 club: Group
+club-visible: Upload at least one flight after joining your new group to make your group appear on the Groups page
 club-join: Join a group
 club-contact-email-address: Email of group contact
 club-exists-already: A group with this name exists already.
@@ -147,8 +148,7 @@ new: New
 newer: Newer
 'no': 'No'
 no-airports-found: No airports found.
-no-club: Not in group
-#no-club-on-upload:  You haven't joined a group.  If you want this flight to be part of the group's flights, join a group before uploading flight.
+no-club:
 no-clubs-found: No groups found.
 no-comments-yet: No comments yet.
 no-groupflights-found: No group flights found.
@@ -259,12 +259,13 @@ your-flights-have-been-saved: Your flights have been saved.
 your-live-tracking-key: 'Your Live Tracking key is:'
 about:
   welcome: SkyLinesCondor -- flight sharing and group flights in the Condor simulator
+  note:
   flights: <a href="{uploadURL}">Upload</a> your Condor IGC files and share them.  Export IGC files from Condor:Flight Analysis.  Download flight plan of any flight.
   tracking: Use your mobile phone to send position updates to SkyLines. Find out how it works <a href="{url}">here</a>.
   analysis: See your flights in detail and improve them. Animated 2-D and 3-D tracks. OLC+ method scores any type of flight.
   task-planning: Use your browser to plan your tasks before the flight and upload them quickly to your flight computer. Integration of {prosoar} is planned.
   competitions: Create competitions to offer your spectators an even better live tracking experience by following all the participants on the same map.
-  groupflights: <a href="{joinURL}">Join</a> or <a href="{joinURL}">register</a> a group!  It's great fun to fly XC together or compare flights on the same Condor flight plan. Animated 2-D and 3-D overlays of your group's tracks.
+  groupflights: <a href="{joinURL}">Join</a> or <a href="{joinURL}">register</a> a group!  It's fun to fly XC together or compare flights on the same Condor flight plan. Animated 2-D and 3-D overlays of your group's tracks.
   landscapes: You can download essentially all Condor 2 <a href="{landURL}">landscapes here</a>
   achievements: Challenge yourself by trying to complete all the achievements that SkyLines offers. Fly large triangles, long final glides or just do your first outlanding.
   notifications: Comment on flights, follow your friends and get <a href="{url}">notifications</a> of their flights.
@@ -280,6 +281,7 @@ landscapesPage:
   paste: and paste each folder in Condor2/Landscapes.
   qbittorent: Click on "qBittorrent Windows x64" or "qBittorrent Windows" links, not the page's ad. qBittorrent (or similar torrent manager) works well for these large files.
   before: Before clicking on the links,
+  other: (or any other torrent manager)
   many: You can download many landscapes at the same time.  Downloads are fast if you have fast internet. Works with slow internet and always resumes after interruptions.
   extract-with: Extract with
   after: After you have downloaded and extracted your landscape files, leave the .7z files on your computer and qBittorrent will help the next guy get them faster!

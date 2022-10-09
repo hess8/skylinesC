@@ -119,11 +119,13 @@ fi
 export PS1='\W> '
 export POSTGIS_GDAL_ENABLED_DRIVERS=GTiff
 export POSTGIS_ENABLE_OUTDB_RASTERS=1
+export FLASK_ENV=development
 alias skyl='cd /home/bret/servers/repo-skylinesC/skylinesC/'
 alias esky='cd /home/bret/servers/repo-skylinesC/skylinesC/ember'
 #alias eserve5='esky;sudo ember serve --environment=production --port 80 --proxy http://localhost:5000/'
 alias eserve42-5='esky;sudo ember serve --environment=production --port 4200 --proxy http://localhost:5000/'
-alias mserve='skyl; pipenv run ./manage.py runserver'
+#alias mserve='skyl; pipenv run ./manage.py runserver'
+alias gserve='skyl; pipenv run gunicorn -b 127.0.0.1:5000 -w 8 --no-sendfile wsgi_skylines'
 alias dbrecreate='pipenv run ./manage.py db recreate'
 alias dbcreate='pipenv run ./manage.py db create'
 alias pycharm='./pycharm/bin/pycharm.sh'
@@ -133,7 +135,7 @@ alias ngstart="sudo service nginx start"
 alias ngstop="sudo service nginx stop"
 alias ngrestart="sudo service nginx restart"
 alias ngstatus="sudo service nginx status"
-alias ngreload="sudo kill -HUP `cat /var/run/nginx.pid`"
+#alias ngreload="sudo kill -HUP `cat /var/run/nginx.pid`"
 alias ngvim-default="sudo vim /etc/nginx/sites-available/default"
 alias ngvim-skylines='sudo vim /etc/nginx/sites-available/skylinescondor.com'
 alias ngvim-nginx.conf="sudo vim /etc/nginx/nginx.conf"

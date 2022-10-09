@@ -1,4 +1,4 @@
-import math
+import math, os, shutil
 from datetime import datetime, timedelta
 
 from flask import Blueprint, request, abort, current_app, make_response
@@ -69,12 +69,17 @@ def writefile(lines,filepath): #need to have \n's inserted already
 
 def create_fpl_file(igc_filename):
     '''Extract fpl file from igc and save in files section'''
-    lines = readfileNoStrip(igc_filename)
+    lines = readfileNoStrip(igc_file)
+    backupdir = '/home/bret/servers/repo-skylinesC/skylinesC/filesBackup'
+    filebase = igc_file.split('/')[-1].replace('.igc','')
+    shutil.copy(igc_file, backupdir + '/{}.igc'.format(filebase))
     keep = []
     for line in lines:
         if "LCONFPL" in line:
             keep.append(line.replace('LCONFPL',''))
-    writefile(keep, igc_filename.replace('.igc','.fpl'))
+    fpl_file = igc_file.replace('.igc','.fpl')
+    writefile(keep, fpl_file)
+    shutil.copy(fpl_file, backupdir + '/{}.fpl'.format(filebase))
 
 def mark_user_notifications_read(pilot):
     if not request.user_id:
@@ -564,7 +569,8 @@ def json(flight_id):
         Flight, flight_id, joinedload=(Flight.igc_file, Flight.model)
     )
     igc_file = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/{}'.format(flight.igc_file.filename)
-    create_fpl_file(igc_file)
+    if not os.path.exists(igc_file.replace('.igc', '.fpl')):
+        create_fpl_file(igc_file)
     current_user = User.get(request.user_id) if request.user_id else None
     if not flight.is_viewable(current_user):
         return jsonify(), 404
