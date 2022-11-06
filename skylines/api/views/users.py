@@ -116,7 +116,7 @@ def recover_step1_post(json):
 def send_recover_mail(user):
     text = u"""Hi %s,
 
-you have asked to recover your password (from IP %s).  To enter a new
+You have asked to recover your password.  To enter a new
 password, click on the following link:
 
  http://skylinescondor.com/users/recover?key=%x
@@ -124,7 +124,6 @@ password, click on the following link:
 SkylinesCondor
 """ % (
         user.name,
-        request.remote_addr,
         user.recover_key,
     )
     sender = 'skylinescondor@soardata.org'
