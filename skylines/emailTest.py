@@ -24,11 +24,11 @@ msg['To'] = recipient
 # envelope header.
 
 s = smtplib.SMTP()
-s.connect('localhost', '587')
+s.connect('localhost')
 
 
 
 # s = smtplib.SMTP('localhost')
 s.sendmail(sender, [recipient], msg.as_string())
 s.quit()
-s.quit()
+print 'Done'
