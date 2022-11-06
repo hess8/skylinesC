@@ -15,11 +15,14 @@ from skylines.model import User
 class Email(Command):
     """ Send email to all users """
 
+
+
     option_list = (
         Option("path", help="path to a text file with the content of the email"),
     )
 
     def run(self, path):
+        sender = 'skylinescondor@soardata.org'
         with io.open(path, mode="r", encoding="utf-8") as f:
             content = f.read()
             title, text = [str.strip() for str in content.split("---")]
@@ -38,12 +41,10 @@ class Email(Command):
             try:
                 custom_text = u"Hello {},\n\n{}".format(user.name, text)
 
-                smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-                smtp.login(email_from, email_pw)
-
+                smtp = smtplib.SMTP('localhost')
                 msg = MIMEText(custom_text.encode("utf-8"), "plain", "utf-8")
                 msg["Subject"] = title.encode("utf-8")
-                msg["From"] = email_from
+                msg["From"] = sender
                 msg["To"] = user.email_address.encode("ascii")
                 # smtp.ehlo()
                 smtp.sendmail(

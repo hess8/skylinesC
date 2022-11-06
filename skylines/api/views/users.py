@@ -28,8 +28,8 @@ from skylines.schemas import (
 )
 
 sys.path.append('/home/bret/secure')
-from emailAccount import *
-
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 users_blueprint = Blueprint("users", "skylines")
 
 
@@ -121,23 +121,22 @@ password, click on the following link:
 
  http://skylinescondor.com/users/recover?key=%x
 
-The SkyLines Team
+SkylinesCondor
 """ % (
         user.name,
         request.remote_addr,
         user.recover_key,
     )
+    sender = 'skylinescondor@soardata.org'
 
-    # context = ssl.create_default_context()
     try:
-        smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        smtp.login(email_from, email_pw)
+        smtp = smtplib.SMTP('localhost')
         message = MIMEText(text.encode("utf-8"), "plain", "utf-8")
-        message["Subject"] = "SkyLines password recovery"
-        message["From"] = email_from
+        message["Subject"] = "SkylinesCondor password recovery"
+        message["From"] = sender
         message["To"] = user.email_address.encode("ascii")
         smtp.sendmail(
-            email_from, user.email_address.encode("ascii"), message.as_string())
+            sender, user.email_address.encode("ascii"), message.as_string())
         smtp.quit()
 
     except:
