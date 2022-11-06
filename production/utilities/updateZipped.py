@@ -84,8 +84,6 @@ for item in mainList:
 for dir in [otherDir1, otherDir2,iniOnlyDir1,iniOnlyDir2]:
 # for dir in [otherDir1, iniOnlyDir1]:
     for item in os.listdir(dir):
-        if 'Kanta' in item:
-            print()
         if os.path.isdir(os.path.join(dir,item)) and item not in mainList:
             print ('Updated symlink for {}.'.format(item))
             mainPath = '{}\\{}'.format(mainDir,item)
@@ -97,7 +95,7 @@ for dir in [otherDir1, otherDir2,iniOnlyDir1,iniOnlyDir2]:
 
 #landscapes are all represented in mainDir now.
 for item in os.listdir(mainDir):
-    if os.path.isdir(item) and 'WestGermany3' not in item:
+    if os.path.isdir(os.path.join(mainDir,item)) and 'WestGermany3' not in item:
         allLands.append(item)
         allLandPaths.append('{}\\{}'.format(mainDir,item))
 
