@@ -27,11 +27,9 @@ from skylines.schemas import (
     ValidationError,
 )
 
-sys.path.append('/home/bret/secure')
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 users_blueprint = Blueprint("users", "skylines")
-
 
 @users_blueprint.route("/users", strict_slashes=False)
 def _list():
@@ -45,7 +43,6 @@ def _list():
         fields.append("club")
 
     return jsonify(users=UserSchema(only=fields).dump(users, many=True).data)
-
 
 @users_blueprint.route("/users", methods=["POST"], strict_slashes=False)
 def new_post():
@@ -73,7 +70,6 @@ def new_post():
 
     return jsonify(user=UserSchema().dump(user).data)
 
-
 @users_blueprint.route("/users/recover", methods=["POST"])
 @oauth.optional()
 def recover_post():
@@ -85,7 +81,6 @@ def recover_post():
         return recover_step2_post(json)
     else:
         return recover_step1_post(json)
-
 
 def recover_step1_post(json):
     try:
@@ -111,7 +106,6 @@ def recover_step1_post(json):
         return jsonify(error="mail-service-unavailable"), 503
 
     return jsonify()
-
 
 def send_recover_mail(user):
     text = u"""Hi %s,

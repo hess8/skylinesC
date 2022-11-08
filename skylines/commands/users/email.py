@@ -15,8 +15,6 @@ from skylines.model import User
 class Email(Command):
     """ Send email to all users """
 
-
-
     option_list = (
         Option("path", help="path to a text file with the content of the email"),
     )
@@ -32,6 +30,8 @@ class Email(Command):
         )
 
         for user in users_query:
+            if 'Hess' not in user.name:
+                continue ##########test
             print(
                 u"Sending email to {} (ID: {})...".format(user.name, user.id).encode(
                     "utf-8"
