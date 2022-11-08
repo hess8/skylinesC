@@ -2,14 +2,14 @@ from __future__ import absolute_import, print_function
 
 from flask_script import Command, Option
 
-import io
-import sys, smtplib, ssl
+import os
+import smtplib
 from email.mime.text import MIMEText
-from email.utils import formatdate
 from flask import current_app
 
 from skylines.database import db
 from skylines.model import User
+from skylines.common import readfileNoStrip
 
 
 class Email(Command):
@@ -20,11 +20,14 @@ class Email(Command):
     )
 
     def run(self, path):
+        os.chdir('/home/bret/servers/repo-skylinesC/skylinesC')
         sender = 'skylinescondor@soardata.org'
-        with io.open(path, mode="r", encoding="utf-8") as f:
-            content = f.read()
-            title, text = [str.strip() for str in content.split("---")]
-
+        lines = readfileNoStrip(path)
+        title = lines[0].strip()
+        text = ''
+        for line in lines[1:]:
+            text += line
+        text += '\nBret'
         users_query = (
             db.session.query(User).filter(User.email_address != None).order_by(User.id)
         )
@@ -39,20 +42,15 @@ class Email(Command):
             )
 
             try:
-                custom_text = u"Hello {},\n\n{}".format(user.name, text)
-
-                smtp = smtplib.SMTP('localhost')
-                msg = MIMEText(custom_text.encode("utf-8"), "plain", "utf-8")
-                msg["Subject"] = title.encode("utf-8")
+                recipient = user.email_address
+                body = 'Hi {},\n'.format(user.name.split(' ')[0])
+                body += text
+                msg = MIMEText(body)
+                msg["Subject"] = title
                 msg["From"] = sender
-                msg["To"] = user.email_address.encode("ascii")
-                # smtp.ehlo()
-                smtp.sendmail(
-                    current_app.config["EMAIL_FROM"].encode("ascii"),
-                    user.email_address.encode("ascii"),
-                    msg.as_string(),
-                )
-                smtp.quit()
+                s = smtplib.SMTP('localhost')
+                s.sendmail(sender, [recipient], msg.as_string())
+                s.quit()
 
             except BaseException as e:
                 print("Sending email failed: {}", e)

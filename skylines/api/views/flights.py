@@ -51,15 +51,15 @@ from skylines.schemas import (
     ValidationError,
 )
 from skylines.worker import tasks
-
+from skylines.common import readfileNoStrip
 import xcsoar
 
 flights_blueprint = Blueprint("flights", "skylines")
 
-def readfileNoStrip(filepath):
-    with open(filepath) as f:
-        lines = f.read().splitlines(True) #keeplinebreaks=True.  Does not strip the lines of \n
-    return lines
+# def readfileNoStrip(filepath):
+#     with open(filepath) as f:
+#         lines = f.read().splitlines(True) #keeplinebreaks=True.  Does not strip the lines of \n
+#     return lines
 
 def writefile(lines,filepath): #need to have \n's inserted already
     file1 = open(filepath,'w')

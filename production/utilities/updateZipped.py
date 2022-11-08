@@ -15,11 +15,8 @@ import winsound
 import win32com.client
 import paramiko
 from subprocess import Popen, PIPE
+from skylines.common import readfile
 
-def readfile(filepath):
-    with open(filepath) as f:
-        lines = f.read().splitlines() #strips the lines of \n
-    return lines
 
 def sevenzip(tempPath,landPath):
     os.system('7z a -t7z "{}" "{}"'.format(tempPath,landPath)) #quotes to handle spaces in windows file names

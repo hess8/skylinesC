@@ -1,9 +1,6 @@
 import os, sys
+from skylines.common import readfileNoStrip
 
-def readfileNoStrip(filepath):
-    with open(filepath) as f:
-        lines = f.read().splitlines(True) #keeplinebreaks=True.  Does not strip the lines of \n
-    return lines
 trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
 landPage = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
 dir = '/media/sf_landscapes-zip'
