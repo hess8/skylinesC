@@ -46,7 +46,8 @@ class Email(Command):
         text = ''
         for line in lines[1:]:
             text += line
-        text += '\nBret @ SkylinesCondor'
+        text += "\nFor help contact skylinescondor@gmail.com.  Don't reply to this message."
+        text += '\n\n--Bret at SkylinesCondor'
         users_query = (
             db.session.query(User).filter(User.email_address != None).order_by(User.id)
         )

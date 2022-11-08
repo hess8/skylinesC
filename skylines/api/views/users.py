@@ -114,8 +114,10 @@ You have asked to recover your password.  To enter a new
 password, click on the following link:
 
  http://skylinescondor.com/users/recover?key=%x
+ 
+For help contact skylinescondor@gmail.com.  Don't reply to this message.
 
-SkylinesCondor
+--Bret at SkylinesCondor
 """ % (
         user.name,
         user.recover_key,
