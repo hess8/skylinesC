@@ -69,6 +69,7 @@ DISTANCE-on-DATE: '{distance} on {date}'
 DISTANCE-on-DATE-by-PILOT: '{distance} on {date} by {pilot}'
 DISTANCE-on-DATE-by-PILOT-and-COPILOT: '{distance} on {date} by {pilot} and {copilot}'
 dont-have-an-account: Don't have an account?
+download: Download
 duplicate-file: Duplicate file
 duration: Duration
 edit: Edit

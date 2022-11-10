@@ -9,6 +9,7 @@ from flask import current_app
 
 from skylines.database import db
 from skylines.model import User
+
 from skylines.common import readfileNoStrip
 
 
@@ -21,11 +22,16 @@ class Email(Command):
     )
 
     def sendEmail(self, user, sender, recipient, title, text):
-        print('Sending email to {} (ID: {})...'.format(user.name, user.id))
+        # print('Sending email to {} (ID: {})...'.format(user.name, user.id))
+        print(
+            u"Sending email to {} (ID: {})...".format(user.name, user.id).encode(
+                "utf-8"
+            )
+        )
         try:
             body = 'Hi {},\n'.format(user.name.split(' ')[0])
             body += text
-            msg = MIMEText(body)
+            msg = MIMEText(body.encode("utf-8"), "plain", "utf-8")
             msg["Subject"] = title
             msg["From"] = sender
             s = smtplib.SMTP('localhost')

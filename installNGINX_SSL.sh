@@ -92,7 +92,7 @@ sudo ln -s /etc/nginx/sites-available/skylinescondor.com /etc/nginx/sites-enable
 sudo vim /etc/nginx/sites-available/skylinescondor.com
 #replace server with:
 	upstream ember {
-	    server 192.168.1.169:4200;
+	    server 192.168.1.50:4200;
 	  }
 
 	server {
