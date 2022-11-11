@@ -15,8 +15,10 @@ import winsound
 import win32com.client
 import paramiko
 from subprocess import Popen, PIPE
-sys.path.append('/home/bret/servers/repo-skylinesC/skylinesC/skylines')
-from common import readfileNoStrip
+# print(os.path.abspath(os.curdir))
+sys.path.append('d:\\skylinesC\\skylines')
+
+from common import readfileNoStrip, readfile
 
 
 def sevenzip(tempPath,landPath):
