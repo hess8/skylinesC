@@ -10,6 +10,7 @@ from flask import current_app
 from skylines.database import db
 from skylines.model import User
 
+
 from skylines.common import readfileNoStrip
 
 
@@ -22,24 +23,21 @@ class Email(Command):
     )
 
     def sendEmail(self, user, sender, recipient, title, text):
-        # print('Sending email to {} (ID: {})...'.format(user.name, user.id))
-        print(
-            u"Sending email to {} (ID: {})...".format(user.name, user.id).encode(
-                "utf-8"
-            )
-        )
+        print("Sending email to {} (ID: {})...".format(user.name.encode("utf-8"),user.id))
+        print(format(user.email_address))
         try:
-            body = 'Hi {},\n'.format(user.name.split(' ')[0])
+            body = 'Hi {},\n'.format(user.name.encode("utf-8").split(' ')[0])
             body += text
-            msg = MIMEText(body.encode("utf-8"), "plain", "utf-8")
+            msg = MIMEText(body)
             msg["Subject"] = title
             msg["From"] = sender
             s = smtplib.SMTP('localhost')
-            s.sendmail(sender, [recipient], msg.as_string())
+            s.sendmail(sender, recipient.encode("ascii"), msg.as_string())
             s.quit()
         except BaseException as e:
-            print("Sending email failed: {}", e)
-
+            print(recipient)
+            print("Sending email failed: {}".format(e))
+            sys.exit('Stop')
 
     def run(self, path, to):
 
@@ -54,12 +52,11 @@ class Email(Command):
             text += line
         text += "\nFor help contact skylinescondor@gmail.com.  Don't reply to this message."
         text += '\n\n--Bret at SkylinesCondor'
-        users_query = (
-            db.session.query(User).filter(User.email_address != None).order_by(User.id)
-        )
-
+        users_queqry = (db.session.query(User).filter(User.email_address != None).order_by(User.id))
         for user in users_query:
             recipient = user.email_address
+            # recipient = 'bret.hess@gmail.com'
+            # print('recipient changed to',recipient)
             if to == 'admin' and user.admin:
                 self.sendEmail(user,sender,recipient,title, text)
                 break
