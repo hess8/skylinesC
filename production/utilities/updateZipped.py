@@ -15,11 +15,9 @@ import winsound
 import win32com.client
 import paramiko
 from subprocess import Popen, PIPE
+sys.path.append('/home/bret/servers/repo-skylinesC/skylinesC/skylines')
+from common import readfileNoStrip
 
-def readfile(filepath):
-    with open(filepath) as f:
-        lines = f.read().splitlines() #strips the lines of \n
-    return lines
 
 def sevenzip(tempPath,landPath):
     os.system('7z a -t7z "{}" "{}"'.format(tempPath,landPath)) #quotes to handle spaces in windows file names
@@ -32,7 +30,7 @@ otherDir1 = 'E:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
 otherDir2 = 'F:\\landscapes_for_symlinks2'
 iniOnlyDir1 = 'E:\\landscapes_ini_only'
 iniOnlyDir2 = 'F:\\landscapes_ini_only2'
-zipDir = 'S:\\Skylines-C\landscapes-zip'
+zipDir = 'S:\\skylinesCfiles\landscapes-zip'
 slcServerIP = '192.168.1.50'
 user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
