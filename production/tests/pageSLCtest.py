@@ -3,7 +3,13 @@ import requests
 from time import sleep
 from datetime import datetime
 from funcs import emailMessage, turns
-'''Run with **python3** on deSoto U18'''
+
+'''Run with **python3** on nginx server U18'''
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--noloop", help="stops loop",action="store_true")
+args = parser.parse_args()
+noloop = args.noloop
 page = 'statistics'
 # page = 'clubs'
 # page = 'flights/all?page=1'
@@ -18,16 +24,24 @@ while True:
         response = requests.get('{}/{}'.format(base,page),timeout=2)
         jsonr = response.json()
         if len(jsonr) > 0:
+            if noloop:
+                break
             turns(looptime,'')
-            continue
+            # if loop:
+            #     continue
         else:
             subject = 'Zero skylinesC flights count'
             emailMessage(subject, '', senderEmail, receiverEmail)
+            if noloop:
+                break
             turns(alerttime, 'zero count')
     except:
         subject = 'SkylinesC flights page timeout/error'
         emailMessage(subject, '', senderEmail, receiverEmail)
+        if noloop:
+            break
         turns(alerttime,'timeout/error')
+
 
 
 
