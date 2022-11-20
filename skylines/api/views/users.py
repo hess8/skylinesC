@@ -27,11 +27,9 @@ from skylines.schemas import (
     ValidationError,
 )
 
-sys.path.append('/home/bret/secure')
-from emailAccount import *
-
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 users_blueprint = Blueprint("users", "skylines")
-
 
 @users_blueprint.route("/users", strict_slashes=False)
 def _list():
@@ -45,7 +43,6 @@ def _list():
         fields.append("club")
 
     return jsonify(users=UserSchema(only=fields).dump(users, many=True).data)
-
 
 @users_blueprint.route("/users", methods=["POST"], strict_slashes=False)
 def new_post():
@@ -73,7 +70,6 @@ def new_post():
 
     return jsonify(user=UserSchema().dump(user).data)
 
-
 @users_blueprint.route("/users/recover", methods=["POST"])
 @oauth.optional()
 def recover_post():
@@ -85,7 +81,6 @@ def recover_post():
         return recover_step2_post(json)
     else:
         return recover_step1_post(json)
-
 
 def recover_step1_post(json):
     try:
@@ -112,32 +107,31 @@ def recover_step1_post(json):
 
     return jsonify()
 
-
 def send_recover_mail(user):
     text = u"""Hi %s,
 
-you have asked to recover your password (from IP %s).  To enter a new
+You have asked to recover your password.  To enter a new
 password, click on the following link:
 
  http://skylinescondor.com/users/recover?key=%x
+ 
+For help contact skylinescondor@gmail.com.  Don't reply to this message.
 
-The SkyLines Team
+--Bret at SkylinesCondor
 """ % (
         user.name,
-        request.remote_addr,
         user.recover_key,
     )
+    sender = 'skylinescondor@soardata.org'
 
-    # context = ssl.create_default_context()
     try:
-        smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        smtp.login(email_from, email_pw)
+        smtp = smtplib.SMTP('localhost')
         message = MIMEText(text.encode("utf-8"), "plain", "utf-8")
-        message["Subject"] = "SkyLines password recovery"
-        message["From"] = email_from
+        message["Subject"] = "SkylinesCondor password recovery"
+        message["From"] = sender
         message["To"] = user.email_address.encode("ascii")
         smtp.sendmail(
-            email_from, user.email_address.encode("ascii"), message.as_string())
+            sender, user.email_address.encode("ascii"), message.as_string())
         smtp.quit()
 
     except:

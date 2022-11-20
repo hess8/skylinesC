@@ -1,10 +1,12 @@
 # '''
-# 1. run in windows cmd window as ADMIN python d:\skylinesC\production\utilities\updateZipped.py
+# 1. run in windows (anaconda "conda activate bchenv") as ADMIN python d:\skylinesC\production\utilities\updateZipped.py
 # 2. conda activate bchenv
 # 3. SET PATH=%PATH%;"C:\Program Files\7-Zip"
 # 4. confirmation that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
 # link target eg C:\Users\Bret\AppData\Local\qBittorrent\logs\qbittorrent.log
 #   sample line:  (N) 2022-04-03T19:07:50 - 'Falkland_Islands.v1.0.7z' added to download list.
+#
+# ssh access: make sure port 22 is open on U14.  Test ssh connection manually
 # '''
 
 import os,sys,shutil
@@ -13,11 +15,11 @@ import winsound
 import win32com.client
 import paramiko
 from subprocess import Popen, PIPE
+# print(os.path.abspath(os.curdir))
+sys.path.append('d:\\skylinesC\\skylines')
 
-def readfile(filepath):
-    with open(filepath) as f:
-        lines = f.read().splitlines() #strips the lines of \n
-    return lines
+from common import readfileNoStrip, readfile
+
 
 def sevenzip(tempPath,landPath):
     os.system('7z a -t7z "{}" "{}"'.format(tempPath,landPath)) #quotes to handle spaces in windows file names
@@ -30,8 +32,8 @@ otherDir1 = 'E:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
 otherDir2 = 'F:\\landscapes_for_symlinks2'
 iniOnlyDir1 = 'E:\\landscapes_ini_only'
 iniOnlyDir2 = 'F:\\landscapes_ini_only2'
-zipDir = 'S:\\Skylines-C\landscapes-zip'
-slcServerIP = '192.168.1.87'
+zipDir = 'S:\\skylinesCfiles\landscapes-zip'
+slcServerIP = '192.168.1.50'
 user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
@@ -82,8 +84,6 @@ for item in mainList:
 for dir in [otherDir1, otherDir2,iniOnlyDir1,iniOnlyDir2]:
 # for dir in [otherDir1, iniOnlyDir1]:
     for item in os.listdir(dir):
-        if 'Kanta' in item:
-            print()
         if os.path.isdir(os.path.join(dir,item)) and item not in mainList:
             print ('Updated symlink for {}.'.format(item))
             mainPath = '{}\\{}'.format(mainDir,item)
@@ -95,7 +95,7 @@ for dir in [otherDir1, otherDir2,iniOnlyDir1,iniOnlyDir2]:
 
 #landscapes are all represented in mainDir now.
 for item in os.listdir(mainDir):
-    if 'WestGermany3' not in item:
+    if os.path.isdir(os.path.join(mainDir,item)) and 'WestGermany3' not in item:
         allLands.append(item)
         allLandPaths.append('{}\\{}'.format(mainDir,item))
 

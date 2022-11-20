@@ -51,15 +51,15 @@ from skylines.schemas import (
     ValidationError,
 )
 from skylines.worker import tasks
-
+from skylines.common import readfileNoStrip
 import xcsoar
 
 flights_blueprint = Blueprint("flights", "skylines")
 
-def readfileNoStrip(filepath):
-    with open(filepath) as f:
-        lines = f.read().splitlines(True) #keeplinebreaks=True.  Does not strip the lines of \n
-    return lines
+# def readfileNoStrip(filepath):
+#     with open(filepath) as f:
+#         lines = f.read().splitlines(True) #keeplinebreaks=True.  Does not strip the lines of \n
+#     return lines
 
 def writefile(lines,filepath): #need to have \n's inserted already
     file1 = open(filepath,'w')
@@ -67,17 +67,17 @@ def writefile(lines,filepath): #need to have \n's inserted already
     file1.close()
     return
 
-def create_fpl_file(igc_file):
+def create_fpl_file(igc_filename):
     '''Extract fpl file from igc and save in files section'''
-    lines = readfileNoStrip(igc_file)
+    lines = readfileNoStrip(igc_filename)
     backupdir = '/home/bret/servers/repo-skylinesC/skylinesC/filesBackup'
-    filebase = igc_file.split('/')[-1].replace('.igc','')
-    shutil.copy(igc_file, backupdir + '/{}.igc'.format(filebase))
+    filebase = igc_filename.split('/')[-1].replace('.igc','')
+    shutil.copy(igc_filename, backupdir + '/{}.igc'.format(filebase))
     keep = []
     for line in lines:
         if "LCONFPL" in line:
             keep.append(line.replace('LCONFPL',''))
-    fpl_file = igc_file.replace('.igc','.fpl')
+    fpl_file = igc_filename.replace('.igc','.fpl')
     writefile(keep, fpl_file)
     shutil.copy(fpl_file, backupdir + '/{}.fpl'.format(filebase))
 

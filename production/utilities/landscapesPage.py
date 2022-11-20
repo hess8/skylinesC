@@ -1,12 +1,10 @@
 import os, sys
+sys.path.append('/home/bret/servers/repo-skylinesC/skylinesC/skylines')
+from common import readfileNoStrip
 
-def readfileNoStrip(filepath):
-    with open(filepath) as f:
-        lines = f.read().splitlines(True) #keeplinebreaks=True.  Does not strip the lines of \n
-    return lines
 trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
 landPage = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
-dir = '/media/sf_landscapes-zip'
+dir = '/media/sf_skylinesCfiles/landscapes-zip'
 dirlist = os.listdir(dir)
 names = []
 sizes = []
@@ -24,8 +22,9 @@ lines.append('  <div class="page-header"> \n')
 lines.append('    <h1>{{t "landscapes"}}</h1> \n')
 lines.append('  </div> \n')
 lines.append('  <p> {{t "landscapesPage.download"}} </p> \n')
-lines.append('  <p> {{t "landscapesPage.before"}} {{t "install"}} <a href="https://www.fosshub.com/qBittorrent.html"> qBittorrent </a> {{t "landscapesPage.other"}}. {{t "landscapesPage.qbittorent"}} {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
-
+lines.append('  <p> {{t "landscapesPage.before"}} {{t "install"}} qBittorrent  {{t "landscapesPage.other"}}. </p> \n')
+lines.append('  <p> <a href="/files/qbittorrent_x64_setup.exe" class="btn btn-default" download>{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n')
+lines.append('  <p> {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
 lines.append('  <p> {{t "landscapesPage.extract-with"}}  <a href="https://www.7-zip.org/download.html"> 7-zip </a>  {{t "landscapesPage.paste"}} </p> \n')
 
 lines.append('  <hr> \n')
@@ -50,8 +49,7 @@ lines.append('  <p> {{t "landscapesPage.see"}}  <a href="https://www.condor.club
 
 for i, name in enumerate(names):
     lines.append('\t<tr> \n')
-    # lines.append('\t\t<td> <a href="http://208.83.226.9:8080/landscapes-zip/{}.torrent" download>'.format(name) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
-    magfilepath = dir+'/{}.magnet'.format(name)
+     magfilepath = dir+'/{}.magnet'.format(name)
     # print name
     magline = readfileNoStrip(magfilepath)[0].strip() + trackerStr
     lines.append('\t\t<td> <a href="{}">'.format(magline) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
