@@ -52,7 +52,7 @@ class Email(Command):
             text += line
         text += "\nFor help contact skylinescondor@gmail.com.  Don't reply to this message."
         text += '\n\n--Bret at SkylinesCondor'
-        users_queqry = (db.session.query(User).filter(User.email_address != None).order_by(User.id))
+        users_query = (db.session.query(User).filter(User.email_address != None).order_by(User.id))
         for user in users_query:
             recipient = user.email_address
             # recipient = 'bret.hess@gmail.com'

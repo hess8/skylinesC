@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os, sys, datetime, time
 import time as t
 # import paramiko
@@ -15,7 +16,7 @@ then delete the oldest dump.
 # dumpOutDir = '/home/bret/google_drive/skylines_backup'
 igcsInDir = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files'
 dbBUdir = '/home/bret/servers/database_backups'
-remoteBUdir = '/media/sf_googleDrive'
+remoteBUdir = '/media/sf_backup'
 igcsOutDir = os.path.join(remoteBUdir,'igcsBackup')
 
 nkeep = 8
@@ -29,7 +30,7 @@ while run:
     now = datetime.datetime.now()
     nowStr = now.strftime("_{}".format(timeFormat))
     print
-    print now.strftime(timeFormat)
+    print(now.strftime(timeFormat))
     #### Database backup #####
     dumpSize = 0
     if True: #debugging switch, when working on tar section below
@@ -38,13 +39,13 @@ while run:
             dumpFilePath = '{}/skylinesdump{}.custom'.format(dbBUdir,nowStr)
             os.system('sudo -u bret pg_dump --exclude-table-data=elevations --format=custom skylines > {}'.format(dumpFilePath))
             dumpSize = os.stat(dumpFilePath).st_size
-            print  '\t{:.2f} MB, {}'.format(dumpSize / float(10 ** 6), dumpFileName)
+            print( '\t{:.2f} MB, {}'.format(dumpSize / float(10 ** 6), dumpFileName))
         except:
-            print '\terror in pg_dump step'
+            print('\terror in pg_dump step')
         try:
             copy2(dumpFilePath, remoteBUdir)
         except:
-            print '\tError in saving pg_dump to remote backup'
+            print('\tError in saving pg_dump to remote backup')
 
         try:
             files = os.listdir(remoteBUdir)
@@ -60,30 +61,30 @@ while run:
                         dumpTimes.append(datetime.datetime.strptime(dumpTimeStamp, format(timeFormat)))
                         try:
                             size = os.stat(os.path.join(remoteBUdir, file)).st_size
-                            # print '\ttest', file, size
+                            # print('\ttest', file, size
                         except:
                             size = None
                         dumpSizes.append(size)
-                        # print '\t{:.2f} MB, {}'.format(size / float(10 ** 6), file)
+                        # print('\t{:.2f} MB, {}'.format(size / float(10 ** 6), file)
                     except:
                         'skip file'
         except:
-            print '\tError in reading dumps'
+            print('\tError in reading dumps')
         allInfo = zip(dumpTimes,dumps,dumpSizes)
         dumpsInfo =  [[dump,timeFile,size] for timeFile,dump,size in sorted(allInfo,reverse=True)] # name, timeFile, size
         for i in range(len(dumpsInfo)):
             file = dumpsInfo[i][0]
             size = dumpsInfo[i][2]
-            # print '\t{:.2f} MB, {}'.format(size / float(10 ** 6), file)
+            # print('\t{:.2f} MB, {}'.format(size / float(10 ** 6), file)
         oldestDump = dumpsInfo[-1]
         while len(dumpsInfo) > nkeep and oldestDump[2] <= dumpsInfo[0][2]: #Delete oldest if newest is larger or same size
             try: #delete oldest
                 os.remove(os.path.join(remoteBUdir,oldestDump[0]))
-                print '\t\tDeleted', oldestDump[0]
+                print('\t\tDeleted', oldestDump[0])
                 dumpsInfo.pop()
                 oldestDump = dumpsInfo[-1]
             except:
-                print '\tError in deleting oldest dump',oldestDump
+                print('\tError in deleting oldest dump',oldestDump)
 
     #### htdocs igcs backup #####
     # Read date of last htdocs tar file in remoteBUdir
@@ -93,7 +94,7 @@ while run:
     try:
         filesIGC = os.listdir(igcsOutDir)
     except:
-        print '\tError in reading tars'
+        print('\tError in reading tars')
     tars = []
     tarTimes = []
     tarSizes = []
@@ -114,7 +115,7 @@ while run:
     for i in range(len(tarsInfo)):
         file = tarsInfo[i][0]
         size = tarsInfo[i][2]
-        #print '/t{:.2f} MB, {}'.format(size / float(10 ** 6), file)
+        #print('/t{:.2f} MB, {}'.format(size / float(10 ** 6), file)
     if len(tars) > 0:
         latestTar = tarsInfo[0]
         latestTime = latestTar[1]
@@ -122,7 +123,7 @@ while run:
         latestTar = None
         latestTime = datetime.datetime.strptime('2000-1-1.0.0.0', format(timeFormat))
     # Add igcs to tar file
-    # print "Compressing igc files"
+    # print("Compressing igc files"
     tarName = 'igcs{}-backto-{}.tar.gz'.format(nowStr, latestTime.strftime(timeFormat))
     tarPath = os.path.join(dbBUdir,tarName)
     igcsTar = tarfile.open(tarPath, mode='w:gz')
@@ -132,31 +133,32 @@ while run:
         if '.igc' in item:
             igcStoredTime = datetime.datetime.fromtimestamp(os.path.getctime('{}/{}'.format(igcsInDir,item)))
             if igcStoredTime > latestTime:
-                try:
-                    igcsTar.add(os.path.join(igcsInDir,item))
-                    count += 1
-                except:
-                    print 'Error adding {} to tar file'.format(item)
-        elif '.fpl' in item:
-            fplStoredTime = datetime.datetime.fromtimestamp(os.path.getctime('{}/{}'.format(igcsInDir, item)))
-            if (now - fplStoredTime).total_seconds() > 3600*36: #delete if older than 36 hrs
-                    os.system('rm {}'.format(os.path.join(igcsInDir,item)))
+                # try:
+                igcsTar.add(os.path.join(igcsInDir,item))
+                count += 1
+                print('\t',count, end='\r')
+                # except:
+        # elif '.fpl' in item:
+        #     fplStoredTime = datetime.datetime.fromtimestamp(os.path.getctime('{}/{}'.format(igcsInDir, item)))
+        #     if (now - fplStoredTime).total_seconds() > 3600*36: #delete if older than 36 hrs
+        #             os.system('rm {}'.format(os.path.join(igcsInDir,item)))
 
+    print
     igcsTar.close()
 
 
-    # print '\t{:.2f} MB, {}'.format(size / float(10 ** 6), tarName)
+    # print('\t{:.2f} MB, {}'.format(size / float(10 ** 6), tarName)
     stderr = None
     if count > 0:
         tarSize = os.stat(tarPath).st_size
-        print  '\t{:.2f} MB, {}'.format(tarSize / float(10 ** 6), tarPath)
+        print( '\t{:.2f} MB, {}'.format(tarSize / float(10 ** 6), tarPath))
         try:
             copy2(tarPath, igcsOutDir)
             # ftp.put(tarPath, os.path.join(igcsOutDir,tarName))  #put requires file name in destination
         except:
-            print '\tError copying igc tar file to remote archive'
+            print('\tError copying igc tar file to remote archive')
     else:
-        print '\tNo new igc files'
+        print('\tNo new igc files')
 
     print
     #ufw maintenance:
