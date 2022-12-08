@@ -4,7 +4,14 @@ from time import sleep
 from datetime import datetime
 from funcs import emailMessage, turns
 
-'''Run with **python3** on nginx server U18'''
+'''Run with **python3** on nginx server U18
+
+# m h dom mon dow user  command
+* * * * * bret python3 /home/bret/servers/repo-skylinesC/skylinesC/production/tests/pageSLCtest.py --noloop > /home/bret/pageSLCtest/cron.log 2>&1 #run every minute
+
+# Can't end command line without line break
+
+'''
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--noloop", help="stops loop",action="store_true")
