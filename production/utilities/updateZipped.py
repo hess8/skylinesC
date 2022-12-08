@@ -1,6 +1,6 @@
 # '''
 # 1. run in windows (anaconda "conda activate bchenv") as ADMIN python d:\skylinesC\production\utilities\updateZipped.py
-# 2. conda activate bchenv
+# 2. conda activate bch39
 # 3. SET PATH=%PATH%;"C:\Program Files\7-Zip"
 # 4. confirmation that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
 # link target eg C:\Users\Bret\AppData\Local\qBittorrent\logs\qbittorrent.log
@@ -12,11 +12,11 @@
 import os,sys,shutil
 # import py7zr
 import winsound
-import win32com.client
+# import win32com.client
 import paramiko
-from subprocess import Popen, PIPE
+# from subprocess import Popen, PIPE
 # print(os.path.abspath(os.curdir))
-sys.path.append('d:\\skylinesC\\skylines')
+sys.path.append('s:\\skylinesCfiles\\skylinesC\\skylines')
 
 from common import readfileNoStrip, readfile
 
@@ -28,16 +28,15 @@ def sevenzip(tempPath,landPath):
 #                     archive.writeall(landPath, 'base')  #This seems slow, but uses threads well
 
 mainDir = 'Z:\\Condor\\Landscapes'
-otherDir1 = 'E:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
-otherDir2 = 'F:\\landscapes_for_symlinks2'
-iniOnlyDir1 = 'E:\\landscapes_ini_only'
-iniOnlyDir2 = 'F:\\landscapes_ini_only2'
+otherDir1 = 'L:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
+# otherDir2 = 'L:\\landscapes_for_symlinks2'
+iniOnlyDir1 = 'L:\\landscapes_ini_only'
+iniOnlyDir2 = 'L:\\landscapes_server_only'
 zipDir = 'S:\\skylinesCfiles\landscapes-zip'
 slcServerIP = '192.168.1.50'
 user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
-
 mainList0 = os.listdir(mainDir)
 
 #remove extra files from ini_only dirs:
@@ -81,11 +80,11 @@ for item in mainList:
     if os.path.isdir('{}\\{}'.format(mainDir,item)) and not os.path.exists('{}\\{}\\{}.ini'.format(mainDir,item,item)):
         os.rmdir('{}\\{}'.format(mainDir,item))
 
-for dir in [otherDir1, otherDir2,iniOnlyDir1,iniOnlyDir2]:
+for dir in [otherDir1, iniOnlyDir1,iniOnlyDir2]:
 # for dir in [otherDir1, iniOnlyDir1]:
     for item in os.listdir(dir):
         if os.path.isdir(os.path.join(dir,item)) and item not in mainList:
-            print ('Updated symlink for {}.'.format(item))
+            print ('Symlink for {}.'.format(item))
             mainPath = '{}\\{}'.format(mainDir,item)
             otherPath = '{}\\{}'.format(dir,item)
             os.system('mklink /D "{}" "{}"'.format(mainPath,otherPath))
