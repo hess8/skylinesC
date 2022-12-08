@@ -1,7 +1,7 @@
 # '''
 # 1. run in windows (anaconda "conda activate bchenv") as ADMIN python d:\skylinesC\production\utilities\updateZipped.py
 # 2. conda activate bch39
-# 3. SET PATH=%PATH%;"C:\Program Files\7-Zip"
+# 3. Add to windows path:  "C:\Program Files\7-Zip"
 # 4. confirmation that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
 # link target eg C:\Users\Bret\AppData\Local\qBittorrent\logs\qbittorrent.log
 #   sample line:  (N) 2022-04-03T19:07:50 - 'Falkland_Islands.v1.0.7z' added to download list.
@@ -77,7 +77,9 @@ allZips = []
 #update symbolic links
 #remove broken symbolic links
 for item in mainList:
-    if os.path.isdir('{}\\{}'.format(mainDir,item)) and not os.path.exists('{}\\{}\\{}.ini'.format(mainDir,item,item)):
+    if 'Corse' in item:
+        xx=0
+    if os.path.islink('{}\\{}'.format(mainDir,item)) and not os.path.exists('{}\\{}\\{}.ini'.format(mainDir,item,item)):
         os.rmdir('{}\\{}'.format(mainDir,item))
 
 for dir in [otherDir1, iniOnlyDir1,iniOnlyDir2]:
@@ -128,6 +130,7 @@ for i, landPath, in enumerate(allLandPaths):
         zipName = '{}.v{}.7z'.format(land.replace(' ','_'),version) #no zips will have spaces, but landscapes folders might
         zipPathTemp = '{}\\{}'.format(mainDir,zipName)
         zipPath = '{}\\{}'.format(zipDir,zipName) #no zips will have spaces, but landscapes folders might
+        count = 0
         if zipPath not in allZips:
             print()
             print('----------------------------------------------------------')
@@ -141,6 +144,7 @@ for i, landPath, in enumerate(allLandPaths):
                 try:
                     os.system('move {} {}'.format(zipPathTemp,zipPath))
                     newZipped.append(zipPath)
+                    count += 1
                 except:
                     sys.exit('Stop.  Problem with moving file')
             except:
