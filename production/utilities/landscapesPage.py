@@ -49,7 +49,7 @@ lines.append('  <p> {{t "landscapesPage.see"}}  <a href="https://www.condor.club
 
 for i, name in enumerate(names):
     lines.append('\t<tr> \n')
-     magfilepath = dir+'/{}.magnet'.format(name)
+    magfilepath = dir+'/{}.magnet'.format(name)
     # print name
     magline = readfileNoStrip(magfilepath)[0].strip() + trackerStr
     lines.append('\t\t<td> <a href="{}">'.format(magline) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
