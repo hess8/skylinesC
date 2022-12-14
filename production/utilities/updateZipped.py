@@ -1,7 +1,7 @@
 # '''
 # 1. run in windows (anaconda "conda activate bchenv") as ADMIN python d:\skylinesC\production\utilities\updateZipped.py
-# 2. conda activate bchenv
-# 3. SET PATH=%PATH%;"C:\Program Files\7-Zip"
+# 2. conda activate bch39
+# 3. Add to windows path:  "C:\Program Files\7-Zip"
 # 4. confirmation that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
 # link target eg C:\Users\Bret\AppData\Local\qBittorrent\logs\qbittorrent.log
 #   sample line:  (N) 2022-04-03T19:07:50 - 'Falkland_Islands.v1.0.7z' added to download list.
@@ -12,11 +12,11 @@
 import os,sys,shutil
 # import py7zr
 import winsound
-import win32com.client
+# import win32com.client
 import paramiko
-from subprocess import Popen, PIPE
+# from subprocess import Popen, PIPE
 # print(os.path.abspath(os.curdir))
-sys.path.append('d:\\skylinesC\\skylines')
+sys.path.append('s:\\skylinesCfiles\\skylinesC\\skylines')
 
 from common import readfileNoStrip, readfile
 
@@ -28,20 +28,19 @@ def sevenzip(tempPath,landPath):
 #                     archive.writeall(landPath, 'base')  #This seems slow, but uses threads well
 
 mainDir = 'Z:\\Condor\\Landscapes'
-otherDir1 = 'E:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
-otherDir2 = 'F:\\landscapes_for_symlinks2'
-iniOnlyDir1 = 'E:\\landscapes_ini_only'
-iniOnlyDir2 = 'F:\\landscapes_ini_only2'
+otherDir1 = 'L:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
+# otherDir2 = 'L:\\landscapes_for_symlinks2'
+iniOnlyDir = 'L:\\landscapes_ini_only'
+serverOnlyDir = 'L:\\landscapes_server_only'
 zipDir = 'S:\\skylinesCfiles\landscapes-zip'
 slcServerIP = '192.168.1.50'
 user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
-
 mainList0 = os.listdir(mainDir)
 
 #remove extra files from ini_only dirs:
-for dir in [iniOnlyDir1]:# iniOnlyDir2]:
+for dir in [iniOnlyDir]:# :
     for landscape in os.listdir(dir):
         for item in os.listdir(os.path.join(dir,landscape)):
             if not '.ini' in item:
@@ -54,7 +53,7 @@ for dir in [iniOnlyDir1]:# iniOnlyDir2]:
                 else:
                     os.remove(os.path.join(dir,landscape,item))
 
-#if folder (not symbolic link) in mainDir begins with "-", remove all but .ini files and move to iniOnlyDir1
+#if folder (not symbolic link) in mainDir begins with "-", remove all but .ini files and move to iniOnlyDir
 for item in mainList0:
     if item[0] == '-':
         path = os.path.join(mainDir,item)
@@ -64,8 +63,8 @@ for item in mainList0:
                     os.system('rmdir /S /Q "{}"'.format(os.path.join(path,item2)))
                 else:
                     os.remove(os.path.join(path,item2))
-        shutil.move(path,os.path.join(iniOnlyDir1,item.replace('-','')))
-        print('Moved {} to {}'.format(path,iniOnlyDir1))
+        shutil.move(path,os.path.join(iniOnlyDir,item.replace('-','')))
+        print('Moved {} to {}'.format(path,iniOnlyDir))
 
 mainList = os.listdir(mainDir)
 
@@ -75,17 +74,17 @@ allLands = []
 allLandPaths = []
 allZips = []
 
-#update symbolic links
+
 #remove broken symbolic links
 for item in mainList:
-    if os.path.isdir('{}\\{}'.format(mainDir,item)) and not os.path.exists('{}\\{}\\{}.ini'.format(mainDir,item,item)):
+    if os.path.islink('{}\\{}'.format(mainDir,item)) and not os.path.exists('{}\\{}\\{}.ini'.format(mainDir,item,item)):
         os.rmdir('{}\\{}'.format(mainDir,item))
-
-for dir in [otherDir1, otherDir2,iniOnlyDir1,iniOnlyDir2]:
-# for dir in [otherDir1, iniOnlyDir1]:
+#update symbolic links
+for dir in [otherDir1, iniOnlyDir,serverOnlyDir]:
+# for dir in [otherDir1, iniOnlyDir]:
     for item in os.listdir(dir):
         if os.path.isdir(os.path.join(dir,item)) and item not in mainList:
-            print ('Updated symlink for {}.'.format(item))
+            print ('Symlink for {}.'.format(item))
             mainPath = '{}\\{}'.format(mainDir,item)
             otherPath = '{}\\{}'.format(dir,item)
             os.system('mklink /D "{}" "{}"'.format(mainPath,otherPath))
@@ -129,6 +128,7 @@ for i, landPath, in enumerate(allLandPaths):
         zipName = '{}.v{}.7z'.format(land.replace(' ','_'),version) #no zips will have spaces, but landscapes folders might
         zipPathTemp = '{}\\{}'.format(mainDir,zipName)
         zipPath = '{}\\{}'.format(zipDir,zipName) #no zips will have spaces, but landscapes folders might
+        count = 0
         if zipPath not in allZips:
             print()
             print('----------------------------------------------------------')
@@ -142,6 +142,7 @@ for i, landPath, in enumerate(allLandPaths):
                 try:
                     os.system('move {} {}'.format(zipPathTemp,zipPath))
                     newZipped.append(zipPath)
+                    count += 1
                 except:
                     sys.exit('Stop.  Problem with moving file')
             except:

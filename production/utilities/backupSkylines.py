@@ -16,7 +16,7 @@ then delete the oldest dump.
 # dumpOutDir = '/home/bret/google_drive/skylines_backup'
 igcsInDir = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files'
 dbBUdir = '/home/bret/servers/database_backups'
-remoteBUdir = '/media/sf_backup'
+remoteBUdir = '/media/sf_backup/'
 igcsOutDir = os.path.join(remoteBUdir,'igcsBackup')
 
 nkeep = 8
