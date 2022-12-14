@@ -30,8 +30,8 @@ def sevenzip(tempPath,landPath):
 mainDir = 'Z:\\Condor\\Landscapes'
 otherDir1 = 'L:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
 # otherDir2 = 'L:\\landscapes_for_symlinks2'
-iniOnlyDir1 = 'L:\\landscapes_ini_only'
-iniOnlyDir2 = 'L:\\landscapes_server_only'
+iniOnlyDir = 'L:\\landscapes_ini_only'
+serverOnlyDir = 'L:\\landscapes_server_only'
 zipDir = 'S:\\skylinesCfiles\landscapes-zip'
 slcServerIP = '192.168.1.50'
 user = 'bret'
@@ -40,7 +40,7 @@ qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 mainList0 = os.listdir(mainDir)
 
 #remove extra files from ini_only dirs:
-for dir in [iniOnlyDir1]:# iniOnlyDir2]:
+for dir in [iniOnlyDir]:# :
     for landscape in os.listdir(dir):
         for item in os.listdir(os.path.join(dir,landscape)):
             if not '.ini' in item:
@@ -53,7 +53,7 @@ for dir in [iniOnlyDir1]:# iniOnlyDir2]:
                 else:
                     os.remove(os.path.join(dir,landscape,item))
 
-#if folder (not symbolic link) in mainDir begins with "-", remove all but .ini files and move to iniOnlyDir1
+#if folder (not symbolic link) in mainDir begins with "-", remove all but .ini files and move to iniOnlyDir
 for item in mainList0:
     if item[0] == '-':
         path = os.path.join(mainDir,item)
@@ -63,8 +63,8 @@ for item in mainList0:
                     os.system('rmdir /S /Q "{}"'.format(os.path.join(path,item2)))
                 else:
                     os.remove(os.path.join(path,item2))
-        shutil.move(path,os.path.join(iniOnlyDir1,item.replace('-','')))
-        print('Moved {} to {}'.format(path,iniOnlyDir1))
+        shutil.move(path,os.path.join(iniOnlyDir,item.replace('-','')))
+        print('Moved {} to {}'.format(path,iniOnlyDir))
 
 mainList = os.listdir(mainDir)
 
@@ -74,16 +74,14 @@ allLands = []
 allLandPaths = []
 allZips = []
 
-#update symbolic links
+
 #remove broken symbolic links
 for item in mainList:
-    if 'Corse' in item:
-        xx=0
     if os.path.islink('{}\\{}'.format(mainDir,item)) and not os.path.exists('{}\\{}\\{}.ini'.format(mainDir,item,item)):
         os.rmdir('{}\\{}'.format(mainDir,item))
-
-for dir in [otherDir1, iniOnlyDir1,iniOnlyDir2]:
-# for dir in [otherDir1, iniOnlyDir1]:
+#update symbolic links
+for dir in [otherDir1, iniOnlyDir,serverOnlyDir]:
+# for dir in [otherDir1, iniOnlyDir]:
     for item in os.listdir(dir):
         if os.path.isdir(os.path.join(dir,item)) and item not in mainList:
             print ('Symlink for {}.'.format(item))

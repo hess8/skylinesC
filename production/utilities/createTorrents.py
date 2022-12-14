@@ -21,9 +21,10 @@
 # -v                : be verbose
 
 import os, sys
+from datetime import datetime
 
 zipDir = '/media/sf_landscapes-zip'
-sotoWatchDir = zipDir + '/QBTwatchSoto'
+# sotoWatchDir = zipDir + '/QBTwatchSoto'
 einsteinWatchDir = zipDir + '/QBTwatchEinstein'
 workDir = zipDir
 os.chdir(workDir)
@@ -33,12 +34,32 @@ zipDirList = os.listdir(zipDir)
 zippedForTorrent  = []
 oldZipped = []
 
+
+
+
 for item in zipDirList:
     if item.split('.')[-1] == '7z':
-        if not os.path.exists('{}/{}.torrent'.format(zipDir,item)):
-            zippedForTorrent.append(item)
-        else:
+        zipPath = '{}/{}.7z'.format(zipDir,item)
+        torrPath = '{}/{}.torrent'.format(zipDir,item)
+        magPath = '{}/{}.magnet'.format(zipDir, item)
+        zipTime = os.path.getmtime(magPath)
+        magTime = os.path.getmtime(torrPath)
+        if os.path.exists(torrPath):
             oldZipped.append(item)
+            torrTime = os.path.getmtime(torrPath)
+            if torrTime < zipTime:
+                oldZipped.pop(-1)
+                zippedForTorrent.append(item)
+                continue
+            elif os.path.exists(magPath):
+                magTime = os.path.getmtime(magPath)
+                if magTime < zipTime:
+                    oldZipped.pop(-1)
+                    zippedForTorrent.append(item)
+                    continue
+        else:
+            zippedForTorrent.append(item)
+
 created = []
 #create torrents
 tracker = 'http://tracker.opentrackr.org:1337/announcefile'
@@ -58,7 +79,7 @@ for zipped in zippedForTorrent:
         print '{}.magnet created'.format(zipped)
     except:
         print 'Error in magnet link for {}'.format(zipped)
-    for dir in [sotoWatchDir,einsteinWatchDir]:
+    for dir in [einsteinWatchDir]:
         try:
             os.system ('cp {}.torrent {}'.format(zipped,dir))
             print('Copied {}.torrent to {}'.format(zipped,dir))
