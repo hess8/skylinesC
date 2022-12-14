@@ -143,7 +143,7 @@ while run:
         #     if (now - fplStoredTime).total_seconds() > 3600*36: #delete if older than 36 hrs
         #             os.system('rm {}'.format(os.path.join(igcsInDir,item)))
 
-    print
+    print('')
     igcsTar.close()
 
 

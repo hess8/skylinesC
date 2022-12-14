@@ -22,7 +22,7 @@
 
 import os, sys
 
-zipDir = '/media/sf_skylinesCfiles/landscapes-zip'
+zipDir = '/media/sf_landscapes-zip'
 sotoWatchDir = zipDir + '/QBTwatchSoto'
 einsteinWatchDir = zipDir + '/QBTwatchEinstein'
 workDir = zipDir
