@@ -31,35 +31,34 @@ os.chdir(workDir)
 zipDirList = os.listdir(zipDir)
 zippedForTorrent  = []
 oldZipped = []
- 
+
 for item in zipDirList: #remove outdated torrents and magnets
-    zipPath = '{}/{}.7z'.format(zipDir, item)
-    torrPath = '{}/{}.torrent'.format(zipDir, item)
-    magPath = '{}/{}.magnet'.format(zipDir, item)
     if item.split('.')[-1] == '7z':
-        zipTime = os.path.getmtime(magPath)
-        magTime = os.path.getmtime(torrPath)
+        zipPath = '{}/{}'.format(zipDir, item)
+        torrPath = '{}/{}.torrent'.format(zipDir, item)
+        magPath = '{}/{}.magnet'.format(zipDir, item)
+        zipTime = os.path.getmtime(zipPath)
         if os.path.exists(torrPath):
             oldZipped.append(item)
             torrTime = os.path.getmtime(torrPath)
             if torrTime < zipTime:
                 oldZipped.pop(-1)
+                os.remove(torrPath)
                 zippedForTorrent.append(item)
                 continue
             elif os.path.exists(magPath):
                 magTime = os.path.getmtime(magPath)
-                if 'Hillrace' in item:
-                    xx = 0
                 if magTime < zipTime:
                     oldZipped.pop(-1)
+                    os.remove(magPath)
                     zippedForTorrent.append(item)
                     continue
         else:
             zippedForTorrent.append(item)
-    if item.split('.')[-1] == 'torrent' and not os.path.exists(zipPath):
-        os.remove(torrPath)
-    if item.split('.')[-1] == 'magnet' and not os.path.exists(zipPath):
-        os.remove(magPath)
+    if item.split('.')[-1] in ['torrent', 'magnet'] and not os.path.exists(item.split('.')[-1] + '.7z'):
+        os.remove(item)
+    # if item.split('.')[-1] == 'magnet' and not os.path.exists(item.split('.')[-1] + '.7z'):
+    #     os.remove(item)
 
 created = []
 #create torrents
