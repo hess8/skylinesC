@@ -4,7 +4,7 @@ from common import readfileNoStrip
 
 trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
 landPage = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
-dir = '/media/sf_skylinesCfiles/landscapes-zip'
+dir = '/media/sf_landscapes-zip'
 dirlist = os.listdir(dir)
 names = []
 sizes = []
@@ -25,7 +25,7 @@ lines.append('  <p> {{t "landscapesPage.download"}} </p> \n')
 lines.append('  <p> {{t "landscapesPage.before"}} {{t "install"}} qBittorrent  {{t "landscapesPage.other"}}. </p> \n')
 lines.append('  <p> <a href="/files/qbittorrent_x64_setup.exe" class="btn btn-default" download>{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n')
 lines.append('  <p> {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
-lines.append('  <p> {{t "landscapesPage.extract-with"}}  <a href="https://www.7-zip.org/download.html"> 7-zip </a>  {{t "landscapesPage.paste"}} </p> \n')
+lines.append('  <p> {{t "landscapesPage.extract-with"}}  <a href="https://www.7-zip.org/download.html"> 7-zip </a>. {{t "landscapesPage.extract-with"}} {{t "landscapesPage.paste"}} </p> \n')
 
 lines.append('  <hr> \n')
 lines.append('  <p> <b> {{t "landscapesPage.share"}} </b> {{t "landscapesPage.seed"}} <b> {{t "landscapesPage.easy"}} </b> {{t "landscapesPage.run"}}</p> \n')
