@@ -34,14 +34,11 @@ zipDirList = os.listdir(zipDir)
 zippedForTorrent  = []
 oldZipped = []
 
-
-
-
-for item in zipDirList:
+for item in zipDirList: #remove outdated torrents and magnets
+    zipPath = '{}/{}.7z'.format(zipDir, item)
+    torrPath = '{}/{}.torrent'.format(zipDir, item)
+    magPath = '{}/{}.magnet'.format(zipDir, item)
     if item.split('.')[-1] == '7z':
-        zipPath = '{}/{}.7z'.format(zipDir,item)
-        torrPath = '{}/{}.torrent'.format(zipDir,item)
-        magPath = '{}/{}.magnet'.format(zipDir, item)
         zipTime = os.path.getmtime(magPath)
         magTime = os.path.getmtime(torrPath)
         if os.path.exists(torrPath):
@@ -59,6 +56,10 @@ for item in zipDirList:
                     continue
         else:
             zippedForTorrent.append(item)
+    if item.split('.')[-1] == 'torrent' and not os.path.exists(zipPath):
+        os.remove(torrPath)
+    if item.split('.')[-1] == 'magnet' and not os.path.exists(zipPath):
+        os.remove(magPath)
 
 created = []
 #create torrents

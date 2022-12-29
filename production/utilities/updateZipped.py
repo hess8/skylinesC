@@ -115,8 +115,8 @@ for i, landPath, in enumerate(allLandPaths):
     if not iniFile:
         sys.exit('Stop.  No .ini file for {}'.format(landPath))
     iniPath = '{}/{}.ini'.format(landPath,land)
-    # if not os.path.exists(iniPath):
-    #     sys.exit('Stop.  No .ini file for {}'.format(landPath))
+    if not os.path.exists(iniPath):
+        sys.exit('Stop.  No .ini file for {}'.format(landPath))
     if os.path.exists(iniPath):
         lines = readfile(iniPath)
         if len(lines) > 1:
