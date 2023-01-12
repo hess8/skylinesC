@@ -49,19 +49,19 @@ for item in zipDirList: #remove outdated torrents and magnets
             torrTime = os.path.getmtime(torrPath)
             if torrTime < zipTime:
                 oldZipped.pop(-1)
-                # os.remove(torrPath)
+                os.remove(torrPath)
                 zippedForTorrent.append(item)
                 continue
             elif os.path.exists(magPath):
                 magTime = os.path.getmtime(magPath)
                 if magTime < zipTime:
                     oldZipped.pop(-1)
-                    # os.remove(magPath)
+                    os.remove(magPath)
                     zippedForTorrent.append(item)
                     continue
         else:
             zippedForTorrent.append(item)
-    if extension(item) in ['.torrent', '.magnet'] and not os.path.exists(filename(item) + '.7z'):
+    if extension(item) in ['.torrent', '.magnet'] and not os.path.exists(filename(item)): #missing .7z file
         os.remove(item)
 
 created = []
@@ -89,8 +89,6 @@ for zipped in zippedForTorrent:
             print('Copied {}.torrent to {}'.format(zipped,dir))
         except:
             sys.exit('Error copying {}.torrent to {}'.format(zipped,dir))
-    with open("test.txt", "a") as myfile:
-        myfile.write("appended text")
     # remove old version files with same landscape
     land = zipped.split('.')[0]
     for item in oldZipped:
