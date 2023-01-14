@@ -29,6 +29,13 @@ def extension(filepath):
 def filename(filepath):
     return os.path.splitext(filepath)[0]
 
+def createMagnet(zipped):
+    try:
+        os.system('magnet-link {}.torrent > {}.magnet'.format(zipped, zipped))
+        print '{}.magnet created'.format(zipped)
+    except:
+        print 'Error in magnet link for {}'.format(zipped)
+
 zipDir = '/media/sf_landscapes-zip'
 einsteinWatchDir = zipDir + '/QBTwatchEinstein'
 workDir = zipDir
@@ -38,7 +45,9 @@ zipDirList = os.listdir(zipDir)
 zippedForTorrent  = []
 oldZipped = []
 
-for item in zipDirList: #remove outdated torrents and magnets
+
+
+for item in zipDirList:
     if extension(item) == '.7z':
         zipPath = '{}/{}'.format(zipDir, item)
         torrPath = '{}/{}.torrent'.format(zipDir, item)
@@ -46,6 +55,10 @@ for item in zipDirList: #remove outdated torrents and magnets
         zipTime = os.path.getmtime(zipPath)
         if os.path.exists(torrPath):
             oldZipped.append(item)
+            # check for missing magnets
+            if not os.path.exists(magPath):
+                createMagnet(item)
+            # remove outdated torrents and magnets
             torrTime = os.path.getmtime(torrPath)
             if torrTime < zipTime:
                 oldZipped.pop(-1)
@@ -78,11 +91,7 @@ for zipped in zippedForTorrent:
     except:
         print 'Error in torrent {}'.format(zipped)
     #create magnet link
-    try:
-        os.system('magnet-link {}.torrent > {}.magnet'.format(zipped, zipped))
-        print '{}.magnet created'.format(zipped)
-    except:
-        print 'Error in magnet link for {}'.format(zipped)
+    createMagnet(zipped)
     for dir in [einsteinWatchDir]:
         try:
             os.system ('cp {}.torrent {}'.format(zipped,dir))

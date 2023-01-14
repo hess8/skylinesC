@@ -51,7 +51,10 @@ for i, name in enumerate(names):
     lines.append('\t<tr> \n')
     magfilepath = dir+'/{}.magnet'.format(name)
     # print name
-    magline = readfileNoStrip(magfilepath)[0].strip() + trackerStr
+    try:
+        magline = readfileNoStrip(magfilepath)[0].strip() + trackerStr
+    except:
+        xx=0
     lines.append('\t\t<td> <a href="{}">'.format(magline) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
     # lines.append('\t<td> <a href="{}"> magnet </a> </td> '.format(magline))
     sizeStr = '{:.1f} GB"'.format(sizes[i] /float(10 ** 9))
