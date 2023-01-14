@@ -25,8 +25,6 @@ timeFormat = '%Y-%m-%d.%H.%M.%S'
 files = os.listdir(remoteBUdir)
 run = True
 while run:
-    # close port 4200 so can't write new data while backing up
-    #os.system('sudo ufw deny 4200 > /dev/null 2>&1')
     now = datetime.datetime.now()
     nowStr = now.strftime("_{}".format(timeFormat))
     print
@@ -131,7 +129,7 @@ while run:
     count = 0
     for item in items:
         if '.igc' in item:
-            igcStoredTime = datetime.datetime.fromtimestamp(os.path.getctime('{}/{}'.format(igcsInDir,item)))
+            igcStoredTime = datetime.datetime.fromtimestamp(os.path.getmtime('{}/{}'.format(igcsInDir,item)))
             if igcStoredTime > latestTime:
                 # try:
                 igcsTar.add(os.path.join(igcsInDir,item))
