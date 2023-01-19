@@ -23,6 +23,19 @@
 import os, sys
 from datetime import datetime
 
+def extension(filepath):
+    return os.path.splitext(filepath)[1]
+
+def filename(filepath):
+    return os.path.splitext(filepath)[0]
+
+def createMagnet(zipped):
+    try:
+        os.system('magnet-link {}.torrent > {}.magnet'.format(zipped, zipped))
+        print '{}.magnet created'.format(zipped)
+    except:
+        print 'Error in magnet link for {}'.format(zipped)
+
 zipDir = '/media/sf_landscapes-zip'
 einsteinWatchDir = zipDir + '/QBTwatchEinstein'
 workDir = zipDir
@@ -31,35 +44,38 @@ os.chdir(workDir)
 zipDirList = os.listdir(zipDir)
 zippedForTorrent  = []
 oldZipped = []
- 
-for item in zipDirList: #remove outdated torrents and magnets
-    zipPath = '{}/{}.7z'.format(zipDir, item)
-    torrPath = '{}/{}.torrent'.format(zipDir, item)
-    magPath = '{}/{}.magnet'.format(zipDir, item)
-    if item.split('.')[-1] == '7z':
-        zipTime = os.path.getmtime(magPath)
-        magTime = os.path.getmtime(torrPath)
+
+
+
+for item in zipDirList:
+    if extension(item) == '.7z':
+        zipPath = '{}/{}'.format(zipDir, item)
+        torrPath = '{}/{}.torrent'.format(zipDir, item)
+        magPath = '{}/{}.magnet'.format(zipDir, item)
+        zipTime = os.path.getmtime(zipPath)
         if os.path.exists(torrPath):
             oldZipped.append(item)
+            # check for missing magnets
+            if not os.path.exists(magPath):
+                createMagnet(item)
+            # remove outdated torrents and magnets
             torrTime = os.path.getmtime(torrPath)
             if torrTime < zipTime:
                 oldZipped.pop(-1)
+                os.remove(torrPath)
                 zippedForTorrent.append(item)
                 continue
             elif os.path.exists(magPath):
                 magTime = os.path.getmtime(magPath)
-                if 'Hillrace' in item:
-                    xx = 0
                 if magTime < zipTime:
                     oldZipped.pop(-1)
+                    os.remove(magPath)
                     zippedForTorrent.append(item)
                     continue
         else:
             zippedForTorrent.append(item)
-    if item.split('.')[-1] == 'torrent' and not os.path.exists(zipPath):
-        os.remove(torrPath)
-    if item.split('.')[-1] == 'magnet' and not os.path.exists(zipPath):
-        os.remove(magPath)
+    if extension(item) in ['.torrent', '.magnet'] and not os.path.exists(filename(item)): #missing .7z file
+        os.remove(item)
 
 created = []
 #create torrents
@@ -75,19 +91,13 @@ for zipped in zippedForTorrent:
     except:
         print 'Error in torrent {}'.format(zipped)
     #create magnet link
-    try:
-        os.system('magnet-link {}.torrent > {}.magnet'.format(zipped, zipped))
-        print '{}.magnet created'.format(zipped)
-    except:
-        print 'Error in magnet link for {}'.format(zipped)
+    createMagnet(zipped)
     for dir in [einsteinWatchDir]:
         try:
             os.system ('cp {}.torrent {}'.format(zipped,dir))
             print('Copied {}.torrent to {}'.format(zipped,dir))
         except:
             sys.exit('Error copying {}.torrent to {}'.format(zipped,dir))
-    with open("test.txt", "a") as myfile:
-        myfile.write("appended text")
     # remove old version files with same landscape
     land = zipped.split('.')[0]
     for item in oldZipped:
