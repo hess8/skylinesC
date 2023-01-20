@@ -148,7 +148,7 @@ for i, landPath, in enumerate(allLandPaths):
                 print ('Error creating {}'.format(zipPath))
     else:
         print ('lines', lines)
-        sys.exit('Stop: .ini file does not exist for {}'.format(landPath))
+        print('Warning: .ini file does not exist for {}'.format(landPath))
 if len(newZipped) == 0:
     print ('No new landscapes to zip')
 # time.sleep(60)
