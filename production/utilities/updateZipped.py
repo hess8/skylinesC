@@ -11,7 +11,6 @@
 
 import os,sys,shutil
 # import py7zr
-import winsound
 # import win32com.client
 import paramiko
 # from subprocess import Popen, PIPE
@@ -149,11 +148,10 @@ for i, landPath, in enumerate(allLandPaths):
                 print ('Error creating {}'.format(zipPath))
     else:
         print ('lines', lines)
-        sys.exit('Stop: .ini file does not exist for {}'.format(landPath))
+        print('Warning: .ini file does not exist for {}'.format(landPath))
 if len(newZipped) == 0:
     print ('No new landscapes to zip')
 # time.sleep(60)
-winsound.PlaySound("SystemHand", winsound.SND_ALIAS)
 
 # run createTorrents on skylinesC server
 if len(newZipped) > 0:
