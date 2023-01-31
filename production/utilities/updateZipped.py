@@ -107,12 +107,6 @@ newZipped = []
 for i, landPath, in enumerate(allLandPaths):
     land = allLands[i]
     files = os.listdir(landPath)
-    for file in files:
-        if '.ini' in file:
-            iniFile = file
-            break
-    if not iniFile:
-        sys.exit('Stop.  No .ini file for {}'.format(landPath))
     iniPath = '{}/{}.ini'.format(landPath,land)
     if not os.path.exists(iniPath):
         sys.exit('Stop.  No .ini file for {}'.format(landPath))
