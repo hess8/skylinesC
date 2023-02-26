@@ -27,7 +27,7 @@ def sevenzip(tempPath,landPath):
 #                     archive.writeall(landPath, 'base')  #This seems slow, but uses threads well
 
 mainDir = 'Z:\\Condor\\Landscapes'
-otherDir1 = 'L:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
+symLinksDir = 'L:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
 # otherDir2 = 'L:\\landscapes_for_symlinks2'
 iniOnlyDir = 'L:\\landscapes_ini_only'
 serverOnlyDir = 'L:\\landscapes_server_only'
@@ -64,6 +64,10 @@ for item in mainList0:
                     os.remove(os.path.join(path,item2))
         shutil.move(path,os.path.join(iniOnlyDir,item.replace('-','')))
         print('Moved {} to {}'.format(path,iniOnlyDir))
+    elif item[0] == '.':
+        path = os.path.join(mainDir,item)
+        shutil.move(path,os.path.join(symLinksDir,item.replace('.','')))
+        print('Moved {} to {}'.format(path,symLinksDir))
 
 mainList = os.listdir(mainDir)
 
@@ -79,8 +83,8 @@ for item in mainList:
     if os.path.islink('{}\\{}'.format(mainDir,item)) and not os.path.exists('{}\\{}\\{}.ini'.format(mainDir,item,item)):
         os.rmdir('{}\\{}'.format(mainDir,item))
 #update symbolic links
-for dir in [otherDir1, iniOnlyDir,serverOnlyDir]:
-# for dir in [otherDir1, iniOnlyDir]:
+for dir in [symLinksDir, iniOnlyDir,serverOnlyDir]:
+# for dir in [symLinksDir, iniOnlyDir]:
     for item in os.listdir(dir):
         if os.path.isdir(os.path.join(dir,item)) and item not in mainList:
             print ('Symlink for {}.'.format(item))
