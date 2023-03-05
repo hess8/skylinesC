@@ -66,6 +66,7 @@ for item in mainList0:
         print('Moved {} to {}'.format(path,iniOnlyDir))
     elif item[0] == '.':
         path = os.path.join(mainDir,item)
+        print('Moving {} to {}'.format(path,symLinksDir))
         shutil.move(path,os.path.join(symLinksDir,item.replace('.','')))
         print('Moved {} to {}'.format(path,symLinksDir))
 
@@ -113,7 +114,7 @@ for i, landPath, in enumerate(allLandPaths):
     files = os.listdir(landPath)
     iniPath = '{}/{}.ini'.format(landPath,land)
     if not os.path.exists(iniPath):
-        sys.exit('Stop.  No .ini file for {}'.format(landPath))
+       print('Stop.  No .ini file matches {}.  Consider renaming the landscape folder with the name of the .ini folder.'.format(landPath))
     if os.path.exists(iniPath):
         lines = readfile(iniPath)
         if len(lines) > 1:
