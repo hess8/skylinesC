@@ -164,7 +164,7 @@
       {{else}}
         <span class="label label-warning">
         {{fa-icon "warning"}}
-        {{#if (eq status 1)}} {{t "duplicate-file"}}
+        {{#if (eq status 1)}} {{t "duplicate-file"}} #status returned by upload.py
           {{else if (eq status 1)}}
           {{else if (eq status 2)}}{{t "date-missing-in-igc-file"}}
           {{else if (eq status 3)}}{{t "failed-to-parse-file"}}

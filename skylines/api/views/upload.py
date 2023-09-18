@@ -66,7 +66,7 @@ class UploadStatus(IntEnum):
     NOT_CONDOR = 6 # _('File is not a Condor flight')
     DATE_NOT_IN_FILENAME = 7  # _('File is not a Condor flight')
 
-
+#UploadResult doesn't interact with the database, so status must be coming from front end
 class UploadResult(
     namedtuple(
         "UploadResult",
@@ -255,7 +255,8 @@ def index_post():
         igc_file = IGCFile()
         prefix += 1
         try:
-            igc_file.date_condor = get_date_from_name(name) #name differs from filename which has _1 etc appended
+            # igc_file.date_condor = get_date_from_name(name) #name differs from filename which has _1 etc appended
+            igc_file.date_condor = data.get("date_chosen")
             igc_file.time_created = igc_file.date_condor
             igc_file.time_modified = datetime.utcnow()
         except:
@@ -378,6 +379,8 @@ def index_post():
         groupflight_actions(flight, igc_file)
 
         create_flight_notifications(flight)
+        print('allowing only one file for now')
+        break #note:
 
     db.session.commit()
 

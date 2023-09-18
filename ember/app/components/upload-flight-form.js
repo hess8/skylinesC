@@ -43,6 +43,10 @@ export default Component.extend(Validations, {
       this.set('files', event.target.value);
     },
 
+    dateSelected(date) {
+      this.router.transitionTo('flights.date', date);
+    },
+
     async submit() {
       let { validations } = await this.validate();
       if (validations.get('isValid')) {
