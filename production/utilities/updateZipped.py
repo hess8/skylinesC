@@ -26,6 +26,24 @@ def sevenzip(tempPath,landPath):
 #     with py7zr.SevenZipFile(tempPath, 'w') as archive:
 #                     archive.writeall(landPath, 'base')  #This seems slow, but uses threads well
 
+def linktoSSDdrive(zipDir,ssdDir,popular,zipsOnSSD):
+    # replace zip files with symbolic links to ssdDrive
+    for landZip in popular:
+        zipPath = '{}\\{}'.format(zipDir, landZip)
+        ssdPath = '{}\\{}'.format(ssdDir, landZip)
+        if landZip in zipsOnSSD and not os.path.exists(zipPath):
+            print('Symlink for ssdDrive {}.'.format(landZip))
+
+            os.system('mklink "{}" "{}"'.format(zipPath, ssdPath))
+
+def getSSDdriveList(ssdDir):
+    listSSD = os.listdir(ssdDir)
+    zipsOnSSD = []
+    for item in listSSD:
+        if item.split('.')[-1] == '7z' and os.path.getsize(os.path.join(ssdDir,item)) > 10:
+            zipsOnSSD.append(item)
+    return zipsOnSSD
+
 mainDir = 'Z:\\Condor\\Landscapes'
 symLinksDir = 'L:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
 # otherDir2 = 'L:\\landscapes_for_symlinks2'
@@ -45,7 +63,7 @@ for dir in [iniOnlyDir]:# :
         for item in os.listdir(os.path.join(dir,landscape)):
             if not '.ini' in item:
                 print ('Removing all but .ini in {}'.format(landscape))
-                break
+                break #now do the removing
         for item in os.listdir(os.path.join(dir,landscape)):
             if not '.ini' in item:
                 if os.path.isdir(os.path.join(dir,landscape,item)):
@@ -101,6 +119,12 @@ for item in os.listdir(mainDir):
     if os.path.isdir(os.path.join(mainDir,item)) and 'WestGermany3' not in item:
         allLands.append(item)
         allLandPaths.append('{}\\{}'.format(mainDir,item))
+
+
+#make symbolic links from ssdDrive to zipDrive:
+popular = readfile(popularFile) #ssdDir has most popular landscapes in it
+zipsOnSSD = getSSDdriveList(ssdDir)
+linktoSSDdrive(zipDir,ssdDir,popular,zipsOnSSD)
 
 #zips
 for item in os.listdir(zipDir):
@@ -188,25 +212,36 @@ if len(newZipped) > 0:
 #             print('Error. {} not found in {}').format(zipped,logfile)
 # time.sleep(5)
 
-### copy zip files to ssdDrive until full by popularity ###
-# to create popularity.txt, sort torrents by ratio, right click and copy>name
-listSSD = os.listdir(ssdDir)
-existingSSD = []
-for item in listSSD:
-    if item.split('.'[-1]) == '7z':
-        existingSSD.append(item)
-popular = readfile(popularFile)
+# fill up SSDdir and remove original files in zipDir
 for landZip in popular:
-    if landZip not in existingSSD:
+    if landZip not in zipsOnSSD:
         try:
-            inDir = os.path.join(zipDir,landZip)
-            outDir = os.path.join(ssdDir, landZip)
-            print('Copying {} to {}'.format(inDir, outDir))
-            shutil.copy(inDir, outDir)
-            print('Copied {} to {}'.format(inDir, outDir))
+            zipPath = os.path.join(zipDir,landZip)
+            ssdPath = os.path.join(ssdDir, landZip)
+            print('Copying {} to {}'.format(zipPath, ssdPath))
+            shutil.copy(zipPath, ssdPath)
+            if os.path.getsize(zipPath) != os.path.getsize(ssdPath):
+                sys.exit('Stop: file sizes on zipDir and ssdDir were not equal after copy: {}'.format(landZip))
+            print('Done: {}'.format(landZip))
         except:
-            print("Can't copy {} to {}".format(inDir, outDir))
-
-
+            print("Can't copy {} to {}".format(zipPath, ssdPath))
+            print('Break')
+            break
+#get new ssdDrive list
+zipsOnSSD = getSSDdriveList(ssdDir)
+#remove zip files on zipDir that are on ssdDir:
+for landZip in zipsOnSSD:
+    zipPath = os.path.join(zipDir, landZip)
+    ssdPath = os.path.join(ssdDir, landZip)
+    if os.path.exists(zipPath):
+        try:
+            if os.path.getsize(zipPath) == os.path.getsize(ssdPath):
+                os.remove(zipPath)
+            else:
+                print("Didn't remove {} because sizes don't match".format(zipPath) )
+        except Exception as error:
+            print('Error in removing {}: {}'.format(zipPath,error))
+### Create symlinks for newly copied
+linktoSSDdrive(zipDir,ssdDir,popular,zipsOnSSD)
 
 print ("Done")
