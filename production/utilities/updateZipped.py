@@ -32,12 +32,13 @@ symLinksDir = 'L:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
 iniOnlyDir = 'L:\\landscapes_ini_only'
 serverOnlyDir = 'L:\\landscapes_server_only'
 zipDir = 'S:\\skylinesCfiles\landscapes-zip'
+ssdDir = 'R:'
+popularFile = os.path.join(zipDir,'.popularity.txt')
 slcServerIP = '192.168.1.50'
 user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 mainList0 = os.listdir(mainDir)
-
 #remove extra files from ini_only dirs:
 for dir in [iniOnlyDir]:# :
     for landscape in os.listdir(dir):
@@ -77,7 +78,6 @@ mainList = os.listdir(mainDir)
 allLands = []
 allLandPaths = []
 allZips = []
-
 
 #remove broken symbolic links
 for item in mainList:
@@ -187,4 +187,26 @@ if len(newZipped) > 0:
 #         else:
 #             print('Error. {} not found in {}').format(zipped,logfile)
 # time.sleep(5)
+
+### copy zip files to ssdDrive until full by popularity ###
+# to create popularity.txt, sort torrents by ratio, right click and copy>name
+listSSD = os.listdir(ssdDir)
+existingSSD = []
+for item in listSSD:
+    if item.split('.'[-1]) == '7z':
+        existingSSD.append(item)
+popular = readfile(popularFile)
+for landZip in popular:
+    if landZip not in existingSSD:
+        try:
+            inDir = os.path.join(zipDir,landZip)
+            outDir = os.path.join(ssdDir, landZip)
+            print('Copying {} to {}'.format(inDir, outDir))
+            shutil.copy(inDir, outDir)
+            print('Copied {} to {}'.format(inDir, outDir))
+        except:
+            print("Can't copy {} to {}".format(inDir, outDir))
+
+
+
 print ("Done")
