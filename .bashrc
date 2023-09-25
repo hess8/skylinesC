@@ -129,6 +129,7 @@ alias gserve='skyl; pipenv run gunicorn -b 127.0.0.1:5000 -w 8 --no-sendfile wsg
 alias torrcreate='skyl; python production/utilities/createTorrents.py'
 alias dbrecreate='pipenv run ./manage.py db recreate'
 alias dbcreate='pipenv run ./manage.py db create'
+alias back='skyl; python production/utilities/backupSkylines.py'
 alias pycharm='./pycharm/bin/pycharm.sh'
 alias pgadmin='python ~/.local/share/virtualenvs/pgadmin-WsDn56it/lib/python2.7/site-packages/pgadmin4/pgAdmin4.py'
 alias pips='pipenv shell'

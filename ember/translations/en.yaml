@@ -49,7 +49,7 @@ date: Date
 date-compiled: Date compiled
 date-missing-in-igc-file: Date missing in IGC file
 date-must-in-filename: Date of flight must be in filename
-date-ok-filename: An easy filename is "textnotnumbers-YYYY-MM-DD.igc".  Month before day.
+date-ok-filename: An easy filename is "textnotnumbers-YYYY-MM-DD.igc", for example "Nephi JS 2023-08-14". Month before day.
 date-space-filename: Separators OK anywhere, needed in date. <space>, <dash>, <dot>, and/or <_>
 date-number-filename: No digits after the date.
 date-missing-refresh: Refresh this page to try again.
@@ -288,7 +288,7 @@ landscapesPage:
   extract-here: With 7-zip installed, right click on the dowloaded file(s) and choose "7zip > Extract Here".
   after: After you have downloaded and extracted your landscape folders, leave the .7z files on your computer and qBittorrent will help the next guy get them faster!
   contact: if you see errors or have questions.
-  share: You can host
+  host: You can host
   seed: ("seed") one or more of these .7z files yourself to help others get them faster. On qBittorrent (Seeds column) you'll see that many files have only one or two people seeding them ("0(1)" or "0(2)") at the moment.  Let's increase the seeds on all the landscapes!
   easy: It's easy to seed.
   run: Leave the .7z files where they are, let qBitTorrent run in the background and you will be seeding them for others!  In qBitTorrent go to Tools>Options>Behavior and click Desktop>"Start qBitTorrent on Windows startup".  On the dashboard, the "Ratio" column shows what fraction of a file you have shared.

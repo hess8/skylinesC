@@ -21,14 +21,14 @@ lines.append('<BasePage> \n')
 lines.append('  <div class="page-header"> \n')
 lines.append('    <h1>{{t "landscapes"}}</h1> \n')
 lines.append('  </div> \n')
-lines.append('  <p> {{t "landscapesPage.download"}} </p> \n')
-lines.append('  <p> {{t "landscapesPage.before"}} {{t "install"}} qBittorrent  {{t "landscapesPage.other"}}. </p> \n')
+
+lines.append('  <p>  <b> {{t "landscapesPage.before"}}  </b> {{t "install"}} qBittorrent  {{t "landscapesPage.other"}}. </p> \n')
 lines.append('  <p> <a href="/files/qbittorrent_x64_setup.exe" class="btn btn-default" download>{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n')
 lines.append('  <p> {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
-lines.append('  <p> {{t "landscapesPage.extract-with"}}  <a href="https://www.7-zip.org/download.html"> 7-zip </a>. {{t "landscapesPage.extract-with"}} {{t "landscapesPage.paste"}} </p> \n')
-
+lines.append('  <p> {{t "landscapesPage.extract-with"}}  <a href="https://www.7-zip.org/download.html"> 7-zip </a>. {{t "landscapesPage.extract-here"}} {{t "landscapesPage.paste"}} </p> \n')
+lines.append('  <p> {{t "landscapesPage.download"}} </p> \n')
 lines.append('  <hr> \n')
-lines.append('  <p> <b> {{t "landscapesPage.share"}} </b> {{t "landscapesPage.seed"}} <b> {{t "landscapesPage.easy"}} </b> {{t "landscapesPage.run"}}</p> \n')
+lines.append('  <p> <b> {{t "landscapesPage.host"}} </b> {{t "landscapesPage.seed"}} <b> {{t "landscapesPage.easy"}} </b> {{t "landscapesPage.run"}}</p> \n')
 
 
 lines.append('  <div class ="col-md-4" > \n')
