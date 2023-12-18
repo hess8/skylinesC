@@ -27,13 +27,12 @@ lines.append('  <p>  <b> {{t "landscapesPage.before"}}  {{t "install"}} qBittorr
 lines.append('  <p> {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
 lines.append('  <p> {{t "landscapesPage.extract-with"}}  <a href="https://www.7-zip.org/download.html"> 7-zip </a>. {{t "landscapesPage.extract-here"}} {{t "landscapesPage.paste"}} </p> \n')
 lines.append('  <p> {{t "landscapesPage.download"}} </p> \n')
-lines.append('  <hr> \n')
-lines.append('  <p> <b> {{t "landscapesPage.host"}} </b> {{t "landscapesPage.seed"}} <b> {{t "landscapesPage.easy"}} </b> {{t "landscapesPage.run"}}</p> \n')
-
-
 lines.append('  <div class ="col-md-4" > \n')
 lines.append('  <p> {{fa-icon "envelope"}} <a href = "mailto:{{' + "'skylinescondor@gmail.com'}}" + '"> {{t "contact-admin"}} </a> {{" "}} {{t "landscapesPage.contact"}} </p>   \n')
 lines.append('  </div> \n')
+lines.append('  <hr> \n')
+lines.append('  <p> <b> {{t "landscapesPage.host"}} </b> {{t "landscapesPage.seed"}} <b> {{t "landscapesPage.easy"}} </b> {{t "landscapesPage.run"}}</p> \n')
+
 lines.append('  <p> <hr> </p> \n')
 
 lines.append('<table class="table table-striped"> \n')
