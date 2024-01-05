@@ -57,7 +57,11 @@ for i, name in enumerate(names):
         xx=0
     lines.append('\t\t<td> <a href="{}">'.format(magline) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
     # lines.append('\t<td> <a href="{}"> magnet </a> </td> '.format(magline))
-    sizeStr = '{:.1f} GB"'.format(sizes[i] /float(10 ** 9))
+    GiB = 1.074e+9
+    if sizes[i] > 0.1 * GiB:
+        sizeStr = '{:.1f} GB"'.format(sizes[i] / GiB)
+    else:
+        sizeStr = '{:.1f} MB"'.format(sizes[i] / GiB * 1000)
     lines.append('\t<td align = "right"> {{"' + sizeStr  + '}} </td> \n')
     lines.append('\t</tr> \n\n')
 
