@@ -283,9 +283,9 @@ circling-direction:
 landscapesPage:
   download: All landscapes are for Condor 2, and download as a single file.
   paste: Put the landscape folder in Condor2/Landscapes.
-  qbittorent: Click on "qBittorrent Windows x64" or "qBittorrent Windows" links, not the page's ad. qBittorrent (or similar torrent manager) works well for these large files.
-  makeSure: Make sure your torrent manager is doing the downloading, #not your...
-  limits: .  Browsers have download size limits.
+#  qbittorent: Click on "qBittorrent Windows x64" or "qBittorrent Windows" links, not the page's ad. qBittorrent (or similar torrent manager) works well for these large files.
+  makeSure: Make sure your torrent manager is downloading the big torrent files,
+  limits: Browsers have download size limits.
   before: Before clicking on the links,
   other: (or any other torrent manager)
   many: You can add many landscapes to the torrent manager at the same time. Downloads can be fast, but also work with even very slow internet.  Downloads always resume after interruptions.
