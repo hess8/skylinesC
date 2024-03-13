@@ -1,7 +1,6 @@
 import Component from '@ember/component';
 import { oneWay, equal } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-
 import { task } from 'ember-concurrency';
 import { validator, buildValidations } from 'ember-cp-validations';
 
@@ -38,13 +37,15 @@ export default Component.extend(Validations, {
 
   showPilotNameInput: equal('pilotId', null),
 
+  flightDate: Date(),
+
   actions: {
     setFilesFromEvent(event) {
       this.set('files', event.target.value);
     },
 
-    dateSelected(date) {
-      this.router.transitionTo('flights.date', date);
+    setFlightDate(date) {
+      this.set('flightDate', date);
     },
 
     async submit() {

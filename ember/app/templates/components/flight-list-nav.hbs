@@ -13,7 +13,6 @@
     <nav.item>
       {{#nav.link-to "flights.latest"}}
         {{#if date}}
-          {{format-date date format="ddmmyyyy" timeZone="UTC"}}
         {{else}}
           {{t "latest"}}
         {{/if}}

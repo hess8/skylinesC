@@ -9,7 +9,11 @@
     <BsAlert @type="danger" @dismissible={{false}}>{{error}}</BsAlert>
   {{/if}}
   1) {{t "date-choose"}}
-   <p> <h2> <DatePicker @date_chosen={{date}} @onSelect={{action "dateSelected"}}>{{fa-icon "calendar"}}</DatePicker> </h2> </p>
+
+
+        &nbsp;<DatePicker @date={{date}} @onSelect={{action "setFlightDate"}}>{{fa-icon "calendar"}}</DatePicker>
+        {{format-date flightDate format="ddmmyyyy" timeZone="UTC"}}
+
   <p></p>
   {{t "agree-public"}}
   <p></p>
