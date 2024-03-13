@@ -1,4 +1,6 @@
 # '''
+
+# RUN AS ADMIN
 # 1. run in windows (anaconda "conda activate bchenv") as ADMIN python d:\skylinesC\production\utilities\updateZipped.py
 # 2. conda activate bch39
 # 3. Add to windows path:  "C:\Program Files\7-Zip"
@@ -18,7 +20,6 @@ import paramiko
 sys.path.append('s:\\skylinesCfiles\\skylinesC\\skylines')
 
 from common import readfileNoStrip, readfile
-
 
 def sevenzip(tempPath,landPath):
     os.system('7z a -t7z "{}" "{}"'.format(tempPath,landPath)) #quotes to handle spaces in windows file names
@@ -44,6 +45,8 @@ def getSSDdriveList(ssdDir):
             zipsOnSSD.append(item)
     return zipsOnSSD
 
+# fill up SSDdir and remove original files in zipDir
+populateSSD = False # fill up SSDdir and remove original files in zipDir
 mainDir = 'Z:\\Condor\\Landscapes'
 symLinksDir = 'L:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
 # otherDir2 = 'L:\\landscapes_for_symlinks2'
@@ -52,7 +55,7 @@ serverOnlyDir = 'L:\\landscapes_server_only'
 zipDir = 'S:\\skylinesCfiles\landscapes-zip'
 ssdDir = 'R:'
 popularFile = os.path.join(zipDir,'.popularity.txt')
-slcServerIP = '192.168.1.50'
+slcServerIP = '192.168.1.57'
 user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
@@ -213,20 +216,21 @@ if len(newZipped) > 0:
 # time.sleep(5)
 
 # fill up SSDdir and remove original files in zipDir
-for landZip in popular:
-    if landZip not in zipsOnSSD:
-        try:
-            zipPath = os.path.join(zipDir,landZip)
-            ssdPath = os.path.join(ssdDir, landZip)
-            print('Copying {} to {}'.format(zipPath, ssdPath))
-            shutil.copy(zipPath, ssdPath)
-            if os.path.getsize(zipPath) != os.path.getsize(ssdPath):
-                sys.exit('Stop: file sizes on zipDir and ssdDir were not equal after copy: {}'.format(landZip))
-            print('Done: {}'.format(landZip))
-        except:
-            print("Can't copy {} to {}".format(zipPath, ssdPath))
-            print('Break')
-            break
+if populateSSD:
+    for landZip in popular:
+        if landZip not in zipsOnSSD:
+            try:
+                zipPath = os.path.join(zipDir,landZip)
+                ssdPath = os.path.join(ssdDir, landZip)
+                print('Copying {} to {}'.format(zipPath, ssdPath))
+                shutil.copy(zipPath, ssdPath)
+                if os.path.getsize(zipPath) != os.path.getsize(ssdPath):
+                    sys.exit('Stop: file sizes on zipDir and ssdDir were not equal after copy: {}'.format(landZip))
+                print('Done: {}'.format(landZip))
+            except:
+                print("Can't copy {} to {}".format(zipPath, ssdPath))
+                print('Break')
+                break
 #get new ssdDrive list
 zipsOnSSD = getSSDdriveList(ssdDir)
 #remove zip files on zipDir that are on ssdDir:
