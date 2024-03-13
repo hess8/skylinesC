@@ -122,14 +122,12 @@ export POSTGIS_ENABLE_OUTDB_RASTERS=1
 export FLASK_ENV=development
 alias skyl='cd /home/bret/servers/repo-skylinesC/skylinesC/'
 alias esky='cd /home/bret/servers/repo-skylinesC/skylinesC/ember'
-#alias eserve5='esky;sudo ember serve --environment=production --port 80 --proxy http://localhost:5000/'
 alias eserve42-5='esky;sudo ember serve --environment=production --port 4200 --proxy http://localhost:5000/'
 #alias mserve='skyl; pipenv run ./manage.py runserver'
 alias gserve='skyl; pipenv run gunicorn -b 127.0.0.1:5000 -w 8 --no-sendfile wsgi_skylines'
 alias torrcreate='skyl; python production/utilities/createTorrents.py'
 alias dbrecreate='pipenv run ./manage.py db recreate'
 alias dbcreate='pipenv run ./manage.py db create'
-alias back='skyl; python production/utilities/backupSkylines.py'
 alias pycharm='./pycharm/bin/pycharm.sh'
 alias pgadmin='python ~/.local/share/virtualenvs/pgadmin-WsDn56it/lib/python2.7/site-packages/pgadmin4/pgAdmin4.py'
 alias pips='pipenv shell'
@@ -148,6 +146,7 @@ alias ngtest="sudo nginx -t"
 alias ngbackup-config-skylines.conf=nginxconfigbackup
 alias bu='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/backupSkylines.py'
 alias ct='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/createTorrents.py'
+alias k42='sudo npx kill-port 4200'
 nginxconfigbackup() { 
   sudo cp /etc/nginx/sites-available/skylinescondor /etc/nginx/sites-available/skylinescondor.$(date "+%Y-%m-%d_%H:%M")-$1
 } #the parameter ending is the comment use dashes "-" between words

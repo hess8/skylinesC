@@ -13,6 +13,7 @@ altitude: Altitude
 avg-speed: Average Speed
 avg-speed-abbr: Avg. speed
 avg-vario-abbr: Avg. vario
+browser: browser
 change: Change
 change-club: Change group
 change-password: Change password
@@ -160,6 +161,7 @@ no-live-tracks-of-pilots: '{num, plural, =1 {There is currently no live track of
 no-pilots-found: No pilots found.
 no-data: No data found...
 not-condor: You submitted a file that is not a Condor .igc file.  Submit real-life flights to skylines.aero.
+not: not
 notifications: Notifications
 olc-distance: OLC Distance
 older: Older
@@ -255,6 +257,7 @@ wrong-credentials: Please check your email address and password.
 wrong-current-password: Please check your current password.
 year: Year
 'yes': 'Yes'
+your: your
 you-have-no-notifications: You have no notifications.
 your-flights-have-been-saved: Your flights have been saved.
 your-live-tracking-key: 'Your Live Tracking key is:'
@@ -280,10 +283,12 @@ circling-direction:
 landscapesPage:
   download: All landscapes are for Condor 2, and download as a single file.
   paste: Put the landscape folder in Condor2/Landscapes.
-  qbittorent: Click on "qBittorrent Windows x64" or "qBittorrent Windows" links, not the page's ad. qBittorrent (or similar torrent manager) works well for these large files.
+#  qbittorent: Click on "qBittorrent Windows x64" or "qBittorrent Windows" links, not the page's ad. qBittorrent (or similar torrent manager) works well for these large files.
+  makeSure: Make sure your torrent manager is downloading the big torrent files,
+  limits: Browsers have download size limits.
   before: Before clicking on the links,
   other: (or any other torrent manager)
-  many: You can download many landscapes at the same time. Downloads are fast if you have fast internet. Works with slow internet and always resumes after interruptions.
+  many: You can add many landscapes to the torrent manager at the same time. Downloads can be fast, but also work with even very slow internet.  Downloads always resume after interruptions.
   extract-with: Extract with
   extract-here: With 7-zip installed, right click on the dowloaded file(s) and choose "7zip > Extract Here".
   after: After you have downloaded and extracted your landscape folders, leave the .7z files on your computer and qBittorrent will help the next guy get them faster!
