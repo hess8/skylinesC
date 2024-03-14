@@ -256,7 +256,7 @@ def index_post():
         prefix += 1
         try:
             # igc_file.date_condor = get_date_from_name(name) #name differs from filename which has _1 etc appended
-            igc_file.date_condor = data.get("date_chosen")
+            igc_file.date_condor = data.get("date_chosen")  only pilot name and id in data right now.
             igc_file.time_created = igc_file.date_condor
             igc_file.time_modified = datetime.utcnow()
         except:

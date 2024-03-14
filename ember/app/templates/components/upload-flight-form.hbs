@@ -8,16 +8,14 @@
   {{#if error}}
     <BsAlert @type="danger" @dismissible={{false}}>{{error}}</BsAlert>
   {{/if}}
-  1) {{t "date-choose"}}
 
-
-        &nbsp;<DatePicker @date={{date}} @onSelect={{action "setFlightDate"}}>{{fa-icon "calendar"}}</DatePicker>
-        {{format-date flightDate format="ddmmyyyy" timeZone="UTC"}}
-
+  <b>{{t "date"}}</b>: {{format-date flightDate format="yyyy-mm-dd" timeZone="UTC"}} UTC
+     <p></p>
+     &nbsp;<DatePicker @date={{date}} @onSelect={{action "setFlightDate"}}>{{fa-icon "calendar"}}</DatePicker>
   <p></p>
-  {{t "agree-public"}}
+     <b>{{t "change"}}</b>  {{t "date-past"}}
   <p></p>
-  2)<ValidatedBlock @label={{t "igc-file"}} @validation={{validations.attrs.files}} @hasContent={{files}} @didValidate={{didValidate}}>
+  <ValidatedBlock @label={{t "igc-file"}} @validation={{validations.attrs.files}} @hasContent={{files}} @didValidate={{didValidate}}>
     <input type="file" name="files" multiple={{false}} onchange={{action "setFilesFromEvent"}} class="form-control" disabled={{uploadTask.isRunning}}>
   </ValidatedBlock>
 

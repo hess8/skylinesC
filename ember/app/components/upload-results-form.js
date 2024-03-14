@@ -37,6 +37,7 @@ export default Component.extend({
           result.set('pilotId', result.get('flight.pilot.id'));
           result.set('copilotId', result.get('flight.copilot.id'));
           result.set('modelId', result.get('flight.model.id'));
+          date_chosen
         }
 
         return result;

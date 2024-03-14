@@ -24,7 +24,7 @@
   {{#if (and date (not latest))}}
     <nav.item>
       {{#nav.link-to "flights.date" date}}
-        {{format-date date format="ddmmyyyy" timeZone="UTC"}}
+        {{format-date date format="yyyy-mm-dd" timeZone="UTC"}}
         &nbsp;<DatePicker @date={{date}} @onSelect={{action "dateSelected"}}>{{fa-icon "calendar"}}</DatePicker>
       {{/nav.link-to}}
     </nav.item>

@@ -46,7 +46,8 @@ creating: Creating...
 cruise-performance: Cruise performance
 current-password: Current password
 date: Date
-date-choose: Select the date for this flight.  Choose a date in the past for an old flight or if you want your flight included in a groupflight that others posted in the past.
+date-default: The date for the flight
+date-past: the date to the past for an old flight or if you want your flight included in a groupflight that others posted in the past.
 date-compiled: Date compiled
 date-missing-in-igc-file: Date missing in IGC file
 date-must-in-filename: Date of flight must be in filename
