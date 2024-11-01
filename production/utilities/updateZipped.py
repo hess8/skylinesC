@@ -8,17 +8,20 @@
 # link target eg C:\Users\Bret\AppData\Local\qBittorrent\logs\qbittorrent.log
 #   sample line:  (N) 2022-04-03T19:07:50 - 'Falkland_Islands.v1.0.7z' added to download list.
 #
+# Add "-" to the beginning of the landscape dir name to remove all but .ini files and move to iniOnlyDir
+# Add "." to the beginning of the landscape dir name to move landscape to symlink directory,
+
 # ssh access: make sure port 22 is open on U14.  Test ssh connection manually
 # '''
 
 import os,sys,shutil
 # import py7zr
 # import win32com.client
-import paramiko
+
 # from subprocess import Popen, PIPE
 # print(os.path.abspath(os.curdir))
 sys.path.append('s:\\skylinesCfiles\\skylinesC\\skylines')
-
+from time import sleep
 from common import readfileNoStrip, readfile
 
 def sevenzip(tempPath,landPath):
@@ -33,8 +36,7 @@ def linktoSSDdrive(zipDir,ssdDir,popular,zipsOnSSD):
         zipPath = '{}\\{}'.format(zipDir, landZip)
         ssdPath = '{}\\{}'.format(ssdDir, landZip)
         if landZip in zipsOnSSD and not os.path.exists(zipPath):
-            print('Symlink for ssdDrive {}.'.format(landZip))
-
+            # print('Symlink for ssdDrive {}.'.format(landZip))
             os.system('mklink "{}" "{}"'.format(zipPath, ssdPath))
 
 def getSSDdriveList(ssdDir):
@@ -45,8 +47,50 @@ def getSSDdriveList(ssdDir):
             zipsOnSSD.append(item)
     return zipsOnSSD
 
+def runCreateTorrents(newZipped):
+    import paramiko
+    if len(newZipped) > 0:
+        k = paramiko.Ed25519Key.from_private_key_file(keyFile)
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            ssh.connect(hostname=slcServerIP, username=user, pkey=k)
+        except:
+            print('ssh.connect failed to {}'.format(slcServerIP))
+        print('Connecting to {} to create torrents'.format(slcServerIP))
+        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/createTorrents.py')
+        stdout = ssh_stdout.readlines()
+        stderr = ssh_stderr.readlines()
+        if len(stderr) > 0:
+            print('Errors in createTorrents command:')
+            for line in stderr:
+                print(line)
+        else:
+            print('Results:')
+            for line in stdout:
+                print(line)
+    #check that new torrents have been added to the qbittorrent servers
+    # time.sleep(5)
+    # shell = win32com.client.Dispatch("WScript.Shell")
+    # for logfile in qbtLogLinks:
+    #     shortcut = shell.CreateShortCut('{}\\{}'.format(zipDir,logfile))
+    #     lines = readfile(shortcut.Targetpath)
+    #     for zipped in newZipped:
+    #         for line in lines:
+    #             if 'added to download list' in line and zipped in line:
+    #                 print('New torrent {} found in {}').format(zipped,logfile)
+    #                 break
+    #         else:
+    #             print('Error. {} not found in {}').format(zipped,logfile)
+    # time.sleep(5)
+
+
 # fill up SSDdir and remove original files in zipDir
-populateSSD = False # fill up SSDdir and remove original files in zipDir
+populateSSD = False # fill up SSDdir and remove original files in zipDirD
+debugMode = False
+if debugMode: #use for pycharm debugging. Can't get paramiko to load in pycharm
+    print("\n\nIn **debug mode**...won't run createTorrents on server\n\n")
+    sleep(2)
 mainDir = 'Z:\\Condor\\Landscapes'
 symLinksDir = 'L:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
 # otherDir2 = 'L:\\landscapes_for_symlinks2'
@@ -63,18 +107,20 @@ mainList0 = os.listdir(mainDir)
 #remove extra files from ini_only dirs:
 for dir in [iniOnlyDir]:# :
     for landscape in os.listdir(dir):
+        notifiedRemove = False
         for item in os.listdir(os.path.join(dir,landscape)):
             if not '.ini' in item:
-                print ('Removing all but .ini in {}'.format(landscape))
-                break #now do the removing
-        for item in os.listdir(os.path.join(dir,landscape)):
-            if not '.ini' in item:
+                if not notifiedRemove:
+                    print ('Removing all but .ini in {}'.format(landscape))
+                    notifiedRemove = True
                 if os.path.isdir(os.path.join(dir,landscape,item)):
                     os.system('rmdir /S /Q "{}"'.format(os.path.join(dir,landscape,item)))
                 else:
                     os.remove(os.path.join(dir,landscape,item))
 
 #if folder (not symbolic link) in mainDir begins with "-", remove all but .ini files and move to iniOnlyDir
+print('To move landscape to ini only directory with only ini file, start the landscape dir name with "-"')
+print('To move landscape to sym link directory, start the landscape dir name with "."')
 for item in mainList0:
     if item[0] == '-':
         path = os.path.join(mainDir,item)
@@ -109,7 +155,7 @@ for dir in [symLinksDir, iniOnlyDir,serverOnlyDir]:
 # for dir in [symLinksDir, iniOnlyDir]:
     for item in os.listdir(dir):
         if os.path.isdir(os.path.join(dir,item)) and item not in mainList:
-            print ('Symlink for {}.'.format(item))
+            # print ('Symlink for {}.'.format(item))
             mainPath = '{}\\{}'.format(mainDir,item)
             otherPath = '{}\\{}'.format(dir,item)
             os.system('mklink /D "{}" "{}"'.format(mainPath,otherPath))
@@ -180,40 +226,8 @@ if len(newZipped) == 0:
 # time.sleep(60)
 
 # run createTorrents on skylinesC server
-if len(newZipped) > 0:
-    k = paramiko.Ed25519Key.from_private_key_file(keyFile)
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    try:
-        ssh.connect(hostname=slcServerIP, username=user, pkey=k)
-    except:
-        print('ssh.connect failed to {}'.format(slcServerIP))
-    print('Connecting to {} to create torrents'.format(slcServerIP))
-    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/createTorrents.py')
-    stdout = ssh_stdout.readlines()
-    stderr = ssh_stderr.readlines()
-    if len(stderr) > 0:
-        print('Errors in createTorrents command:')
-        for line in stderr:
-            print(line)
-    else:
-        print('Results:')
-        for line in stdout:
-            print(line)
-#check that new torrents have been added to the qbittorrent servers
-# time.sleep(5)
-# shell = win32com.client.Dispatch("WScript.Shell")
-# for logfile in qbtLogLinks:
-#     shortcut = shell.CreateShortCut('{}\\{}'.format(zipDir,logfile))
-#     lines = readfile(shortcut.Targetpath)
-#     for zipped in newZipped:
-#         for line in lines:
-#             if 'added to download list' in line and zipped in line:
-#                 print('New torrent {} found in {}').format(zipped,logfile)
-#                 break
-#         else:
-#             print('Error. {} not found in {}').format(zipped,logfile)
-# time.sleep(5)
+if not debugMode:
+    runCreateTorrents(newZipped)
 
 # fill up SSDdir and remove original files in zipDir
 if populateSSD:
