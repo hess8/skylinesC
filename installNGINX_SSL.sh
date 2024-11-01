@@ -31,11 +31,12 @@ sudo apt-get install certbot
 cd /etc/nginx/
 sudo cp nginx.conf nginx.conf.orig
 
+
 sudo cp sites-available/default sites-available/acme-challenge
 sudo ln -s /etc/nginx/sites-available/acme-challenge /etc/nginx/sites-enabled/
 sudo rm sites-enabled/default
 
-sudo vim /etc/nginx/ites-available/acme-challenge
+sudo vim /etc/nginx/sites-available/acme-challenge
 #replace;
    server_name _;
 #with
@@ -48,6 +49,8 @@ sudo service nginx reload
 
 
 #!!!!!!!!!!!!! Make sure you forward port 80 to this machine before the below!!!!!!!!!
+hostnamectl set-hostname soardata.org # Certificate is tied to hostname, so to make it portable
+# ...to other machines, they must all have this hostname.
 sudo certbot certonly --dry-run --webroot --webroot-path=/var/www/html -d skylinescondor.com
 ##### if that works, remove --dry-run and run again
 #success!
@@ -132,6 +135,6 @@ Go to https://amplify.nginx.com/dashboard
 
 
 ### Nginx Amplify agent (run on both U14 and U18 machines)
-curl -sS -L -O https://github.com/nginxinc/nginx-amplify-agent/raw/master/packages/install.sh && API_KEY='59c5a93cf3596a889d01a0efa4754897' sh ./install.sh
+#curl -sS -L -O https://github.com/nginxinc/nginx-amplify-agent/raw/master/packages/install.sh && API_KEY='59c5a93cf3596a889d01a0efa4754897' sh ./install.sh
 # Check status with
-ps ax | grep -i 'amplify\-'
+#ps ax | grep -i 'amplify\-'
