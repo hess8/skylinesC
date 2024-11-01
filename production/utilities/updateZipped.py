@@ -1,7 +1,7 @@
 # '''
 
 # RUN AS ADMIN
-# 1. run in windows (anaconda "conda activate bchenv") as ADMIN python d:\skylinesC\production\utilities\updateZipped.py
+# 1. run on either machine (anaconda "conda activate bchenv") as ADMIN
 # 2. conda activate bch39
 # 3. Add to windows path:  "C:\Program Files\7-Zip"
 # 4. confirmation that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
@@ -69,6 +69,15 @@ def runCreateTorrents(newZipped):
             print('Results:')
             for line in stdout:
                 print(line)
+
+def versionFromPath(path,firstN):
+    ''''''
+    '''Gets version from first characters of path'''
+    if 'C2' in path[:firstN]:
+        return '2'
+    if 'C3' in path[:firstN]:
+        return '3'
+
     #check that new torrents have been added to the qbittorrent servers
     # time.sleep(5)
     # shell = win32com.client.Dispatch("WScript.Shell")
@@ -83,7 +92,6 @@ def runCreateTorrents(newZipped):
     #         else:
     #             print('Error. {} not found in {}').format(zipped,logfile)
     # time.sleep(5)
-
 
 # fill up Fastestdir and remove original files in zipDir
 populateFastest = False # fill up Fastestdir and remove original files in zipDirD
@@ -102,13 +110,14 @@ C3serverDir = 'P:\\LandscapesC3\\landscapesC3-server'
 # otherDir2 = 'L:\\landscapes_for_symlinks2'
 
 zipDir = 'S:\\skylinesCfiles\landscapes-zip'
-FastestDir = 'R:'
-if populateFastest:
-    popularFile = os.path.join(zipDir,'.popularity.txt') #if populateFastest, then move most popular to faster dir
 slcServerIP = '192.168.1.57'
 user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
+if populateFastest:
+    FastestDir = 'R:'
+    popularFile = os.path.join(zipDir,'.popularity.txt') #if populateFastest, then move most popular to faster dir
+
 C2List0 = os.listdir(C2fullDir)
 #if dir in full dirs begins with "-", remove all but .ini files and move to C2iniDir
 print('Start the landscape dir name with "-" to move landscape to ini only directory with only ini file')
@@ -152,45 +161,50 @@ allLands = []
 allLandPaths = []
 allZips = []
 # versionDict = {'C2List' : '2', 'C3List' : '3',}
-C2List = os.listdir(C2fullDir)
-C3List = os.listdir(C3fullDir)
+C2List1 = os.listdir(C2fullDir)
+C3List1 = os.listdir(C3fullDir)
 #remove broken symbolic links
-for list in [C2List,C3List]:
+for list in [C2List1,C3List1]:
     for item in list:
-        if list == C2List: path = C2fullDir
-        elif list == C3List: path = C3fullDir
+        if list == C2List1: path = C2fullDir
+        elif list == C3List1: path = C3fullDir
         if os.path.islink('{}\\{}'.format(path,item)) and not os.path.exists('{}\\{}\\{}.ini'.format(C2fullDir,item,item)):
             os.rmdir('{}\\{}'.format(path,item))
 
 #update symbolic links
-for dir in [C2iniDir, C3iniDir, C2serverDir, C3serverDir]:
-# for dir in [symLinksDir, C2iniDir]:
-    for item in os.listdir(dir):
-        if os.path.isdir(os.path.join(dir,item)) and item not in C2List:
-            # print ('Symlink for {}.'.format(item))
-            C2Path = '{}\\{}'.format(C2fullDir,item)
-            otherPath = '{}\\{}'.format(dir,item)
-            os.system('mklink /D "{}" "{}"'.format(C2Path,otherPath))
-        elif item not in C2List:
-            print ('not added', dir, item)
-            print ('isdir', os.path.isdir(os.path.join(dir,item)))
-#landscapes are all represented in C2fullDir now.
-
-# get all landscape paths of any status
-for list in [C2List,C3List]:
-    for item in list:
-        if list == C2List: path = C2fullDir
-        elif list == C3List: path = C3fullDir
-        if os.path.isdir(os.path.join(path,item)) and 'WestGermany3' not in item:
-            allLands.append(item)
-            allLandPaths.append('{}\\{}'.format(path,item))
-
-
+C2List2 = os.listdir(C2fullDir)
+C3List2 = os.listdir(C3fullDir)
 #make symbolic links from FastestDrive to zipDrive:
 if populateFastest:
     popular = readfile(popularFile) #FastestDir has most popular landscapes in it
     zipsOnFastest = getFastestdriveList(FastestDir)
     linktoFastestdrive(zipDir,FastestDir,popular,zipsOnFastest)
+for dir in [C2iniDir, C3iniDir, C2serverDir, C3serverDir]:
+# for dir in [symLinksDir, C2iniDir]:
+    for item in os.listdir(dir):
+        v = versionFromPath(dir)
+        if v == 2: list = C2List2
+        elif v==3: list = C3List2
+        if os.path.isdir(os.path.join(dir,item)) and item not in list:
+            # print ('Symlink for {}.'.format(item))
+            C2Path = '{}\\{}'.format(C2fullDir,item)
+            otherPath = '{}\\{}'.format(dir,item)
+            os.system('mklink /D "{}" "{}"'.format(C2Path,otherPath))
+        elif item not in list:
+            print ('not added', dir, item)
+            print ('isdir', os.path.isdir(os.path.join(dir,item)))
+#landscapes are all represented in C2fullDir now.
+
+# get all landscape paths of any status
+C2ListFinal = os.listdir(C2fullDir)
+C3ListFinal = os.listdir(C3fullDir)
+for list in [C2ListFinal,C3ListFinal]:
+    for item in list:
+        if list == C2ListFinal: path = C2fullDir
+        elif list == C3ListFinal: path = C3fullDir
+        if os.path.isdir(os.path.join(path,item)) and 'WestGermany3' not in item:
+            allLands.append(item)
+            allLandPaths.append('{}\\{}'.format(path,item))
 
 #get existing 7z files
 for item in os.listdir(zipDir):
@@ -206,6 +220,9 @@ for i, landPath, in enumerate(allLandPaths):
     if not os.path.exists(iniPath):
        print('Stop.  No .ini file matches {}.  Consider renaming the landscape folder with the name of the .ini folder.'.format(landPath))
     if os.path.exists(iniPath):
+        v = versionFromPath(dir)
+        if v == 2: list = C2ListFinal; tempDir = C2fullDir
+        elif v == 3: list = C3ListFinal; tempDir = C3fullDir
         lines = readfile(iniPath)
         if len(lines) > 1:
             version = lines[1].split('=')[1].split('(')[0].split(',')[0].replace('00','0').replace('.10.','.1.').replace(' ','')
@@ -214,7 +231,7 @@ for i, landPath, in enumerate(allLandPaths):
             print ('lines', lines)
             sys.exit('Stop:  does not exist or cannot be parsed')
         zipName = '{}.v{}.7z'.format(land.replace(' ','_'),version) #no zips will have spaces, but landscapes folders might
-        zipPathTemp = '{}\\{}'.format(C2fullDir,zipName)
+        zipPathTemp = '{}\\{}'.format(tempDir,zipName)
         zipPath = '{}\\{}'.format(zipDir,zipName) #no zips will have spaces, but landscapes folders might
         count = 0
         if zipPath not in allZips:
@@ -262,21 +279,21 @@ if populateFastest:
                 print("Can't copy {} to {}".format(zipPath, FastestPath))
                 print('Break')
                 break
-#get new FastestDrive list
-zipsOnFastest = getFastestdriveList(FastestDir)
-#remove zip files on zipDir that are on FastestDir:
-for landZip in zipsOnFastest:
-    zipPath = os.path.join(zipDir, landZip)
-    FastestPath = os.path.join(FastestDir, landZip)
-    if os.path.exists(zipPath):
-        try:
-            if os.path.getsize(zipPath) == os.path.getsize(FastestPath):
-                os.remove(zipPath)
-            else:
-                print("Didn't remove {} because sizes don't match".format(zipPath) )
-        except Exception as error:
-            print('Error in removing {}: {}'.format(zipPath,error))
-### Create symlinks for newly copied
-linktoFastestdrive(zipDir,FastestDir,popular,zipsOnFastest)
+#list FastestDrive .7z files
+    zipsOnFastest = getFastestdriveList(FastestDir)
+    #remove zip files on zipDir that are on FastestDir:
+    for landZip in zipsOnFastest:
+        zipPath = os.path.join(zipDir, landZip)
+        FastestPath = os.path.join(FastestDir, landZip)
+        if os.path.exists(zipPath):
+            try:
+                if os.path.getsize(zipPath) == os.path.getsize(FastestPath):
+                    os.remove(zipPath)
+                else:
+                    print("Didn't remove {} because sizes don't match".format(zipPath) )
+            except Exception as error:
+                print('Error in removing {}: {}'.format(zipPath,error))
+    ### Create symlinks for newly copied
+    linktoFastestdrive(zipDir,FastestDir,popular,zipsOnFastest)
 
 print ("Done")
