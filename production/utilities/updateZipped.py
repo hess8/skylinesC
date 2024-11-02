@@ -73,9 +73,10 @@ def runCreateTorrents(newZipped):
 def versionFromPath(path,firstN):
     ''''''
     '''Gets version from first characters of path'''
-    if 'C2' in path[:firstN]:
+    dirList = path.split('\\')
+    if 'C2' in dirList[2][:firstN]:
         return '2'
-    if 'C3' in path[:firstN]:
+    if 'C3' in dirList[2][:firstN]:
         return '3'
 
     #check that new torrents have been added to the qbittorrent servers
@@ -93,18 +94,17 @@ def versionFromPath(path,firstN):
     #             print('Error. {} not found in {}').format(zipped,logfile)
     # time.sleep(5)
 
-# fill up Fastestdir and remove original files in zipDir
 populateFastest = False # fill up Fastestdir and remove original files in zipDirD
 debugMode = False
 if debugMode: #use for pycharm debugging. Can't get paramiko to load in pycharm
     print("\n\nIn **debug mode**...won't run createTorrents on server\n\n")
     sleep(2)
-C2fullDir = 'P:\\LandscapesC2\\landscapesC2-full'
-C3fullDir = 'P:\\LandscapesC3\\landscapesC3-full'
-C2iniDir = 'P:\\LandscapesC2\\landscapesC2-ini'
-C3iniDir = 'P:\\LandscapesC3\\landscapesC3-ini'
-C2serverDir = 'P:\\LandscapesC2\\landscapesC2-server'
-C3serverDir = 'P:\\LandscapesC3\\landscapesC3-server'
+C2fullDir = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-full'
+C3fullDir = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-full'
+C2iniDir = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-ini'
+C3iniDir = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-ini'
+C2serverDir = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-server'
+C3serverDir = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-server'
 #py7zr does not follow symlinks
 #C3symLinksDir = 'P:\\LandscapesC3\\landscapesC3-ini'
 # otherDir2 = 'L:\\landscapes_for_symlinks2'
@@ -118,40 +118,44 @@ if populateFastest:
     FastestDir = 'R:'
     popularFile = os.path.join(zipDir,'.popularity.txt') #if populateFastest, then move most popular to faster dir
 
-C2List0 = os.listdir(C2fullDir)
-#if dir in full dirs begins with "-", remove all but .ini files and move to C2iniDir
+C2ListA = os.listdir(C2fullDir)
+C3ListA = os.listdir(C3fullDir)
+#if dir in full dirs begins with "-", remove all but .ini files and move to ini dirs
 print('Start the landscape dir name with "-" to move landscape to ini only directory with only ini file')
 #print('To move landscape to sym link directory, start the landscape dir name with "."')
-for item in C2List0:
-    if item[0] == '-':
-        path = os.path.join(C2fullDir,item)
-        for item2 in os.listdir(path):
-            if not '.ini' in item2:
-                if os.path.isdir(os.path.join(path,item2)):
-                    os.system('rmdir /S /Q "{}"'.format(os.path.join(path,item2)))
-                else:
-                    os.remove(os.path.join(path,item2))
-        shutil.move(path,os.path.join(C2iniDir,item.replace('-','')))
-        print('Moved {} to {}'.format(path,C2iniDir))
-    # elif item[0] == '.':  #legacy to move to symlinks dir...keep in code
-    #     path = os.path.join(C2fullDir,item)
-    #     print('Moving {} to {}'.format(path,symLinksDir))
-    #     shutil.move(path,os.path.join(symLinksDir,item.replace('.','')))
-    #     print('Moved {} to {}'.format(path,symLinksDir))
+for list in [C2ListA,C3ListA]:
+    for item in list:
+        if list == C2ListA: fullPath = C2fullDir; iniDir = C2iniDir
+        elif list == C3ListA: fullPath = C3fullDir; iniDir = C3iniDir
+        if item[0] == '-':
+            path = os.path.join(fullPath,item)
+            for item2 in os.listdir(fullPath):
+                if not '.ini' in item2:
+                    if os.path.isdir(os.path.join(fullPath,item2)):
+                        os.system('rmdir /S /Q "{}"'.format(os.path.join(fullPath,item2)))
+                    else:
+                        os.remove(os.path.join(fullPath,item2))
+            shutil.move(path,os.path.join(iniDir,item.replace('-','')))
+            print('Moved {} to {}'.format(path,iniDir))
+        # elif item[0] == '.':  #legacy to move to symlinks dir...keep in code
+        #     path = os.path.join(C2fullDir,item)
+        #     print('Moving {} to {}'.format(path,symLinksDir))
+        #     shutil.move(path,os.path.join(symLinksDir,item.replace('.','')))
+        #     print('Moved {} to {}'.format(path,symLinksDir))
 
 #remove extra files from init-only dirs:
-for dir in [C2iniDir,C3iniDir]:
-    for landscape in os.listdir(dir):
+for dir1 in [C2iniDir,C3iniDir]:
+    for landscape in os.listdir(dir1):
         notifiedRemove = False
-        for item in os.listdir(os.path.join(dir,landscape)):
+        for item in os.listdir(os.path.join(dir1,landscape)):
             if not '.ini' in item:
                 if not notifiedRemove:
                     print ('Removing all but .ini in {}'.format(landscape))
                     notifiedRemove = True
-                if os.path.isdir(os.path.join(dir,landscape,item)):
-                    os.system('rmdir /S /Q "{}"'.format(os.path.join(dir,landscape,item)))
+                if os.path.isdir(os.path.join(dir1,landscape,item)):
+                    os.system('rmdir /S /Q "{}"'.format(os.path.join(dir1,landscape,item)))
                 else:
-                    os.remove(os.path.join(dir,landscape,item))
+                    os.remove(os.path.join(dir1,landscape,item))
 
 
 
@@ -161,50 +165,50 @@ allLands = []
 allLandPaths = []
 allZips = []
 # versionDict = {'C2List' : '2', 'C3List' : '3',}
-C2List1 = os.listdir(C2fullDir)
-C3List1 = os.listdir(C3fullDir)
+C2ListB = os.listdir(C2fullDir)
+C3ListB = os.listdir(C3fullDir)
 #remove broken symbolic links
-for list in [C2List1,C3List1]:
+for list in [C2ListB,C3ListB]:
     for item in list:
-        if list == C2List1: path = C2fullDir
-        elif list == C3List1: path = C3fullDir
-        if os.path.islink('{}\\{}'.format(path,item)) and not os.path.exists('{}\\{}\\{}.ini'.format(C2fullDir,item,item)):
-            os.rmdir('{}\\{}'.format(path,item))
+        if list == C2ListB: fullDir1 = C2fullDir
+        elif list == C3ListB: fullDir1 = C3fullDir
+        if os.path.islink('{}\\{}'.format(fullDir1,item)) and not os.path.exists('{}\\{}\\{}.ini'.format(fullDir1,item,item)):
+            os.rmdir('{}\\{}'.format(fullDir1,item))
 
-#update symbolic links
-C2List2 = os.listdir(C2fullDir)
-C3List2 = os.listdir(C3fullDir)
-#make symbolic links from FastestDrive to zipDrive:
+#### update symbolic links
+C2ListB = os.listdir(C2fullDir)
+C3ListB = os.listdir(C3fullDir)
+#make/remake ymbolic links from FastestDrive to zipDrive:
 if populateFastest:
     popular = readfile(popularFile) #FastestDir has most popular landscapes in it
     zipsOnFastest = getFastestdriveList(FastestDir)
     linktoFastestdrive(zipDir,FastestDir,popular,zipsOnFastest)
-for dir in [C2iniDir, C3iniDir, C2serverDir, C3serverDir]:
-# for dir in [symLinksDir, C2iniDir]:
-    for item in os.listdir(dir):
-        v = versionFromPath(dir)
-        if v == 2: list = C2List2
-        elif v==3: list = C3List2
-        if os.path.isdir(os.path.join(dir,item)) and item not in list:
+#symbolic links for other dirs
+for dirB in [C2iniDir, C3iniDir, C2serverDir, C3serverDir]:
+    for item in os.listdir(dirB):
+        v = versionFromPath(dirB,20)
+        if v == '2': list = C2ListB; fullDirB = C2fullDir
+        elif v == '3': list = C3ListB; fullDirB = C3fullDir
+        if os.path.isdir(os.path.join(dirB,item)) and item not in list:
             # print ('Symlink for {}.'.format(item))
-            C2Path = '{}\\{}'.format(C2fullDir,item)
-            otherPath = '{}\\{}'.format(dir,item)
-            os.system('mklink /D "{}" "{}"'.format(C2Path,otherPath))
+            fullPathB = '{}\\{}'.format(fullDirB,item)
+            otherPath = '{}\\{}'.format(dirB,item)
+            os.system('mklink /D "{}" "{}"'.format(fullPathB,otherPath))
         elif item not in list:
-            print ('not added', dir, item)
-            print ('isdir', os.path.isdir(os.path.join(dir,item)))
-#landscapes are all represented in C2fullDir now.
+            print ('not added', dirB, item)
+            print ('isdir', os.path.isdir(os.path.join(dirB,item)))
+## now all landscapes are represented in C2fullDir ##
 
 # get all landscape paths of any status
-C2ListFinal = os.listdir(C2fullDir)
-C3ListFinal = os.listdir(C3fullDir)
-for list in [C2ListFinal,C3ListFinal]:
+C2ListC = os.listdir(C2fullDir)
+C3ListC = os.listdir(C3fullDir)
+for list in [C2ListC,C3ListC]:
     for item in list:
-        if list == C2ListFinal: path = C2fullDir
-        elif list == C3ListFinal: path = C3fullDir
-        if os.path.isdir(os.path.join(path,item)) and 'WestGermany3' not in item:
+        if list == C2ListC: fullDirC = C2fullDir
+        elif list == C3ListC: fullDirC = C3fullDir
+        if os.path.isdir(os.path.join(fullDirC,item)) and 'WestGermany3' not in item:
             allLands.append(item)
-            allLandPaths.append('{}\\{}'.format(path,item))
+            allLandPaths.append('{}\\{}'.format(fullDirC,item))
 
 #get existing 7z files
 for item in os.listdir(zipDir):
@@ -217,12 +221,12 @@ for i, landPath, in enumerate(allLandPaths):
     land = allLands[i]
     files = os.listdir(landPath)
     iniPath = '{}/{}.ini'.format(landPath,land)
-    if not os.path.exists(iniPath):
-       print('Stop.  No .ini file matches {}.  Consider renaming the landscape folder with the name of the .ini folder.'.format(landPath))
-    if os.path.exists(iniPath):
-        v = versionFromPath(dir)
-        if v == 2: list = C2ListFinal; tempDir = C2fullDir
-        elif v == 3: list = C3ListFinal; tempDir = C3fullDir
+    if not os.path.exists(iniPath) and 'path' not in iniPath.lower():
+       ('Skipping...  No .ini file matches {}.  Consider renaming the landscape folder with the name of the .ini folder.'.format(landPath))
+    elif os.path.exists(iniPath):
+        v = versionFromPath(iniPath,20)
+        if v == '2': list = C2ListC; tempDir = C2fullDir
+        elif v == '3': list = C3ListC; tempDir = C3fullDir
         lines = readfile(iniPath)
         if len(lines) > 1:
             version = lines[1].split('=')[1].split('(')[0].split(',')[0].replace('00','0').replace('.10.','.1.').replace(' ','')
@@ -279,7 +283,7 @@ if populateFastest:
                 print("Can't copy {} to {}".format(zipPath, FastestPath))
                 print('Break')
                 break
-#list FastestDrive .7z files
+    #list FastestDrive .7z files
     zipsOnFastest = getFastestdriveList(FastestDir)
     #remove zip files on zipDir that are on FastestDir:
     for landZip in zipsOnFastest:
