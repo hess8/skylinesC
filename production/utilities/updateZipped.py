@@ -3,19 +3,20 @@
 # RUN AS ADMIN
 # 1. run on either machine (anaconda "conda activate bchenv") as ADMIN
 # 2. conda activate bch39
-# 3. Add to windows path:  "C:\Program Files\7-Zip"
+# 3. !!!!Add to windows path:  "C:\Program Files\7-Zip!!!!"
 # 4. confirmation that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
 # link target eg C:\Users\Bret\AppData\Local\qBittorrent\logs\qbittorrent.log
 #   sample line:  (N) 2022-04-03T19:07:50 - 'Falkland_Islands.v1.0.7z' added to download list.
 #
-# Add "-" to the beginning of the landscape dir name to remove all but .ini files and move to C2ini
+# Add "-" to the beginning of the landscape dir name to remove all but .ini files and move to lowVini
 # xxx-legacy (kept in code commented out). Add "." to the beginning of the landscape dir name to move landscape to symlink directory,
 
 # ssh access: make sure port 22 is open on U14.  Test ssh connection manually
 # '''
 
 import os,sys,shutil
-# import py7zr
+import re
+# import py7zr #py7zr does not follow symlinks!  So we use C:\Program Files\7-Zip.  See note above
 # import win32com.client
 
 # from subprocess import Popen, PIPE
@@ -29,23 +30,6 @@ def sevenzip(tempPath,landPath):
 #     os.system('py7zr c "{}" "{}"'.format(tempPath,landPath))
 #     with py7zr.SevenZipFile(tempPath, 'w') as archive:
 #                     archive.writeall(landPath, 'base')  #This seems slow, but uses threads well
-
-def linktoFastestdrive(zipDir,FastestDir,popular,zipsOnFastest):
-    # replace zip files with symbolic links to FastestDrive
-    for landZip in popular:
-        zipPath = os.path.join(zipDir, landZip)
-        FastestPath = os.path.join(FastestDir, landZip)
-        if landZip in zipsOnFastest and not os.path.exists(zipPath):
-            # print('Symlink for FastestDrive {}.'.format(landZip))
-            os.system('mklink "{}" "{}"'.format(zipPath, FastestPath))
-
-def getFastestdriveList(FastestDir):
-    listFastest = os.listdir(FastestDir)
-    zipsOnFastest = []
-    for item in listFastest:
-        if item.split('.')[-1] == '7z' and os.path.getsize(os.path.join(FastestDir,item)) > 10:
-            zipsOnFastest.append(item)
-    return zipsOnFastest
 
 def runCreateTorrents(newZipped):
     import paramiko
@@ -70,14 +54,12 @@ def runCreateTorrents(newZipped):
             for line in stdout:
                 print(line)
 
-def versionFromPath(path,firstN):
+def vtagFromPath(path):
     ''''''
-    '''Gets version from first characters of path'''
-    dirList = path.split(os.sep)
-    if 'C2' in dirList[2][:firstN]:
-        return '2'
-    if 'C3' in dirList[2][:firstN]:
-        return '3'
+    '''Gets version tag from regex pattern: C[any digits] in path'''
+    versTag = re.search("C[0-9]+",path)
+    return versTag
+
 
 def updateSymlinks(versionsLists):
     '''makes symlinks in main dir (first in versionDirs) for rest of paths in versionDirs'''
@@ -110,7 +92,6 @@ def get_file_size_in_gb(filepath):
 def zipDestDriveByPriority(priorList,toCompressPath):
     ''''''
     compressFactor = 0.8 * float(120/50)
-
     for dest in priorList:
         drive = dest.split(os.sep)[0]
         avail = get_free_space_gb(drive)
@@ -126,7 +107,7 @@ def zipDestDriveByPriority(priorList,toCompressPath):
     # time.sleep(5)
     # shell = win32com.client.Dispatch("WScript.Shell")
     # for logfile in qbtLogLinks:
-    #     shortcut = shell.CreateShortCut('{}\\{}'.format(zipDir,logfile))
+    #     shortcut = shell.CreateShortCut('{}\\{}'.format(zipMain,logfile))
     #     lines = readfile(shortcut.Targetpath)
     #     for zipped in newZipped:
     #         for line in lines:
@@ -142,23 +123,27 @@ debugMode = False
 if debugMode: #use for pycharm debugging. Can't get paramiko to load in pycharm
     print("\n\nIn **debug mode**...won't run createTorrents on server\n\n")
     sleep(2)
-C2Main = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-full'
-C2Ext1 = 'Z:\\C2LandExt1'
-C2ini = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-ini'
-C2server = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-server'
-C3Main = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-full'
-C3Ext1 = 'Z:\\C3LandExt1'
-C3ini = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-ini'
-C3server = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-server'
-zipMain = 'S:\\skylinesCfiles\landscapes-zip'
+lowVMain = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-full'
+lowVExt1 = 'Z:\\C2LandExt1'
+lowVini = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-ini'
+lowVserver = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-server'
+highVMain = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-full'
+highVExt1 = 'Z:\\C3LandExt1'
+highVini = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-ini'
+highVserver = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-server'
+LowerVersionLandDirs = [lowVMain,lowVExt1,lowVini,lowVserver]
+HigherVersionLandDirs = [highVMain,highVExt1,highVini,highVserver]
+versionsLists = [LowerVersionLandDirs, HigherVersionLandDirs]
+
+
+zipMain = 'L:\\skylinesCfiles\landscapes-zip'
 zipExt1 = 'R:\\zippedExt1'
+zipPathPrior = []
 
-#py7zr does not follow symlinks
-#C3symLinksDir = 'P:\\LandscapesC3\\landscapesC3-ini'
-# otherDir2 = 'L:\\landscapes_for_symlinks2'
 
-C2LandDirs = [C2Main,C2Ext1,C2ini,C2server]
-C3LandDirs = [C3Main,C3Ext1,C3ini,C3server]
+
+
+
 zipDirs = [zipMain,zipExt1]
 
 slcServerIP = '192.168.1.57'
@@ -166,15 +151,15 @@ user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 
-C2ListA = os.listdir(C2Main)
-C3ListA = os.listdir(C3Main)
+lowVListA = os.listdir(lowVMain)
+highVListA = os.listdir(highVMain)
 #if dir in full dirs begins with "-", remove all but .ini files and move to ini dirs
 print('Start the landscape dir name with "-" to move landscape to ini only directory with only ini file')
 #print('To move landscape to sym link directory, start the landscape dir name with "."')
-for list in [C2ListA,C3ListA]:
+for list in [lowVListA,highVListA]:
     for item in list:
-        if list == C2ListA: fullPath = C2Main; ini = C2ini
-        elif list == C3ListA: fullPath = C3Main; ini = C3ini
+        if list == lowVListA: fullPath = lowVMain; ini = lowVini
+        elif list == highVListA: fullPath = highVMain; ini = highVini
         if item[0] == '-':
             path = os.path.join(fullPath,item)
             for item2 in os.listdir(fullPath):
@@ -186,13 +171,13 @@ for list in [C2ListA,C3ListA]:
             shutil.move(path,os.path.join(ini,item.replace('-','')))
             print('Moved {} to {}'.format(path,ini))
         # elif item[0] == '.':  #legacy to move to symlinks dir...keep in code
-        #     path = os.path.join(C2Main,item)
+        #     path = os.path.join(lowVMain,item)
         #     print('Moving {} to {}'.format(path,symLinksDir))
         #     shutil.move(path,os.path.join(symLinksDir,item.replace('.','')))
         #     print('Moved {} to {}'.format(path,symLinksDir))
 
 #remove extra files from init-only dirs:
-for dir1 in [C2ini,C3ini]:
+for dir1 in [lowVini,highVini]:
     for landscape in os.listdir(dir1):
         notifiedRemove = False
         for item in os.listdir(os.path.join(dir1,landscape)):
@@ -210,37 +195,36 @@ for dir1 in [C2ini,C3ini]:
 allLands = []
 allLandPaths = []
 allZips = []
-# versionDict = {'C2List' : '2', 'C3List' : '3',}
-C2ListB = os.listdir(C2Main)
-C3ListB = os.listdir(C3Main)
+# versionDict = {'lowVList' : '2', 'highVList' : '3',}
+lowVListB = os.listdir(lowVMain)
+highVListB = os.listdir(highVMain)
 #remove broken symbolic links
-for list in [C2ListB,C3ListB]:
+for list in [lowVListB,highVListB]:
     for item in list:
-        if list == C2ListB: fullDir1 = C2Main
-        elif list == C3ListB: fullDir1 = C3Main
-        if os.path.islink(os.path.join(fullDir1,item)) and not os.path.exists(os.path.join(fullDir1,item,item,'.ini')):
-            os.rmdir(os.path.join(fullDir1,item))
+        if list == lowVListB: main1 = lowVMain
+        elif list == highVListB: main1 = highVMain
+        if os.path.islink(os.path.join(main1,item)) and not os.path.exists(os.path.join(main1,item,item,'.ini')):
+            os.rmdir(os.path.join(main1,item))
 
 #### update symbolic links to landscape folders
-versionsLists = [C2LandDirs, C3LandDirs]
+
 updateSymlinks(versionsLists)
 ## now all landscapes are represented in main folders ##
 
 # get all landscape paths of any status
-C2ListC = os.listdir(C2Main)
-C3ListC = os.listdir(C3Main)
-for list in [C2ListC,C3ListC]:
+lowVListC = os.listdir(lowVMain)
+highVListC = os.listdir(highVMain)
+for list in [lowVListC,highVListC]:
     for item in list:
-        if list == C2ListC: fullDirC = C2Main
-        elif list == C3ListC: os.path.joinfullDirC = C3Main
-        if os.path.isdir(os.path.join(fullDirC,item)) and 'WestGermany3' not in item:
+        if list == lowVListC: mainC = lowVMain
+        elif list == highVListC: os.path.joinmainC = highVMain
+        if os.path.isdir(os.path.join(mainC,item)) and 'WestGermany3' not in item:
             allLands.append(item)
-            allLandPaths.append(os.path.join(fullDirC,item))
+            allLandPaths.append(os.path.join(mainC,item))
 
 #### update symbolic links to zip files
-versionsLists = [zipDirs]
-updateSymlinks(versionsLists)
-## now all zips are represented in zipDir ##
+updateSymlinks(zipDirs)
+## now all zips are represented in zipMain ##
 
 #get existing 7z files
 for item in os.listdir(zipMain):
@@ -264,26 +248,26 @@ for i, landPath, in enumerate(allLandPaths):
             print ('lines', lines)
             sys.exit("Stop: .ini file can't be parsed {}".format(iniFilePath))
 
-        zipName = '{}.v{}.7z_'.format(land.replace(' ','_'),version) #no zips will have spaces, but landscapes folders might
-        zipPath = os.path.join(zipMain, zipName)  # no zips will have spaces, but landscapes folders might
-        zipPathTemp = os.path.join(destDir,zipName,'.temp')
-
+        condorVers = vtagFromPath(path)
+        zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
+        destination = zipDestDriveByPriority(zipPathPrior,landPath)
+        zipPath = os.path.join(destination, zipName)  # no zips will have spaces, but landscapes folders might
+        zipPathTemp = os.path.join(zipPath,'.temp')
         count = 0
         if zipPath not in allZips:
             print()
             print('----------------------------------------------------------')
             print(zipPath,)
-            try:\\
+            try:
                 #create new zip
                 landZip = zipPath.split('.')[0].split('')[-1]
                 print ('***Creating {}***'.format(zipName))
                 sevenzip(zipPathTemp,landPath)
                 newZipped.append(zipPath)
                 try:
-                    # os.system('move {} {}'.format(zipPathTemp,zipPath)) #don't need to move...creating in zipDir
+                    # os.system('move {} {}'.format(zipPathTemp,zipPath)) #don't need to move...creating in zipMain
                     os.rename(zipPath,zipPath.remove('.temp'))
                     print('zip created and temp tag removed')
-
                     count += 1
                 except:
                     sys.exit('Stop.  Problem with renaming temp file')
@@ -294,43 +278,12 @@ for i, landPath, in enumerate(allLandPaths):
         print('Warning: .ini file does not exist for {}'.format(landPath))
 if len(newZipped) == 0:
     print ('No new landscapes to zip')
+else:
+    updateSymlinks(zipDirs)
 # time.sleep(60)
 
 # run createTorrents on skylinesC server
 if not debugMode:
     runCreateTorrents(newZipped)
-
-# fill up Fastestdir with popular files and remove original files in zipDir
-if populateFastest:
-    for landZip in popular:
-        if landZip not in zipsOnFastest:
-            try:
-                zipPath = os.path.join(zipDir,landZip)
-                FastestPath = os.path.join(FastestDir, landZip)
-                print('Copying {} to {}'.format(zipPath, FastestPath))
-                shutil.copy(zipPath, FastestPath)
-                if os.path.getsize(zipPath) != os.path.getsize(FastestPath):
-                    sys.exit('Stop: file sizes on zipDir and FastestDir were not equal after copy: {}'.format(landZip))
-                print('Done: {}'.format(landZip))
-            except:
-                print("Can't copy {} to {}".format(zipPath, FastestPath))
-                print('Break')
-                break
-    #list FastestDrive .7z files
-    zipsOnFastest = getFastestdriveList(FastestDir)
-    #remove zip files on zipDir that are on FastestDir:
-    for landZip in zipsOnFastest:
-        zipPath = os.path.join(zipDir, landZip)
-        FastestPath = os.path.join(FastestDir, landZip)
-        if os.path.exists(zipPath):
-            try:
-                if os.path.getsize(zipPath) == os.path.getsize(FastestPath):
-                    os.remove(zipPath)
-                else:
-                    print("Didn't remove {} because sizes don't match".format(zipPath) )
-            except Exception as error:
-                print('Error in removing {}: {}'.format(zipPath,error))
-    ### Create symlinks for newly copied
-    linktoFastestdrive(zipDir,FastestDir,popular,zipsOnFastest)
 
 print ("Done")
