@@ -79,6 +79,24 @@ def versionFromPath(path,firstN):
     if 'C3' in dirList[2][:firstN]:
         return '3'
 
+def updateSymlinks(versionsLists):
+    '''makes symlinks in main dir (first in versionDirs) for rest of paths in versionDirs'''
+    for versionDirs in versionsLists:
+        mainDir = versionDirs[0]
+        listMain = os.listdir(mainDir)
+        for otherDir in versionDirs[1:]:
+            for item in os.listdir(otherDir):
+                mainPath = '{}\\{}'.format(fullDirB, item)
+                otherPath = '{}\\{}'.format(otherDir, item)
+                if item not in listMain and \
+                    ('land' in mainDir.lower() and os.path.isdir(os.path.join(dirB, item))) \
+                    or \
+                    ('zip' in mainDir.lower() and item.split('.')[-1] == '7z'):
+                    os.system('mklink /D "{}" "{}"'.format(mainPath, otherPath))
+                elif item not in list:
+                    print('not added', dirB, item)
+                    print('isdir', os.path.isdir(os.path.join(dirB, item)))
+
     #check that new torrents have been added to the qbittorrent servers
     # time.sleep(5)
     # shell = win32com.client.Dispatch("WScript.Shell")
@@ -94,7 +112,7 @@ def versionFromPath(path,firstN):
     #             print('Error. {} not found in {}').format(zipped,logfile)
     # time.sleep(5)
 
-populateFastest = False # fill up Fastestdir and remove original files in zipDirD
+
 debugMode = False
 if debugMode: #use for pycharm debugging. Can't get paramiko to load in pycharm
     print("\n\nIn **debug mode**...won't run createTorrents on server\n\n")
@@ -114,17 +132,14 @@ zipExt1 = 'R:\\zippedExt1'
 #C3symLinksDir = 'P:\\LandscapesC3\\landscapesC3-ini'
 # otherDir2 = 'L:\\landscapes_for_symlinks2'
 
-C2LandDirs = [C2MainDir,C2iniDir,C2serverDir]
-C3LandDirs = [C3MainDir,C3iniDir,C3serverDir]
+C2LandDirs = [C2MainDir,C2Ext1,C2iniDir,C2serverDir]
+C3LandDirs = [C3MainDir,C3Ext1,C3iniDir,C3serverDir]
 zipDirs = [zipMain,zipExt1]
 
 slcServerIP = '192.168.1.57'
 user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
-if populateFastest:
-    FastestDir = 'R:'
-    popularFile = os.path.join(zipDir,'.popularity.txt') #if populateFastest, then move most popular to faster dir
 
 C2ListA = os.listdir(C2MainDir)
 C3ListA = os.listdir(C3MainDir)
@@ -192,19 +207,22 @@ if populateFastest:
     zipsOnFastest = getFastestdriveList(FastestDir)
     linktoFastestdrive(zipDir,FastestDir,popular,zipsOnFastest)
 #symbolic links for other dirs
-for dirB in [C2iniDir, C3iniDir, C2serverDir, C3serverDir]:
-    for item in os.listdir(dirB):
-        v = versionFromPath(dirB,20)
-        if v == '2': list = C2ListB; fullDirB = C2MainDir
-        elif v == '3': list = C3ListB; fullDirB = C3MainDir
-        if os.path.isdir(os.path.join(dirB,item)) and item not in list:
-            # print ('Symlink for {}.'.format(item))
-            fullPathB = '{}\\{}'.format(fullDirB,item)
-            otherPath = '{}\\{}'.format(dirB,item)
-            os.system('mklink /D "{}" "{}"'.format(fullPathB,otherPath))
-        elif item not in list:
-            print ('not added', dirB, item)
-            print ('isdir', os.path.isdir(os.path.join(dirB,item)))
+for pathsList in [C2LandDirs,C2LandDirs]:
+    for dirB in pathsList:
+        for item in os.listdir(dirB):
+            v = versionFromPath(dirB,20)
+            if v == '2': list = C2ListB; fullDirB = C2MainDir
+            elif v == '3': list = C3ListB; fullDirB = C3MainDir
+            if os.path.isdir(os.path.join(dirB,item)) and item not in list:
+                # print ('Symlink for {}.'.format(item))
+                fullPathB = '{}\\{}'.format(fullDirB,item)
+                otherPath = '{}\\{}'.format(dirB,item)
+                os.system('mklink /D "{}" "{}"'.format(fullPathB,otherPath))
+            elif item not in list:
+                print ('not added', dirB, item)
+                print ('isdir', os.path.isdir(os.path.join(dirB,item)))
+
+
 ## now all landscapes are represented in C2MainDir ##
 
 # get all landscape paths of any status
