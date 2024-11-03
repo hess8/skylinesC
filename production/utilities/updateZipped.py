@@ -107,19 +107,21 @@ def zipDestDriveByPriority(priorList,toCompressPath):
 def checkForIni(mainDir):
     mainDirList = os.listdir(mainDir)
     for mainItem in mainDirList:
+        if mainItem[:2] == 'no' or not os.path.isdir(itemMainPath):
+            break
         itemMainPath = os.path.join(mainDir, mainItem)
-        if not os.path.isdir(itemMainPath): break  # note: isdir is true for a link pointing to a dir
         itemDirList = os.listdir(itemMainPath)
-        for subItem in itemDirList:
-            if '.ini' in subItem:
+        for dirItem in itemDirList:
+            if '.ini' in dirItem:
+                iniName = os.path.basename(iniFilePath).split('.')[0]
+                if iniName  != mainItem:
+                    print("The .ini file name {} doesn't match {}.  Renaming the landscape folder with the name of the .ini folder"
+                        .format(dirItem,landPath))
+                    os.rename(itemMainPath, os.path.join(mainDir,iniName))
                 break
         else:
-            if os.path.islink(itemMainPath):
-                print('no .ini file for link {}; removing link'.format(itemMainPath))
-                os.rmdir(os.path.join(mainDir, subItem))
-            elif 'patch' not in itemMainPath:
-                print('no .ini file found in full dir {}; adding "no_ini_" to name'.format(itemMainPath))
-                os.rename(itemMainPath, "no_ini_"+itemMainPath)
+            print('no .ini file found in full dir {}; adding "no_ini_" to name'.format(itemMainPath))
+            os.rename(itemMainPath, "no_ini_"+itemMainPath)
 
 debugMode = False
 if debugMode: #use for pycharm debugging. Can't get paramiko to load in pycharm
@@ -215,7 +217,7 @@ allLands = []
 allLandPaths = []
 allZips = []
 allZipPaths = []
-#remove broken symbolic links and flag landscapes without .ini file
+#remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
 checkForIni(lowVMain)
 checkForIni(highVMain)
 
@@ -237,7 +239,7 @@ for dir in [lowVMain,highVMain]:
 
 #### update symbolic links to zip files
 updateSymlinks([zipDirs])
-# get all zip paths from zipMan
+# get all zip paths from zipMain
 items = os.listdir(zipMain)
 for item in items:
     if item.split('.')[-1] == '7z':
@@ -246,27 +248,33 @@ for item in items:
 
 ## now all zips are represented in zipMain ##
 
-
-
-
-#create new zips
-newZipped = []
+# list dirs to be zipped
+toZip = []
 for i, landPath, in enumerate(allLandPaths):
+    if os.path.basename(landPath)[:2] == 'no':
+        break
     land = allLands[i]
     files = os.listdir(landPath)
     iniFilePath = os.path.join(landPath,land+'.ini')
-    if not os.path.exists(iniFilePath) and 'path' not in iniFilePath.lower():
-       ('Skipping...  No .ini file matches {}.  Consider renaming the landscape folder with the name of the .ini folder.'.format(landPath))
-    elif os.path.exists(iniFilePath):
-        lines = readfile(iniFilePath)
-        if len(lines) > 1:
-            version = lines[1].split('=')[1].split('(')[0].split(',')[0].replace('00','0').replace('.10.','.1.').replace(' ','')
-        else:
-            print('len lines',len(lines))
-            print ('lines', lines)
-            sys.exit("Stop: .ini file can't be parsed {}".format(iniFilePath))
-        condorVers = vtagFromPath(landPath)
-        zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
+    lines = readfile(iniFilePath)
+    if len(lines) > 1:
+        version = lines[1].split('=')[1].split('(')[0].split(',')[0].replace('00','0').replace('.10.','.1.').replace(' ','')
+    else:
+        print('len lines',len(lines))
+        print ('lines', lines)
+        sys.exit("Stop: .ini file can't be parsed {}".format(iniFilePath))
+    condorVers = vtagFromPath(landPath)
+    zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
+    if zipName not in allZips:
+        toZip.append(zipName)
+    if len(toZip) > 0:
+        print("Will create these zips:")
+        for name in toZip:
+            print(name)
+
+#create new zips
+newZipped = []
+for name in toZip:
         destination = zipDestDriveByPriority(zipPathPrior,landPath)
         zipPath = os.path.join(destination, zipName)  # no zips will have spaces, but landscapes folders might
         zipPathTemp = os.path.join(zipPath + '.temp')
@@ -287,12 +295,10 @@ for i, landPath, in enumerate(allLandPaths):
                     print('zip created and temp tag removed')
                     count += 1
                 except:
-                    sys.exit('Stop.  Problem with renaming temp file')
+                    print('Problem with renaming temp file')
             except:
                 print ('Error creating {}'.format(zipPath))
-    else:
-        print ('lines', lines)
-        print('Warning: .ini file does not exist for {}'.format(landPath))
+
 if len(newZipped) == 0:
     print ('No new landscapes to zip')
 else:
