@@ -21,7 +21,7 @@ import re
 
 # from subprocess import Popen, PIPE
 # print(os.path.abspath(os.curdir))
-sys.path.append('s:\\skylinesCfiles\\skylinesC\\skylines')
+sys.path.append('L:\\skylinesCfiles\\skylinesC\\skylines')
 from time import sleep
 from common import readfileNoStrip, readfile
 
@@ -70,14 +70,16 @@ def updateSymlinks(versionsLists):
             for item in os.listdir(otherDir):
                 mainPath = os.path.join(mainDir, item)
                 otherPath = os.path.join(otherDir, item)
-                if item not in listMain and \
-                    ('land' in mainDir.lower() and os.path.isdir(os.path.join(mainDir, item))) \
+                if item in listMain:
+                    if os.path.isdir(mainPath) and os.path.isdir(otherPath):
+                        print('Duplication of directories {} and {}.  No symlink created'.format(mainPath,otherPath))
+                elif \
+                    ('land' in mainDir.lower() and os.path.isdir(otherPath)) \
                     or \
                     ('zip' in mainDir.lower() and item.split('.')[-1] == '7z'):
+
                     os.system('mklink /D "{}" "{}"'.format(mainPath, otherPath))
-                elif item not in list:
-                    print('not added', otherDir, item)
-                    print('isdir', os.path.isdir(otherPath))
+
 def get_free_space_gb(drive):
     """Gets the free space on the specified drive in GB."""
     total, used, free = shutil.disk_usage(drive)
@@ -102,22 +104,22 @@ def zipDestDriveByPriority(priorList,toCompressPath):
         os.stop('Probably not enough room in dirs {} to compress dir {}, {} Gb'.format(priorList,toCompressPath,  size))
 
 
-
-    #check that new torrents have been added to the qbittorrent servers
-    # time.sleep(5)
-    # shell = win32com.client.Dispatch("WScript.Shell")
-    # for logfile in qbtLogLinks:
-    #     shortcut = shell.CreateShortCut('{}\\{}'.format(zipMain,logfile))
-    #     lines = readfile(shortcut.Targetpath)
-    #     for zipped in newZipped:
-    #         for line in lines:
-    #             if 'added to download list' in line and zipped in line:
-    #                 print('New torrent {} found in {}').format(zipped,logfile)
-    #                 break
-    #         else:
-    #             print('Error. {} not found in {}').format(zipped,logfile)
-    # time.sleep(5)
-
+def checkForIni(mainDir):
+    mainDirList = os.listdir(mainDir)
+    for mainItem in mainDirList:
+        itemMainPath = os.path.join(mainDir, mainItem)
+        if not os.path.isdir(itemMainPath): break
+        itemDirList = os.listdir(itemMainPath)
+        for subItem in itemDirList:
+            if '.ini' in subItem:
+                break
+        else:
+            if os.path.islink(itemMainPath):
+                print('no .ini file for link {}; removing link'.format(itemMainPath))
+                os.rmdir(os.path.join(mainDir, subItem))
+            elif 'patch' not in itemMainPath:
+                print('no .ini file found in full dir {}; adding "no_ini_" to name'.format(itemMainPath))
+                os.rename(itemMainPath, "no_ini_"+itemMainPath)
 
 debugMode = False
 if debugMode: #use for pycharm debugging. Can't get paramiko to load in pycharm
@@ -131,20 +133,15 @@ highVMain = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-full'
 highVExt1 = 'Z:\\C3LandExt1'
 highVini = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-ini'
 highVserver = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-server'
-LowerVersionLandDirs = [lowVMain,lowVExt1,lowVini,lowVserver]
-HigherVersionLandDirs = [highVMain,highVExt1,highVini,highVserver]
-versionsLists = [LowerVersionLandDirs, HigherVersionLandDirs]
+lowerVersionLandDirs = [lowVMain,lowVExt1,lowVini,lowVserver]
+higherVersionLandDirs = [highVMain,highVExt1,highVini,highVserver]
+versionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
 
 
 zipMain = 'L:\\skylinesCfiles\landscapes-zip'
 zipExt1 = 'R:\\zippedExt1'
-zipPathPrior = []
-
-
-
-
-
 zipDirs = [zipMain,zipExt1]
+zipPathPrior = [zipExt1,zipMain] # fill up in this order
 
 slcServerIP = '192.168.1.57'
 user = 'bret'
@@ -153,21 +150,22 @@ qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 
 lowVListA = os.listdir(lowVMain)
 highVListA = os.listdir(highVMain)
+
 #if dir in full dirs begins with "-", remove all but .ini files and move to ini dirs
 print('Start the landscape dir name with "-" to move landscape to ini only directory with only ini file')
 #print('To move landscape to sym link directory, start the landscape dir name with "."')
 for list in [lowVListA,highVListA]:
     for item in list:
-        if list == lowVListA: fullPath = lowVMain; ini = lowVini
-        elif list == highVListA: fullPath = highVMain; ini = highVini
+        if list == lowVListA: mainPath = lowVMain; ini = lowVini
+        elif list == highVListA: mainPath = highVMain; ini = highVini
         if item[0] == '-':
-            path = os.path.join(fullPath,item)
-            for item2 in os.listdir(fullPath):
+            path = os.path.join(mainPath,item)
+            for item2 in os.listdir(mainPath):
                 if not '.ini' in item2:
-                    if os.path.isdir(os.path.join(fullPath,item2)):
-                        os.system('rmdir /S /Q "{}"'.format(os.path.join(fullPath,item2)))
+                    if os.path.isdir(os.path.join(mainPath,item2)):
+                        os.system('rmdir /S /Q "{}"'.format(os.path.join(mainPath,item2)))
                     else:
-                        os.remove(os.path.join(fullPath,item2))
+                        os.remove(os.path.join(mainPath,item2))
             shutil.move(path,os.path.join(ini,item.replace('-','')))
             print('Moved {} to {}'.format(path,ini))
         # elif item[0] == '.':  #legacy to move to symlinks dir...keep in code
@@ -176,7 +174,7 @@ for list in [lowVListA,highVListA]:
         #     shutil.move(path,os.path.join(symLinksDir,item.replace('.','')))
         #     print('Moved {} to {}'.format(path,symLinksDir))
 
-#remove extra files from init-only dirs:
+#remove extra files from ini-only dirs:
 for dir1 in [lowVini,highVini]:
     for landscape in os.listdir(dir1):
         notifiedRemove = False
@@ -195,16 +193,10 @@ for dir1 in [lowVini,highVini]:
 allLands = []
 allLandPaths = []
 allZips = []
-# versionDict = {'lowVList' : '2', 'highVList' : '3',}
-lowVListB = os.listdir(lowVMain)
-highVListB = os.listdir(highVMain)
-#remove broken symbolic links
-for list in [lowVListB,highVListB]:
-    for item in list:
-        if list == lowVListB: main1 = lowVMain
-        elif list == highVListB: main1 = highVMain
-        if os.path.islink(os.path.join(main1,item)) and not os.path.exists(os.path.join(main1,item,item,'.ini')):
-            os.rmdir(os.path.join(main1,item))
+
+#remove broken symbolic links and flag landscapes without .ini file
+checkForIni(lowVMain)
+checkForIni(highVMain)
 
 #### update symbolic links to landscape folders
 
@@ -212,15 +204,13 @@ updateSymlinks(versionsLists)
 ## now all landscapes are represented in main folders ##
 
 # get all landscape paths of any status
-lowVListC = os.listdir(lowVMain)
-highVListC = os.listdir(highVMain)
-for list in [lowVListC,highVListC]:
-    for item in list:
-        if list == lowVListC: mainC = lowVMain
-        elif list == highVListC: os.path.joinmainC = highVMain
-        if os.path.isdir(os.path.join(mainC,item)) and 'WestGermany3' not in item:
-            allLands.append(item)
-            allLandPaths.append(os.path.join(mainC,item))
+for dirsList in [lowerVersionLandDirs,higherVersionLandDirs] :
+    for dir in dirsList:
+        items = os.listdir(dir)
+        for item in items:
+            if os.path.isdir(os.path.join(dir, item)) and 'WestGermany3' not in item:
+                allLands.append(item)
+                allLandPaths.append(os.path.join(dir, item))
 
 #### update symbolic links to zip files
 updateSymlinks(zipDirs)
@@ -287,3 +277,17 @@ if not debugMode:
     runCreateTorrents(newZipped)
 
 print ("Done")
+#check that new torrents have been added to the qbittorrent servers
+    # time.sleep(5)
+    # shell = win32com.client.Dispatch("WScript.Shell")
+    # for logfile in qbtLogLinks:
+    #     shortcut = shell.CreateShortCut('{}\\{}'.format(zipMain,logfile))
+    #     lines = readfile(shortcut.Targetpath)
+    #     for zipped in newZipped:
+    #         for line in lines:
+    #             if 'added to download list' in line and zipped in line:
+    #                 print('New torrent {} found in {}').format(zipped,logfile)
+    #                 break
+    #         else:
+    #             print('Error. {} not found in {}').format(zipped,logfile)
+    # time.sleep(5)
