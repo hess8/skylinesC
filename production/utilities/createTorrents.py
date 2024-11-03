@@ -129,7 +129,8 @@ if makeAllMagnets:
             print 'Error in magnet link for {}'.format(torrent)
 
 #run update for skylinesC page.
-os.system('python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/landscapesPage.py')
-print 'Updated landscapes.hbs'
+print('Not updating landscapes.hbs')
+# os.system('python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/landscapesPage.py')
+# print 'Updated landscapes.hbs'
 #beep
 print 'Done'
