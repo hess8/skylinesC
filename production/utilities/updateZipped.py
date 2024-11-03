@@ -105,19 +105,33 @@ def zipDestDriveByPriority(priorList,toCompressPath):
 
 
 def checkForIni(mainDir):
+    '''Checks for bad links and addresses mismatch between landscape and ini names'''
     mainDirList = os.listdir(mainDir)
     for mainItem in mainDirList:
-        if mainItem[:2] == 'no' or not os.path.isdir(itemMainPath):
-            break
         itemMainPath = os.path.join(mainDir, mainItem)
+        if mainItem[:2] == 'no':
+            continue
+        elif os.path.islink(itemMainPath) and not os.path.isdir(itemMainPath):
+            os.remove(itemMainPath)
+            print('Removed broken link {}'.format(mainItem))
+            continue
         itemDirList = os.listdir(itemMainPath)
         for dirItem in itemDirList:
             if '.ini' in dirItem:
-                iniName = os.path.basename(iniFilePath).split('.')[0]
-                if iniName  != mainItem:
-                    print("The .ini file name {} doesn't match {}.  Renaming the landscape folder with the name of the .ini folder"
-                        .format(dirItem,landPath))
-                    os.rename(itemMainPath, os.path.join(mainDir,iniName))
+                iniName = os.path.basename(dirItem).split('.')[0]
+                if iniName != mainItem and 'patch' not in mainItem.lower() and 'WestGermany3' not in mainItem:
+                    try:
+                        os.rename(itemMainPath, os.path.join(mainDir,iniName))
+                        print(
+                            "The .ini file name {} doesn't match {}.  Renamed the landscape folder with the name of the .ini file"
+                            .format(dirItem, mainItem))
+                        xx=0
+                    except:
+                        try:
+                            os.rename(itemMainPath, os.path.join(mainDir,'no_match_ini_' + iniName))
+                            print('Renamed {} to {}'.format(itemMainPath,os.path.join(mainDir,'no_match_ini_' + iniName)))
+                        except:
+                            os.stop("Stop: can't rename {} to {}".format(itemMainPath,os.path.join(mainDir,'no_match_ini_' + iniName)))
                 break
         else:
             print('no .ini file found in full dir {}; adding "no_ini_" to name'.format(itemMainPath))
@@ -127,20 +141,19 @@ debugMode = False
 if debugMode: #use for pycharm debugging. Can't get paramiko to load in pycharm
     print("\n\nIn **debug mode**...won't run createTorrents on server\n\n")
     sleep(2)
-lowVMain = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-main'
+lowVMain = 'P:\\landscapes\\landscapesC2\\landscapesC2-main'
 lowVExt1 = 'Z:\\C2LandExt1'
-lowVini = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-ini'
-lowVserver = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-server'
-highVMain = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-main'
+lowVini = 'P:\\landscapes\\landscapesC2\\landscapesC2-ini'
+lowVserver = 'P:\\landscapes\\landscapesC2\\landscapesC2-server'
+highVMain = 'P:\\landscapes\\landscapesC3\\landscapesC3-main'
 highVExt1 = 'Z:\\C3LandExt1'
-highVini = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-ini'
-highVserver = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-server'
+highVini = 'P:\\landscapes\\landscapesC3\\landscapesC3-ini'
+highVserver = 'P:\\landscapes\\landscapesC3\\landscapesC3-server'
 lowerVersionLandDirs = [lowVMain,lowVExt1,lowVini,lowVserver]
 higherVersionLandDirs = [highVMain,highVExt1,highVini,highVserver]
 landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
 
-
-zipMain = 'P:\\Landscapes\\landscapes-zip'
+zipMain = 'P:\\landscapes\\landscapes-zip'
 zipExt1 = 'R:\\zippedExt1'
 zipDirs = [zipMain,zipExt1]
 zipPathPrior = [zipExt1,zipMain] # fill up in this order
@@ -153,22 +166,32 @@ qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 lowVListA = os.listdir(lowVMain)
 highVListA = os.listdir(highVMain)
 
-# #temp REMOVE '_c2' version tag from existing C2 .7z files
+# #temp
+# print(' temp changing zip file names')
 # for dir in zipDirs:
 #     list = os.listdir(dir)
 #     for item in list:
-#         if '_c2' in item:
-#             os.rename(os.path.join(dir,item), os.path.join(dir,item.replace('_c2','' )))
+#         if '.7z' in item and '_C2.7z' not in item and 'C3' not in item:
+#             os.rename(os.path.join(dir,item), os.path.join(dir,item.replace('.7z','_C2.7z' )))
 
-#temp remove C2 tag from mistakenly tagged landscape folders
+#temp add C2 back to some names
 #
-# list = os.listdir(lowVMain)
-# for item in list:
-#     if '_C2' in item:
-#         newname = item.replace('_C2','' )
-#         os.rename(os.path.join(lowVMain,item), os.path.join(lowVMain,newname))
-
-
+list = os.listdir(lowVMain)
+tochange = ['Belgium','Atlantide','','','','','',]
+for land in list:
+    landbase = land.replace('_C2','')
+    if landbase not in tochange:
+        continue
+    dirlist = os.listdir(os.path.join(lowVMain,land))
+    newland = land + '_C2'
+    os.rename(os.path.join(lowVMain,land),os.path.join(lowVMain,newland))
+    for item in dirlist:
+        if land in item:
+            os.rename(os.path.join(lowVMain,newland, item), os.path.join(lowVMain,newland, item + '_C2'))
+        if '_C2' in item:
+            newname = item.replace('_C2','')
+            name2 = newname.replace(landbase,landbase+'_C2')
+            os.rename(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land,name2))
 
 
 #if dir in main dirs begins with "-", remove all but .ini files and move to ini dirs
@@ -245,7 +268,6 @@ for item in items:
     if item.split('.')[-1] == '7z':
         allZips.append(item)
         allZipPaths.append(os.path.join(zipMain, item))
-
 ## now all zips are represented in zipMain ##
 
 # list dirs to be zipped
@@ -267,10 +289,10 @@ for i, landPath, in enumerate(allLandPaths):
     zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
     if zipName not in allZips:
         toZip.append(zipName)
-    if len(toZip) > 0:
-        print("Will create these zips:")
-        for name in toZip:
-            print(name)
+if len(toZip) > 0:
+    print("Will create these zips:")
+    for name in toZip:
+        print(name)
 
 #create new zips
 newZipped = []

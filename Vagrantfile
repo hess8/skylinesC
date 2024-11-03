@@ -140,7 +140,6 @@ pipenv run ./manage.py db create
 mkdir -p htdocs/files
 mkdir -p htdocs/srtm
 
-
 # Front end
 v=12
 curl -sL https://deb.nodesource.com/setup_$v.x | sudo -E bash -
