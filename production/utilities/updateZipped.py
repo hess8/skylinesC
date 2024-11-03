@@ -58,27 +58,27 @@ def vtagFromPath(path):
     ''''''
     '''Gets version tag from regex pattern: C[any digits] in path'''
     versTag = re.search("C[0-9]+",path)
-    return versTag
+    return versTag[0]
 
 
-def updateSymlinks(versionsLists):
+def updateSymlinks(dirsLists):
     '''makes symlinks in main dir (first in versionDirs) for rest of paths in versionDirs'''
-    for versionDirs in versionsLists:
-        mainDir = versionDirs[0]
+    xx=0
+    for list in dirsLists:
+        mainDir = list[0]
         listMain = os.listdir(mainDir)
-        for otherDir in versionDirs[1:]:
+        for otherDir in list[1:]:
             for item in os.listdir(otherDir):
                 mainPath = os.path.join(mainDir, item)
                 otherPath = os.path.join(otherDir, item)
-                if item in listMain:
-                    if os.path.isdir(mainPath) and os.path.isdir(otherPath):
-                        print('Duplication of directories {} and {}.  No symlink created'.format(mainPath,otherPath))
-                elif \
-                    ('land' in mainDir.lower() and os.path.isdir(otherPath)) \
-                    or \
-                    ('zip' in mainDir.lower() and item.split('.')[-1] == '7z'):
-
+                if item in listMain: # note: isdir is true for a link pointing to a dir
+                    if not os.path.islink(mainPath) and not os.path.islink(otherPath):
+                        print('Duplication of directories:  No symlink created between {} and {}.'.format(mainPath,otherPath))
+                elif 'zip' in mainDir.lower() and item.split('.')[-1] == '7z':
+                    os.system('mklink "{}" "{}"'.format(mainPath, otherPath))
+                elif not os.path.islink(otherPath):
                     os.system('mklink /D "{}" "{}"'.format(mainPath, otherPath))
+
 
 def get_free_space_gb(drive):
     """Gets the free space on the specified drive in GB."""
@@ -108,7 +108,7 @@ def checkForIni(mainDir):
     mainDirList = os.listdir(mainDir)
     for mainItem in mainDirList:
         itemMainPath = os.path.join(mainDir, mainItem)
-        if not os.path.isdir(itemMainPath): break
+        if not os.path.isdir(itemMainPath): break  # note: isdir is true for a link pointing to a dir
         itemDirList = os.listdir(itemMainPath)
         for subItem in itemDirList:
             if '.ini' in subItem:
@@ -125,20 +125,20 @@ debugMode = False
 if debugMode: #use for pycharm debugging. Can't get paramiko to load in pycharm
     print("\n\nIn **debug mode**...won't run createTorrents on server\n\n")
     sleep(2)
-lowVMain = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-full'
+lowVMain = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-main'
 lowVExt1 = 'Z:\\C2LandExt1'
 lowVini = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-ini'
 lowVserver = 'P:\\Landscapes\\LandscapesC2\\landscapesC2-server'
-highVMain = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-full'
+highVMain = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-main'
 highVExt1 = 'Z:\\C3LandExt1'
 highVini = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-ini'
 highVserver = 'P:\\Landscapes\\LandscapesC3\\landscapesC3-server'
 lowerVersionLandDirs = [lowVMain,lowVExt1,lowVini,lowVserver]
 higherVersionLandDirs = [highVMain,highVExt1,highVini,highVserver]
-versionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
+landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
 
 
-zipMain = 'L:\\skylinesCfiles\landscapes-zip'
+zipMain = 'P:\\Landscapes\\landscapes-zip'
 zipExt1 = 'R:\\zippedExt1'
 zipDirs = [zipMain,zipExt1]
 zipPathPrior = [zipExt1,zipMain] # fill up in this order
@@ -151,7 +151,25 @@ qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 lowVListA = os.listdir(lowVMain)
 highVListA = os.listdir(highVMain)
 
-#if dir in full dirs begins with "-", remove all but .ini files and move to ini dirs
+# #temp REMOVE '_c2' version tag from existing C2 .7z files
+# for dir in zipDirs:
+#     list = os.listdir(dir)
+#     for item in list:
+#         if '_c2' in item:
+#             os.rename(os.path.join(dir,item), os.path.join(dir,item.replace('_c2','' )))
+
+#temp remove C2 tag from mistakenly tagged landscape folders
+#
+# list = os.listdir(lowVMain)
+# for item in list:
+#     if '_C2' in item:
+#         newname = item.replace('_C2','' )
+#         os.rename(os.path.join(lowVMain,item), os.path.join(lowVMain,newname))
+
+
+
+
+#if dir in main dirs begins with "-", remove all but .ini files and move to ini dirs
 print('Start the landscape dir name with "-" to move landscape to ini only directory with only ini file')
 #print('To move landscape to sym link directory, start the landscape dir name with "."')
 for list in [lowVListA,highVListA]:
@@ -159,15 +177,18 @@ for list in [lowVListA,highVListA]:
         if list == lowVListA: mainPath = lowVMain; ini = lowVini
         elif list == highVListA: mainPath = highVMain; ini = highVini
         if item[0] == '-':
-            path = os.path.join(mainPath,item)
-            for item2 in os.listdir(mainPath):
-                if not '.ini' in item2:
-                    if os.path.isdir(os.path.join(mainPath,item2)):
-                        os.system('rmdir /S /Q "{}"'.format(os.path.join(mainPath,item2)))
-                    else:
-                        os.remove(os.path.join(mainPath,item2))
-            shutil.move(path,os.path.join(ini,item.replace('-','')))
-            print('Moved {} to {}'.format(path,ini))
+            print("handling '-' files needs to be rewritten")
+            # path = os.path.join(mainPath,item)
+            # for item2 in os.listdir(mainPath):
+            #     if not '.ini' in item2:
+            #         if os.path.isdir(os.path.join(mainPath,item2)): # note: isdir is true for a link pointing to a dir
+            #             os.system('rmdir /S /Q "{}"'.format(os.path.join(mainPath,item2)))
+            #         else:
+            #             os.remove(os.path.join(mainPath,item2))
+            # shutil.move(path,os.path.join(ini,item.replace('-','')))
+            # print('Moved {} to {}'.format(path,ini))
+
+        #######
         # elif item[0] == '.':  #legacy to move to symlinks dir...keep in code
         #     path = os.path.join(lowVMain,item)
         #     print('Moving {} to {}'.format(path,symLinksDir))
@@ -183,7 +204,7 @@ for dir1 in [lowVini,highVini]:
                 if not notifiedRemove:
                     print ('Removing all but .ini in {}'.format(landscape))
                     notifiedRemove = True
-                if os.path.isdir(os.path.join(dir1,landscape,item)):
+                if os.path.isdir(os.path.join(dir1,landscape,item)): # note: isdir is true for a link pointing to a dir
                     os.system('rmdir /S /Q "{}"'.format(os.path.join(dir1,landscape,item)))
                 else:
                     os.remove(os.path.join(dir1,landscape,item))
@@ -193,40 +214,47 @@ for dir1 in [lowVini,highVini]:
 allLands = []
 allLandPaths = []
 allZips = []
-
+allZipPaths = []
 #remove broken symbolic links and flag landscapes without .ini file
 checkForIni(lowVMain)
 checkForIni(highVMain)
 
 #### update symbolic links to landscape folders
 
-updateSymlinks(versionsLists)
+updateSymlinks(landVersionsLists)
 ## now all landscapes are represented in main folders ##
 
-# get all landscape paths of any status
-for dirsList in [lowerVersionLandDirs,higherVersionLandDirs] :
-    for dir in dirsList:
-        items = os.listdir(dir)
-        for item in items:
-            if os.path.isdir(os.path.join(dir, item)) and 'WestGermany3' not in item:
+# get all landscape paths that have textures dir
+for dir in [lowVMain,highVMain]:
+    items = os.listdir(dir)
+    for item in items:
+        itemPath = os.path.join(dir, item)
+        if os.path.isdir(itemPath) and \
+            'Textures' in os.listdir(itemPath) \
+            and 'WestGermany3' not in item: # note: isdir is true for a link pointing to a dir
                 allLands.append(item)
                 allLandPaths.append(os.path.join(dir, item))
 
 #### update symbolic links to zip files
-updateSymlinks(zipDirs)
+updateSymlinks([zipDirs])
+# get all zip paths from zipMan
+items = os.listdir(zipMain)
+for item in items:
+    if item.split('.')[-1] == '7z':
+        allZips.append(item)
+        allZipPaths.append(os.path.join(zipMain, item))
+
 ## now all zips are represented in zipMain ##
 
-#get existing 7z files
-for item in os.listdir(zipMain):
-    if item.split('.')[-1] =='7z':
-        allZips.append(os.path.join(zipMain,item))
+
+
 
 #create new zips
 newZipped = []
 for i, landPath, in enumerate(allLandPaths):
     land = allLands[i]
     files = os.listdir(landPath)
-    iniFilePath = os.path.join(landPath,land,'.ini')
+    iniFilePath = os.path.join(landPath,land+'.ini')
     if not os.path.exists(iniFilePath) and 'path' not in iniFilePath.lower():
        ('Skipping...  No .ini file matches {}.  Consider renaming the landscape folder with the name of the .ini folder.'.format(landPath))
     elif os.path.exists(iniFilePath):
@@ -237,21 +265,20 @@ for i, landPath, in enumerate(allLandPaths):
             print('len lines',len(lines))
             print ('lines', lines)
             sys.exit("Stop: .ini file can't be parsed {}".format(iniFilePath))
-
-        condorVers = vtagFromPath(path)
+        condorVers = vtagFromPath(landPath)
         zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
         destination = zipDestDriveByPriority(zipPathPrior,landPath)
         zipPath = os.path.join(destination, zipName)  # no zips will have spaces, but landscapes folders might
-        zipPathTemp = os.path.join(zipPath,'.temp')
+        zipPathTemp = os.path.join(zipPath + '.temp')
         count = 0
-        if zipPath not in allZips:
+        if zipName not in allZips:
             print()
             print('----------------------------------------------------------')
-            print(zipPath,)
+
             try:
                 #create new zip
-                landZip = zipPath.split('.')[0].split('')[-1]
                 print ('***Creating {}***'.format(zipName))
+                print(zipPath, )
                 sevenzip(zipPathTemp,landPath)
                 newZipped.append(zipPath)
                 try:
