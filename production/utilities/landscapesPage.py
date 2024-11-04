@@ -24,10 +24,11 @@ def tableRow(name, trackerStr, dir):
     lines.append('\t\t\t\t<td> <a href="{}">'.format(magline) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
     # lines.append('\t<td> <a href="{}"> magnet </a> </td> '.format(magline))
     GiB = 1.074e+9
-    if sizes[i] > 0.1 * GiB:
-        sizeStr = '{:.1f} GB"'.format(sizes[i] / GiB)
+    size = os.stat(os.path.join(dir, name)).st_size
+    if size > 0.1 * GiB:
+        sizeStr = '{:.1f} GB"'.format(size / GiB)
     else:
-        sizeStr = '{:.1f} MB"'.format(sizes[i] / GiB * 1000)
+        sizeStr = '{:.1f} MB"'.format(size / GiB * 1000)
     lines.append('\t<td align = "right"> {{"' + sizeStr  + '}} </td> \n')
     lines.append('\t</tr> \n\n')
 
@@ -44,10 +45,11 @@ dirlist = os.listdir(dir)
 names = []
 sizes = []
 for item in dirlist:
+    if 'AA3' in item and item.split('.')[-1]=='torrent':
+        xx=0
     if item.split('.')[-1]=='torrent':
         name = item.split('.torrent')[0]
         names.append(name)
-        sizes.append(os.stat(os.path.join(dir,name)).st_size)
 
 lowVersionList = []
 highVersionList = []
