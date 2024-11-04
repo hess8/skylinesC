@@ -64,7 +64,9 @@ def versionFromPath(path):
 def updateSymlinks(dirsLists):
     """"""
     '''makes symlinks in main dir (first in dirsLists) for rest of paths in dirsLists
-    Works for both landscapes and zips folder.  If zips folder, removes and .temp files'''
+    Works for both landscapes and zips folder.
+    If zips folder, removes .temp files'''
+
     xx=0
     for list in dirsLists:
         mainDir = list[0]
@@ -75,7 +77,7 @@ def updateSymlinks(dirsLists):
                 otherPath = os.path.join(otherDir, item)
                 if item in listMain: # note: isdir is true for a link pointing to a dir
                     if not os.path.islink(mainPath) and not os.path.islink(otherPath):
-                        print('Duplication of directories:  No symlink created between {} and {}.'.format(mainPath,otherPath))
+                        print('Duplication:  No symlink created between {} and {}.'.format(mainPath,otherPath))
                 elif 'zip' in mainDir.lower():
                     if item.split('.')[-1] == '7z':
                         os.system('mklink "{}" "{}"'.format(mainPath, otherPath))
@@ -112,9 +114,19 @@ def zipDestDriveByPriority(priorList,toCompressPath):
             return dest
     else:
         os.stop('Probably not enough room in dirs {} to compress dir {}, {} Gb'.format(priorList,toCompressPath,  size))
+def checkZipsLinks(zipMain):
+    '''Removes bad links'''
+    zipMainList = os.listdir(zipMain)
+    for mainItem in zipMainList:
+        itemMainPath = os.path.join(zipMain, mainItem)
+        if 'Cz' in mainItem:
+            xx=0
+        if os.path.islink(itemMainPath) and not os.path.exists(itemMainPath):
+            os.remove(itemMainPath)
+            print('Removed broken link {}'.format(mainItem))
 
 
-def checkForIni(mainDir):
+def checkLinksIni(mainDir):
     '''Checks for bad links and addresses mismatch between landscape and ini names'''
     mainDirList = os.listdir(mainDir)
     for mainItem in mainDirList:
@@ -174,9 +186,9 @@ keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 
 #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
-checkForIni(lowVMain)
-checkForIni(highVMain)
-
+checkLinksIni(lowVMain)
+checkLinksIni(highVMain)
+checkZipsLinks(zipMain)
 lowVListA = os.listdir(lowVMain)
 highVListA = os.listdir(highVMain)
 
@@ -264,9 +276,9 @@ allLandPaths = []
 allZips = []
 allZipPaths = []
 #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
-checkForIni(lowVMain)
-checkForIni(highVMain)
-
+checkLinksIni(lowVMain)
+checkLinksIni(highVMain)
+checkZipsLinks(zipMain)
 #### update symbolic links to landscape folders
 
 updateSymlinks(landVersionsLists)
