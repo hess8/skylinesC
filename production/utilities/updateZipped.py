@@ -54,7 +54,7 @@ def runCreateTorrents(newZipped):
             for line in stdout:
                 print(line)
 
-def vtagFromPath(path):
+def versionFromPath(path):
     ''''''
     '''Gets version tag from regex pattern: C[any digits] in path'''
     versTag = re.search("C[0-9]+",path)
@@ -62,7 +62,9 @@ def vtagFromPath(path):
 
 
 def updateSymlinks(dirsLists):
-    '''makes symlinks in main dir (first in versionDirs) for rest of paths in versionDirs'''
+    """"""
+    '''makes symlinks in main dir (first in dirsLists) for rest of paths in dirsLists
+    Works for both landscapes and zips folder.  If zips folder, removes and .temp files'''
     xx=0
     for list in dirsLists:
         mainDir = list[0]
@@ -74,10 +76,18 @@ def updateSymlinks(dirsLists):
                 if item in listMain: # note: isdir is true for a link pointing to a dir
                     if not os.path.islink(mainPath) and not os.path.islink(otherPath):
                         print('Duplication of directories:  No symlink created between {} and {}.'.format(mainPath,otherPath))
-                elif 'zip' in mainDir.lower() and item.split('.')[-1] == '7z':
-                    os.system('mklink "{}" "{}"'.format(mainPath, otherPath))
+                elif 'zip' in mainDir.lower():
+                    if item.split('.')[-1] == '7z':
+                        os.system('mklink "{}" "{}"'.format(mainPath, otherPath))
                 elif not os.path.islink(otherPath):
                     os.system('mklink /D "{}" "{}"'.format(mainPath, otherPath))
+        #remove .temp files
+        if 'zip' in mainDir.lower():
+            for dir in list:
+                for item in os.listdir(dir):
+                    if 'zip' in item and item.split('.')[-1] == 'temp':
+                        os.remove(os.path.join(dir,item))
+
 
 
 def get_free_space_gb(drive):
@@ -131,7 +141,7 @@ def checkForIni(mainDir):
                             os.rename(itemMainPath, os.path.join(mainDir,'no_match_ini_' + iniName))
                             print('Renamed {} to {}'.format(itemMainPath,os.path.join(mainDir,'no_match_ini_' + iniName)))
                         except:
-                            os.stop("Stop: can't rename {} to {}".format(itemMainPath,os.path.join(mainDir,'no_match_ini_' + iniName)))
+                            sys.stop("Stop: can't rename {} to {}".format(itemMainPath,os.path.join(mainDir,'no_match_ini_' + iniName)))
                 break
         else:
             print('no .ini file found in full dir {}; adding "no_ini_" to name'.format(itemMainPath))
@@ -152,7 +162,7 @@ highVserver = 'P:\\landscapes\\landscapesC3\\landscapesC3-server'
 lowerVersionLandDirs = [lowVMain,lowVExt1,lowVini,lowVserver]
 higherVersionLandDirs = [highVMain,highVExt1,highVini,highVserver]
 landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
-
+versionMainDict = {'C2': lowVMain, 'C3': highVMain}
 zipMain = 'P:\\landscapes\\landscapes-zip'
 zipExt1 = 'R:\\zippedExt1'
 zipDirs = [zipMain,zipExt1]
@@ -163,35 +173,48 @@ user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 
+#remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
+checkForIni(lowVMain)
+checkForIni(highVMain)
+
 lowVListA = os.listdir(lowVMain)
 highVListA = os.listdir(highVMain)
 
 # #temp
-# print(' temp changing zip file names')
+# print(' removing files without tag')
 # for dir in zipDirs:
 #     list = os.listdir(dir)
 #     for item in list:
 #         if '.7z' in item and '_C2.7z' not in item and 'C3' not in item:
+#             # os.rename(os.path.join(dir,item), os.path.join(dir,item.replace('.7z','_C2.7z' )))
+#             os.remove(os.path.join(dir,item))
+
+# print('adding _C2 back to zip files')
+# for dir in zipDirs:
+#     list = os.listdir(dir)
+#     for item in list:
+#         if item.split('.')[-1] == '7z' in item and '_C2.7z' not in item and 'C3' not in item\
+#           and not os.path.exists(os.path.join(dir,item.replace('.7z','_C2.7z' ))):
 #             os.rename(os.path.join(dir,item), os.path.join(dir,item.replace('.7z','_C2.7z' )))
 
 #temp add C2 back to some names
 #
-list = os.listdir(lowVMain)
-tochange = ['Belgium','Atlantide','','','','','',]
-for land in list:
-    landbase = land.replace('_C2','')
-    if landbase not in tochange:
-        continue
-    dirlist = os.listdir(os.path.join(lowVMain,land))
-    newland = land + '_C2'
-    os.rename(os.path.join(lowVMain,land),os.path.join(lowVMain,newland))
-    for item in dirlist:
-        if land in item:
-            os.rename(os.path.join(lowVMain,newland, item), os.path.join(lowVMain,newland, item + '_C2'))
-        if '_C2' in item:
-            newname = item.replace('_C2','')
-            name2 = newname.replace(landbase,landbase+'_C2')
-            os.rename(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land,name2))
+# list = os.listdir(lowVMain)
+# tochange = ['Belgium','Atlantide','','','','','',]
+# for land in list:
+#     landbase = land.replace('_C2','')
+#     if landbase not in tochange:
+#         continue
+#     dirlist = os.listdir(os.path.join(lowVMain,land))
+#     newland = land + '_C2'
+#     os.rename(os.path.join(lowVMain,land),os.path.join(lowVMain,newland))
+#     for item in dirlist:
+#         if land in item:
+#             os.rename(os.path.join(lowVMain,newland, item), os.path.join(lowVMain,newland, item + '_C2'))
+#         if '_C2' in item:
+#             newname = item.replace('_C2','')
+#             name2 = newname.replace(landbase,landbase+'_C2')
+#             os.rename(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land,name2))
 
 
 #if dir in main dirs begins with "-", remove all but .ini files and move to ini dirs
@@ -285,7 +308,7 @@ for i, landPath, in enumerate(allLandPaths):
         print('len lines',len(lines))
         print ('lines', lines)
         sys.exit("Stop: .ini file can't be parsed {}".format(iniFilePath))
-    condorVers = vtagFromPath(landPath)
+    condorVers = versionFromPath(landPath)
     zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
     if zipName not in allZips:
         toZip.append(zipName)
@@ -296,35 +319,39 @@ if len(toZip) > 0:
 
 #create new zips
 newZipped = []
-for name in toZip:
-        destination = zipDestDriveByPriority(zipPathPrior,landPath)
-        zipPath = os.path.join(destination, zipName)  # no zips will have spaces, but landscapes folders might
-        zipPathTemp = os.path.join(zipPath + '.temp')
-        count = 0
-        if zipName not in allZips:
-            print()
-            print('----------------------------------------------------------')
+for newZip in toZip:
+    if 'C3' in newZip:
+        mainDir = highVMain
+    else:
+        mainDir = lowVMain
+    land2 = newZip.split('.')[0]
+    landPath2 = os.path.join(mainDir, land2)
+    destination = zipDestDriveByPriority(zipPathPrior,landPath2)
+    zipPath = os.path.join(destination, newZip)  # no zips will have spaces, but landscapes folders might
+    zipPathTemp = os.path.join(zipPath + '.temp')
 
-            try:
-                #create new zip
-                print ('***Creating {}***'.format(zipName))
-                print(zipPath, )
-                sevenzip(zipPathTemp,landPath)
-                newZipped.append(zipPath)
-                try:
-                    # os.system('move {} {}'.format(zipPathTemp,zipPath)) #don't need to move...creating in zipMain
-                    os.rename(zipPath,zipPath.remove('.temp'))
-                    print('zip created and temp tag removed')
-                    count += 1
-                except:
-                    print('Problem with renaming temp file')
-            except:
-                print ('Error creating {}'.format(zipPath))
+    count = 0
+    print()
+    print('----------------------------------------------------------')
+    print('***Creating {} in {}***'.format(newZip, destination))
+
+    try:
+        #create new zip
+        sevenzip(zipPathTemp,landPath2)
+        newZipped.append(zipPath)
+        try:
+            os.rename(zipPath,zipPath.remove('.temp'))
+            print('zip created and temp tag removed')
+            count += 1
+        except:
+            print('Problem with renaming temp file')
+    except:
+        print ('Error creating {}'.format(zipPath))
 
 if len(newZipped) == 0:
     print ('No new landscapes to zip')
 else:
-    updateSymlinks(zipDirs)
+    updateSymlinks([zipDirs])
 # time.sleep(60)
 
 # run createTorrents on skylinesC server
