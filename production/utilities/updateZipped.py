@@ -119,7 +119,7 @@ def checkForIni(mainDir):
     mainDirList = os.listdir(mainDir)
     for mainItem in mainDirList:
         itemMainPath = os.path.join(mainDir, mainItem)
-        if mainItem[:2] == 'no':
+        if mainItem[:2] == 'no_':
             continue
         elif os.path.islink(itemMainPath) and not os.path.isdir(itemMainPath):
             os.remove(itemMainPath)
@@ -218,7 +218,7 @@ highVListA = os.listdir(highVMain)
 
 
 #if dir in main dirs begins with "-", remove all but .ini files and move to ini dirs
-print('Start the landscape dir name with "-" to move landscape to ini only directory with only ini file')
+print('Start the landscape dir name with "-" to move landscape to ini only directory')
 #print('To move landscape to sym link directory, start the landscape dir name with "."')
 for list in [lowVListA,highVListA]:
     for item in list:
@@ -296,7 +296,7 @@ for item in items:
 # list dirs to be zipped
 toZip = []
 for i, landPath, in enumerate(allLandPaths):
-    if os.path.basename(landPath)[:2] == 'no':
+    if os.path.basename(landPath)[:2] == 'no_':
         break
     land = allLands[i]
     files = os.listdir(landPath)
@@ -340,7 +340,7 @@ for newZip in toZip:
         sevenzip(zipPathTemp,landPath2)
         newZipped.append(zipPath)
         try:
-            os.rename(zipPath,zipPath.remove('.temp'))
+            os.rename(zipPathTemp,zipPath)
             print('zip created and temp tag removed')
             count += 1
         except:
