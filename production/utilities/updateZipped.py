@@ -21,7 +21,7 @@ import re
 
 # from subprocess import Popen, PIPE
 # print(os.path.abspath(os.curdir))
-sys.path.append('L:\\skylinesCfiles\\skylinesC\\skylines')
+sys.path.append('L:\\condor-related\\skylinesC\\skylines')
 from time import sleep
 from common import readfileNoStrip, readfile
 
@@ -80,9 +80,9 @@ def updateSymlinks(dirsLists):
                         print('Duplication:  No symlink created between {} and {}.'.format(mainPath,otherPath))
                 elif 'zip' in mainDir.lower():
                     if item.split('.')[-1] == '7z':
-                        os.system('mklink "{}" "{}"'.format(mainPath, otherPath))
+                        makeLink(mainPath, otherPath)
                 elif not os.path.islink(otherPath):
-                    os.system('mklink /D "{}" "{}"'.format(mainPath, otherPath))
+                    makeLink(mainPath, otherPath)
         #remove .temp files
         if 'zip' in mainDir.lower():
             for dir in list:
@@ -131,7 +131,7 @@ def checkLinksIni(mainDir):
     mainDirList = os.listdir(mainDir)
     for mainItem in mainDirList:
         itemMainPath = os.path.join(mainDir, mainItem)
-        if mainItem[:2] == 'no_':
+        if mainItem[0] == '!':
             continue
         elif os.path.islink(itemMainPath) and not os.path.isdir(itemMainPath):
             os.remove(itemMainPath)
@@ -143,32 +143,42 @@ def checkLinksIni(mainDir):
                 iniName = os.path.basename(dirItem).split('.')[0]
                 if iniName != mainItem and 'patch' not in mainItem.lower() and 'WestGermany3' not in mainItem:
                     try:
-                        os.rename(itemMainPath, os.path.join(mainDir,iniName))
                         print(
-                            "The .ini file name {} doesn't match {}.  Renamed the landscape folder with the name of the .ini file"
+                            "The .ini file name {} doesn't match {}.  Rename the landscape folder with the name of the .ini file"
                             .format(dirItem, mainItem))
-                        xx=0
+                        renameTry(itemMainPath, os.path.join(mainDir,iniName))
+
                     except:
-                        try:
-                            os.rename(itemMainPath, os.path.join(mainDir,'no_match_ini_' + iniName))
-                            print('Renamed {} to {}'.format(itemMainPath,os.path.join(mainDir,'no_match_ini_' + iniName)))
-                        except:
-                            sys.stop("Stop: can't rename {} to {}".format(itemMainPath,os.path.join(mainDir,'no_match_ini_' + iniName)))
+                        renameTry(itemMainPath, os.path.join(mainDir,'!_no_match_ini_' + iniName))
                 break
         else:
-            print('no .ini file found in full dir {}; adding "no_ini_" to name'.format(itemMainPath))
-            os.rename(itemMainPath, "no_ini_"+itemMainPath)
+            print('!_no .ini file found in full dir {}; adding "!no_ini_" to name'.format(itemMainPath))
+            renameTry(itemMainPath,os.path.join(mainDir, "no_ini_" + mainItem))
+
+def makeLink(linkDir, realDir):
+    try:
+        os.symlink(realDir, linkDir)
+        # os.system('mklink "{}" "{}"'.format(, realDir))
+    except:
+        print('Problem creating symblolic link {} -> {}'.format(linkDir, realDir))
+
+def renameTry(oldname, newname):
+    try:
+        os.rename(oldname, newname)
+        print('Renamed {} to {}'.format(oldname, newname))
+    except:
+        sys.exit("Stop: can't rename {} to {}".format(oldname, newname))
 
 debugMode = False
 if debugMode: #use for pycharm debugging. Can't get paramiko to load in pycharm
     print("\n\nIn **debug mode**...won't run createTorrents on server\n\n")
     sleep(2)
 lowVMain = 'P:\\landscapes\\landscapesC2\\landscapesC2-main'
-lowVExt1 = 'Z:\\C2LandExt1'
+lowVExt1 = 'L:\\condor-related\\C2LandExt1'
 lowVini = 'P:\\landscapes\\landscapesC2\\landscapesC2-ini'
 lowVserver = 'P:\\landscapes\\landscapesC2\\landscapesC2-server'
 highVMain = 'P:\\landscapes\\landscapesC3\\landscapesC3-main'
-highVExt1 = 'Z:\\C3LandExt1'
+highVExt1 = 'L:\\condor-related\\C3LandExt1'
 highVini = 'P:\\landscapes\\landscapesC3\\landscapesC3-ini'
 highVserver = 'P:\\landscapes\\landscapesC3\\landscapesC3-server'
 lowerVersionLandDirs = [lowVMain,lowVExt1,lowVini,lowVserver]
@@ -176,9 +186,9 @@ higherVersionLandDirs = [highVMain,highVExt1,highVini,highVserver]
 landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
 versionMainDict = {'C2': lowVMain, 'C3': highVMain}
 zipMain = 'P:\\landscapes\\landscapes-zip'
-zipExt1 = 'R:\\zippedExt1'
-zipDirs = [zipMain,zipExt1]
-zipPathPrior = [zipExt1,zipMain] # fill up in this order
+zipExtras = ['R:\\zipped1']
+zipDirs = [zipMain] + zipExtras
+zipPathPrior = [zipExtras[0],zipMain] # fill up in this order
 
 slcServerIP = '192.168.1.57'
 user = 'bret'
@@ -198,7 +208,7 @@ highVListA = os.listdir(highVMain)
 #     list = os.listdir(dir)
 #     for item in list:
 #         if '.7z' in item and '_C2.7z' not in item and 'C3' not in item:
-#             # os.rename(os.path.join(dir,item), os.path.join(dir,item.replace('.7z','_C2.7z' )))
+#             # renameTry(os.path.join(dir,item), os.path.join(dir,item.replace('.7z','_C2.7z' )))
 #             os.remove(os.path.join(dir,item))
 
 # print('adding _C2 back to zip files')
@@ -207,7 +217,7 @@ highVListA = os.listdir(highVMain)
 #     for item in list:
 #         if item.split('.')[-1] == '7z' in item and '_C2.7z' not in item and 'C3' not in item\
 #           and not os.path.exists(os.path.join(dir,item.replace('.7z','_C2.7z' ))):
-#             os.rename(os.path.join(dir,item), os.path.join(dir,item.replace('.7z','_C2.7z' )))
+#             renameTry(os.path.join(dir,item), os.path.join(dir,item.replace('.7z','_C2.7z' )))
 
 #temp add C2 back to some names
 #
@@ -219,14 +229,14 @@ highVListA = os.listdir(highVMain)
 #         continue
 #     dirlist = os.listdir(os.path.join(lowVMain,land))
 #     newland = land + '_C2'
-#     os.rename(os.path.join(lowVMain,land),os.path.join(lowVMain,newland))
+#     renameTry(os.path.join(lowVMain,land),os.path.join(lowVMain!_newland))
 #     for item in dirlist:
 #         if land in item:
-#             os.rename(os.path.join(lowVMain,newland, item), os.path.join(lowVMain,newland, item + '_C2'))
+#             renameTry(os.path.join(lowVMain!_newland, item), os.path.join(lowVMain!_newland, item + '_C2'))
 #         if '_C2' in item:
 #             newname = item.replace('_C2','')
 #             name2 = newname.replace(landbase,landbase+'_C2')
-#             os.rename(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land,name2))
+#             renameTry(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land!_name2))
 
 
 #if dir in main dirs begins with "-", remove all but .ini files and move to ini dirs
@@ -308,7 +318,7 @@ for item in items:
 # list dirs to be zipped
 toZip = []
 for i, landPath, in enumerate(allLandPaths):
-    if os.path.basename(landPath)[:2] == 'no_':
+    if os.path.basename(landPath)[0] == '!':
         break
     land = allLands[i]
     files = os.listdir(landPath)
@@ -351,17 +361,12 @@ for newZip in toZip:
         #create new zip
         sevenzip(zipPathTemp,landPath2)
         newZipped.append(zipPath)
-        try:
-            os.rename(zipPathTemp,zipPath)
-            print('zip created and temp tag removed')
-            count += 1
-        except:
-            print('Problem with renaming temp file')
+        renameTry(zipPathTemp,zipPath)
     except:
         print ('Error creating {}'.format(zipPath))
 
 if len(newZipped) == 0:
-    print ('No new landscapes to zip')
+    print ('!_no new landscapes to zip')
 else:
     updateSymlinks([zipDirs])
 # time.sleep(60)
