@@ -6,8 +6,9 @@ user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 
-def sevenzip(tempPath,landPath):
+def sevenzip(tempPath,landPath): # 7z command is from an anaconda package...don't know the name
     os.system('7z a -t7z "{}" "{}"'.format(tempPath,landPath)) #quotes to handle spaces in windows file names
+        #pyzr won't handle
 #     os.system('py7zr c "{}" "{}"'.format(tempPath,landPath))
 #     with py7zr.SevenZipFile(tempPath, 'w') as archive:
 #                     archive.writeall(landPath, 'base')  #This seems slow, but uses threads well
@@ -111,7 +112,9 @@ def checkLinksIni(mainDir):
     '''Checks for bad links and addresses mismatch between landscape and ini names'''
     mainDirList = os.listdir(mainDir)
     for mainItem in mainDirList:
+
         itemMainPath = os.path.join(mainDir, mainItem)
+        if not os.path.isdir(itemMainPath): continue
         if mainItem[0] == '!':
             continue
         elif os.path.islink(itemMainPath) and not os.path.isdir(itemMainPath):
