@@ -1,40 +1,19 @@
 import os,sys,shutil
 import re
 
-slcServerIP = '192.168.1.57'
+slcServerIP = '192.168.1.14'
 user = 'bret'
 keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 
-def sevenzip(tempPath,landPath): # 7z command is from an anaconda package...don't know the name
-    os.system('7z a -t7z "{}" "{}"'.format(tempPath,landPath)) #quotes to handle spaces in windows file names
+def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies type of archive
+    maxThreads = 4
+    status = os.system('7z a -t7z -mmt={} "{}" "{}"'.format(maxThreads,tempPath,landPath)) #quotes to handle spaces in windows file names
+    return status
         #pyzr won't handle
 #     os.system('py7zr c "{}" "{}"'.format(tempPath,landPath))
 #     with py7zr.SevenZipFile(tempPath, 'w') as archive:
 #                     archive.writeall(landPath, 'base')  #This seems slow, but uses threads well
-
-def runCreateTorrents(newZipped):
-    import paramiko
-    if len(newZipped) > 0:
-        k = paramiko.Ed25519Key.from_private_key_file(keyFile)
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        try:
-            ssh.connect(hostname=slcServerIP, username=user, pkey=k)
-        except:
-            print('ssh.connect failed to {}'.format(slcServerIP))
-        print('Connecting to {} to create torrents'.format(slcServerIP))
-        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/createTorrents.py')
-        stdout = ssh_stdout.readlines()
-        stderr = ssh_stderr.readlines()
-        if len(stderr) > 0:
-            print('Errors in createTorrents command:')
-            for line in stderr:
-                print(line)
-        else:
-            print('Results:')
-            for line in stdout:
-                print(line)
 
 def versionFromPath(path):
     ''''''
@@ -89,8 +68,7 @@ def zipDestDriveByPriority(priorList,toCompressPath):
     ''''''
     compressFactor = 0.8 * float(120/50)
     for dest in priorList:
-        drive = dest.split(os.sep)[0]
-        avail = get_free_space_gb(drive)
+        avail = get_free_space_gb(dest)
         size = get_file_size_in_gb(toCompressPath)
         if size/compressFactor < avail:
             return dest
@@ -115,29 +93,42 @@ def checkLinksIni(mainDir):
 
         itemMainPath = os.path.join(mainDir, mainItem)
         if not os.path.isdir(itemMainPath): continue
-        if mainItem[0] == '!':
+        if mainItem[0] == '_':
             continue
         elif os.path.islink(itemMainPath) and not os.path.isdir(itemMainPath):
             os.remove(itemMainPath)
             print('Removed broken link {}'.format(mainItem))
             continue
-        itemDirList = os.listdir(itemMainPath)
-        for dirItem in itemDirList:
-            if '.ini' in dirItem:
-                iniName = os.path.basename(dirItem).split('.')[0]
+        landscapeDir = itemMainPath
+        landscapeDirList = os.listdir(landscapeDir)
+        for landDirItem in landscapeDirList:
+            if '.ini' in landDirItem:
+                file_name, extension = os.path.splitext(landDirItem)
+                if extension != '.ini':
+                    newLandDirItem = landDirItem.replace(extension,'.ini')
+                    renameTry(os.path.join(landscapeDir,landDirItem),os.path.join(landscapeDir,newLandDirItem))
+
+                iniName = os.path.basename(landDirItem).split('.')[0]
                 if iniName != mainItem and 'patch' not in mainItem.lower() and 'WestGermany3' not in mainItem:
-                    try:
+                    # try:
                         print(
                             "The .ini file name {} doesn't match {}.  Rename the landscape folder with the name of the .ini file"
-                            .format(dirItem, mainItem))
-                        renameTry(itemMainPath, os.path.join(mainDir,iniName))
+                            .format(landDirItem, mainItem))
+                        landscapeDirOld = landscapeDir
+                        landscapeDir = os.path.join(mainDir,iniName)
+                        renameTry(landscapeDirOld, landscapeDir)
+                        if os.path.islink(landscapeDir):
+                            targetPath = os.readlink(landscapeDir)
+                            targetList = targetPath.split(os.sep)
+                            if targetList[-1] != iniName:
+                                renameTry(targetPath, os.path.join(os.sep.join(targetList[:-1]),iniName))
 
-                    except:
-                        renameTry(itemMainPath, os.path.join(mainDir,'!_no_match_ini_' + iniName))
+                    # except:
+                    #     renameTry(landscapeDir, os.path.join(mainDir,'__no_match_ini_' + iniName))
                 break
         else:
-            print('!_no .ini file found in full dir {}; adding "!no_ini_" to name'.format(itemMainPath))
-            renameTry(itemMainPath,os.path.join(mainDir, "no_ini_" + mainItem))
+            print('no .ini file found in full dir {}; adding "!no_ini_" to name'.format(landscapeDir))
+            renameTry(landscapeDir,os.path.join(mainDir, "no_ini_" + mainItem))
 
 def makeLink(linkDir, realDir):
     try:
@@ -147,8 +138,10 @@ def makeLink(linkDir, realDir):
         print('Problem creating symblolic link {} -> {}'.format(linkDir, realDir))
 
 def renameTry(oldname, newname):
-    try:
-        os.rename(oldname, newname)
-        print('Renamed {} to {}'.format(oldname, newname))
-    except:
-        sys.exit("Stop: can't rename {} to {}".format(oldname, newname))
+    # try:
+    #     os.rename(oldname, newname)
+    #     print('Renamed {} to {}'.format(oldname, newname))
+    # except:
+    #     sys.exit("Stop: can't rename {} to {}".format(oldname, newname))
+    os.rename(oldname, newname)
+    print('Renamed {} to {}'.format(oldname, newname))

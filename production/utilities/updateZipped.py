@@ -1,15 +1,16 @@
 # '''
 
-# RUN AS ADMIN
-# 1. run on either machine (anaconda "conda activate bchenv") as ADMIN
-# 2. conda activate bch39
-# 3. !!!!Add to windows path:  "C:\Program Files\7-Zip!!!!"
-# 4. confirmation that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
+# 1. Checks links
+# 2. creates new zips
+# 3. creates new links
+# 4. runs createTorrents.py
+# 5. runs landscapesPage.py
+# 6. can confirm that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
 # link target eg C:\Users\Bret\AppData\Local\qBittorrent\logs\qbittorrent.log
 #   sample line:  (N) 2022-04-03T19:07:50 - 'Falkland_Islands.v1.0.7z' added to download list.
 #
 # Add "-" to the beginning of the landscape dir name to remove all but .ini files and move to lowVini
-# xxx-legacy (kept in code commented out). Add "." to the beginning of the landscape dir name to move landscape to symlink directory,
+# xxx-legacy (kept in code, needs updating). Add "." to the beginning of the landscape dir name to move landscape to symlink directory,
 
 # ssh access: make sure port 22 is open on U14.  Test ssh connection manually
 # '''
@@ -20,33 +21,39 @@ import os,sys
 
 # from subprocess import Popen, PIPE
 # print(os.path.abspath(os.curdir))
-sys.path.append('L:\\condor-related\\skylinesC\\skylines')
 from time import sleep
-from common import readfileNoStrip, readfile
+from common_util import readfileNoStrip, readfile
 from uzsubs import *
+from landscapesPage import landscapesPage
+from createTorrents import createTorrents
 
 debugMode = False
 if debugMode: #use for pycharm debugging. Can't get paramiko to load in pycharm
     print("\n\nIn **debug mode**...won't run createTorrents on server\n\n")
     sleep(2)
-lowVMain = 'P:\\landscapes\\landscapesC2-main'
-lowVExt1 = 'L:\\condor-related\\C2LandExt1'
-lowVini = 'P:\\landscapes\\landscapesC2-ini'
-lowVserver = 'P:\\landscapes\\landscapesC2-server'
-highVMain = 'P:\\landscapes\\landscapesC3-main'
-highVExt1 = 'L:\\condor-related\\C3LandExt1'
-highVini = 'P:\\landscapes\\landscapesC3-ini'
-highVserver = 'P:\\landscapes\\landscapesC3-server'
+Eland = '/mnt/E/landscapes'
+lowVMain = '/mnt/P/landscapes/landscapesC2-main'
+lowVExt1 = '/mnt/E/landscapes/landscapesC2-main'
+lowVini = '/mnt/P/landscapes/landscapesC2-ini'
+lowVserver = '/mnt/P/landscapes/landscapesC2-server'
+highVMain = '/mnt/P/landscapes/landscapesC3-main'
+highVExt1 = '/mnt/E/landscapes/landscapesC3-main'
+highVini = '/mnt/P/landscapes/landscapesC3-ini'
+highVserver = '/mnt/P/landscapes/landscapesC3-server'
 lowerVersionLandDirs = [lowVMain,lowVExt1,lowVini,lowVserver]
 higherVersionLandDirs = [highVMain,highVExt1,highVini,highVserver]
 landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
 versionMainDict = {'C2': lowVMain, 'C3': highVMain}
-zipMain = 'P:\\landscapes\\landscapes-zip'
-zipExtras = ['R:\\zipped1']
+zipMain = '/mnt/P/landscapes/landscapes-zip'
+zipExtras = ['/mnt/E/landscapes/zipped1']
 zipDirs = [zipMain] + zipExtras
 zipPathPrior = [zipExtras[0],zipMain] # fill up in this order
-
-
+utilitiesDir = '/mnt/L/condor-related/skylinesC/production/utilities'
+trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
+landPageDest = os.path.join(zipMain,'landscapes.hbs')
+watchDir = os.path.join(zipMain + '/qbtWatch')
+makeAllMagnets = False  # needed only occasionally
+########
 
 #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
 checkLinksIni(lowVMain)
@@ -90,6 +97,14 @@ highVListA = os.listdir(highVMain)
 #             newname = item.replace('_C2','')
 #             name2 = newname.replace(landbase,landbase+'_C2')
 #             renameTry(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land!_name2))
+
+#remove .temp files
+for zipDir in zipPathPrior:
+    itemslist = os.listdir(zipDir)
+    for item in itemslist:
+        file_name, extension = os.path.splitext('/home/lancaster/Downloads/a.ppt')
+        if extension == '.temp':
+            os.remove(item)
 
 
 #if dir in main dirs begins with "-", remove all but .ini files and move to ini dirs
@@ -171,12 +186,15 @@ for item in items:
 # list dirs to be zipped
 toZip = []
 for i, landPath, in enumerate(allLandPaths):
-    if os.path.basename(landPath)[0] == '!':
+    if os.path.basename(landPath)[0] == '_':
         break
     land = allLands[i]
     files = os.listdir(landPath)
     iniFilePath = os.path.join(landPath,land+'.ini')
-    lines = readfile(iniFilePath)
+    try:
+        lines = readfile(iniFilePath)
+    except:
+        xx=0
     if len(lines) > 1:
         version = lines[1].split('=')[1].split('(')[0].split(',')[0].replace('00','0').replace('.10.','.1.').replace(' ','')
     else:
@@ -212,28 +230,29 @@ for newZip in toZip:
 
     try:
         #create new zip
-        sevenzip(zipPathTemp,landPath2)
-        newZipped.append(zipPath)
+        status = sevenzip(zipPathTemp,landPath2)
+        if status != 0:
+            sys.exit('Zip {} failed'.format(os.path.join(zipPathTemp,landPath2)))
         renameTry(zipPathTemp,zipPath)
     except:
         print ('Error creating {}'.format(zipPath))
 
 if len(newZipped) == 0:
-    print ('!_no new landscapes to zip')
+    print ('no new landscapes to zip')
 else:
     updateSymlinks([zipDirs])
 # time.sleep(60)
 
-# run createTorrents on skylinesC server
-if not debugMode:
-    runCreateTorrents(newZipped)
+if not debugMode and len(newZipped) > 0:
+    createTorrents(zipMain,watchDir,makeAllMagnets)
+    landscapesPage(zipMain,landPageDest,trackerStr)
 
 print ("Done")
 #check that new torrents have been added to the qbittorrent servers
     # time.sleep(5)
     # shell = win32com.client.Dispatch("WScript.Shell")
     # for logfile in qbtLogLinks:
-    #     shortcut = shell.CreateShortCut('{}\\{}'.format(zipMain,logfile))
+    #     shortcut = shell.CreateShortCut('{}/{}'.format(zipMain,logfile))
     #     lines = readfile(shortcut.Targetpath)
     #     for zipped in newZipped:
     #         for line in lines:
