@@ -12,8 +12,8 @@
 # Add "-" to the beginning of the landscape dir name to remove all but .ini files and move to lowVini
 # xxx-legacy (kept in code, needs updating). Add "." to the beginning of the landscape dir name to move landscape to symlink directory,
 
-# ssh access: make sure port 22 is open on U14.  Test ssh connection manually
-# '''
+# landscapes.py writes the new page locally so we need to make this symbolic link on the skylinesC server:
+# ln -s /media/sf_landscapes-zip/latestLandscapesPage/landscapes.hbs ember/app/templates/landscapes.hbs
 
 import os,sys
 # import py7zr #py7zr does not follow symlinks!  So we use C:\Program Files\7-Zip.  See note above
@@ -24,13 +24,8 @@ import os,sys
 from time import sleep
 from common_util import readfileNoStrip, readfile
 from uzsubs import *
-from landscapesPage import landscapesPage
 from createTorrents import createTorrents
-
-debugMode = False
-if debugMode: #use for pycharm debugging. Can't get paramiko to load in pycharm
-    print("\n\nIn **debug mode**...won't run createTorrents on server\n\n")
-    sleep(2)
+forceLandPage = True # run it even if new files are not created.
 Eland = '/mnt/E/landscapes'
 lowVMain = '/mnt/P/landscapes/landscapesC2-main'
 lowVExt1 = '/mnt/E/landscapes/landscapesC2-main'
@@ -50,9 +45,9 @@ zipDirs = [zipMain] + zipExtras
 zipPathPrior = [zipExtras[0],zipMain] # fill up in this order
 utilitiesDir = '/mnt/L/condor-related/skylinesC/production/utilities'
 trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
-landPageDest = os.path.join(zipMain,'landscapes.hbs')
 watchDir = os.path.join(zipMain + '/qbtWatch')
 makeAllMagnets = False  # needed only occasionally
+landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
 ########
 
 #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
@@ -102,9 +97,9 @@ highVListA = os.listdir(highVMain)
 for zipDir in zipPathPrior:
     itemslist = os.listdir(zipDir)
     for item in itemslist:
-        file_name, extension = os.path.splitext('/home/lancaster/Downloads/a.ppt')
+        file_name, extension = os.path.splitext(item)
         if extension == '.temp':
-            os.remove(item)
+            os.remove(os.path.join(zipDir,item))
 
 
 #if dir in main dirs begins with "-", remove all but .ini files and move to ini dirs
@@ -243,9 +238,7 @@ else:
     updateSymlinks([zipDirs])
 # time.sleep(60)
 
-if not debugMode and len(newZipped) > 0:
-    createTorrents(zipMain,watchDir,makeAllMagnets)
-    landscapesPage(zipMain,landPageDest,trackerStr)
+createTorrents(zipMain,watchDir,makeAllMagnets,landPageDest,trackerStr,forceLandPage)
 
 print ("Done")
 #check that new torrents have been added to the qbittorrent servers

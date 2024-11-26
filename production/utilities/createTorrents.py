@@ -1,4 +1,4 @@
-def createTorrents(zipDir, watchDir,makeAllMagnets):
+def createTorrents(zipDir, watchDir,makeAllMagnets,landPageDest,trackerStr,forceLandPage):
     #Notes on ***magnet links***, which are created in landscapes.py:
     # npm install -g magnet-link
     # magnet-link /home/bret/Downloads/AA2.v0.7.7z.torrent > magnet.txt
@@ -23,6 +23,7 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
 
     import os, sys
     from datetime import datetime
+    from landscapesPage import landscapesPage
 
     def extension(filepath):
         return os.path.splitext(filepath)[1]
@@ -35,7 +36,7 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             os.system('magnet-link {}.torrent > {}.magnet'.format(zipped, zipped))
             print('{}.magnet created'.format(zipped))
         except:
-            print('Error in magnet link for {}'.format(zipped))
+            print('Error while creating magnet link for {}'.format(zipped))
 
 
     workDir = zipDir
@@ -51,10 +52,15 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             torrPath = '{}/{}.torrent'.format(zipDir, item)
             magPath = '{}/{}.magnet'.format(zipDir, item)
             zipTime = os.path.getmtime(zipPath)
+            if 'Arequipa_Peru3' in item:
+                xx=0
             if os.path.exists(torrPath):
                 oldZipped.append(item)
                 # check for missing magnets
                 if not os.path.exists(magPath):
+                    createMagnet(item)
+                elif os.stat(magPath).st_size == 0:
+                    os.remove(magPath)
                     createMagnet(item)
                 # remove outdated torrents and magnets
                 torrTime = os.path.getmtime(torrPath)
@@ -75,19 +81,19 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
         if extension(item) in ['.torrent', '.magnet'] and not os.path.exists(filename(item)): #missing .7z file
             os.remove(item)
 
-    created = []
+    createdTorr = []
     #create torrents
     tracker = 'http://tracker.opentrackr.org:1337/announcefile'
     sizeExp = 21 # 2^21 bytes = 2MB
     comment = 'skylinescondor.com'
     for zipped in zippedForTorrent:
         webSeed = 'http://208.83.226.9:8080/{}'.format(zipped)
-        try:
-            os.system('mktorrent -a {} -l {} -c {} -w {} {}'.format(tracker,sizeExp,comment,webSeed,zipped))
-            print('{}.torrent created'.format(zipped))
-            created.append(zipped)
-        except:
-            print('Error in torrent {}'.format(zipped))
+        # try:
+        os.system('mktorrent -a {} -l {} -c {} -w {} {}'.format(tracker,sizeExp,comment,webSeed,zipped))
+        print('{}.torrent created'.format(zipped))
+        createdTorr.append(zipped)
+        # except:
+        #     print('Error in torrent {}'.format(zipped))
         #create magnet link
         createMagnet(zipped)
 
@@ -112,6 +118,7 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
                     os.remove(magnetVersion)
                     print('removed',magnetVersion)
     #create all magnet links
+    createdMags = []
     if makeAllMagnets:
         zipDirList = os.listdir(zipDir)
         torrents  = []
@@ -125,5 +132,8 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             except:
                 print('Error in magnet link for {}'.format(torrent))
 
-print('Torrents done')
+    print('Torrents done')
+
+    if forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest):
+        landscapesPage(zipDir,landPageDest,trackerStr)
 
