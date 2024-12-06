@@ -63,7 +63,7 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr):
 
     lines.append('  <p>  <b> {{t "landscapesPage.before"}}  {{t "install"}} qBittorrent  {{t "landscapesPage.other"}} </b> </p> \n')
     # lines.append('  <p> <a href="/files/qbittorrent_x64_setup.exe" class="btn btn-default" download>{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n')
-    exeStr = '  <p> <a href="' + qbtExePath + '" class="btn btn-default" download>{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n'
+    exeStr = '  <p> <a href="' + qbtExePath + '" class="btn btn-default">{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n'
     lines.append(exeStr)
     lines.append('  <p> {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
     lines.append('  <p> {{t "landscapesPage.makeSure"}} <b> {{t "not"}} {{t "your"}} {{t "browser"}}. </b>  {{t "landscapesPage.limits"}}  </p> \n')
