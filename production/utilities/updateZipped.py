@@ -1,4 +1,4 @@
-# '''
+'''Calls landscapes.py and createTorrents.py'''
 
 # 1. Checks links
 # 2. creates new zips
@@ -16,7 +16,7 @@
 # ln -s /media/sf_landscapes-zip/latestLandscapesPage/landscapes.hbs ember/app/templates/landscapes.hbs
 
 import os,sys
-# import py7zr #py7zr does not follow symlinks!  So we use C:\Program Files\7-Zip.  See note above
+# import py7zr #py7zr does not follow symlinks!
 # import win32com.client
 
 # from subprocess import Popen, PIPE
@@ -25,30 +25,44 @@ from time import sleep
 from common_util import readfileNoStrip, readfile
 from uzsubs import *
 from createTorrents import createTorrents
-forceLandPage = True # run it even if new files are not created.
-Eland = '/mnt/E/landscapes'
-lowVMain = '/mnt/P/landscapes/landscapesC2-main'
-lowVExt1 = '/mnt/E/landscapes/landscapesC2-main'
-lowVini = '/mnt/P/landscapes/landscapesC2-ini'
-lowVserver = '/mnt/P/landscapes/landscapesC2-server'
-highVMain = '/mnt/P/landscapes/landscapesC3-main'
-highVExt1 = '/mnt/E/landscapes/landscapesC3-main'
-highVini = '/mnt/P/landscapes/landscapesC3-ini'
-highVserver = '/mnt/P/landscapes/landscapesC3-server'
-lowerVersionLandDirs = [lowVMain,lowVExt1,lowVini,lowVserver]
-higherVersionLandDirs = [highVMain,highVExt1,highVini,highVserver]
+from datetime import datetime
+from landscapesPage import landscapesPage
+
+##zipping##
+lowVMain = '/mnt/E/landscapes/landscapesC2-main'
+lowVExt1 = None #'/mnt/E/landscapes/landscapesC2-main'
+lowVini = '/mnt/E/landscapes/landscapesC2-ini'
+lowVserver = '/mnt/E/landscapes/landscapesC2-server'
+highVMain = '/mnt/E/landscapes/landscapesC3-main'
+highVExt1 = None #'/mnt/E/landscapes/landscapesC3-main'
+highVini = '/mnt/E/landscapes/landscapesC3-ini'
+highVserver = '/mnt/E/landscapes/landscapesC3-server'
+lowerVersionLandDirs = [lowVMain,lowVini,lowVserver]
+higherVersionLandDirs = [highVMain,highVini,highVserver]
 landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
 versionMainDict = {'C2': lowVMain, 'C3': highVMain}
-zipMain = '/mnt/P/landscapes/landscapes-zip'
-zipExtras = ['/mnt/E/landscapes/zipped1']
-zipDirs = [zipMain] + zipExtras
-zipPathPrior = [zipExtras[0],zipMain] # fill up in this order
+zipMain = '/mnt/P/landscapes-zip'
+zipExtras = None #['/mnt/E/landscapes/zipped1']
+zipDirs = [zipMain] #+ zipExtras
+zipPathPrior = [zipMain] # [zipExtras[0],zipMain] # fill up in this order
 utilitiesDir = '/mnt/L/condor-related/skylinesC/production/utilities'
+## Landscapes page ##
+forceLandPage = True # run it even if new files are not created.
+landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
+qbtorrentExeDir = os.path.join(zipMain,'qbt_exe')
+qbtExePath = get_qbtExe(qbtorrentExeDir)
+landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
+# landHBS = '/home/bret/servers/repo-skylinesC/landscapes.test.hbs'
+## Torrents ##
+
 trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
 watchDir = os.path.join(zipMain + '/qbtWatch')
 makeAllMagnets = False  # needed only occasionally
-landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
+
 ########
+
+if not os.path.exists(watchDir):
+    os.mkdir(watchDir)
 
 #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
 checkLinksIni(lowVMain)
@@ -238,7 +252,10 @@ else:
     updateSymlinks([zipDirs])
 # time.sleep(60)
 
-createTorrents(zipMain,watchDir,makeAllMagnets,landPageDest,trackerStr,forceLandPage)
+createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
+
+if forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest):
+    landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr)
 
 print ("Done")
 #check that new torrents have been added to the qbittorrent servers

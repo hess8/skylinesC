@@ -22,14 +22,14 @@ class Email(Command):
         Option("to", help="can be 'admin' (goes to ) or 'all'")
     )
 
-    def sendEmail(self, user, sender, recipient, title, text):
+    def sendEmail(self, user, sender, recipient, subject, text):
         print("Sending email to {} (ID: {})...".format(user.name.encode("utf-8"),user.id))
         print(format(user.email_address))
         try:
             body = 'Hi {},\n'.format(user.name.encode("utf-8").split(' ')[0])
             body += text
             msg = MIMEText(body)
-            msg["Subject"] = title
+            msg["Subject"] = subject
             msg["From"] = sender
             s = smtplib.SMTP('localhost')
             s.sendmail(sender, recipient.encode("ascii"), msg.as_string())
@@ -46,7 +46,7 @@ class Email(Command):
         sender = 'skylinescondor@soardata.org'
         os.chdir('/home/bret/servers/repo-skylinesC/skylinesC')
         lines = readfileNoStrip(path)
-        title = lines[0].strip()
+        subject = lines[0].strip()
         text = ''
         for line in lines[1:]:
             text += line
@@ -58,10 +58,10 @@ class Email(Command):
             # recipient = 'bret.hess@gmail.com'
             # print('recipient changed to',recipient)
             if to == 'admin' and user.admin:
-                self.sendEmail(user,sender,recipient,title, text)
-                break
+                self.sendEmail(user,sender,recipient,subject, text)
+                # break
             elif to == 'all':
-                self.sendEmail(user,sender,recipient,title,text)
+                self.sendEmail(user,sender,recipient,subject,text)
 
 
 

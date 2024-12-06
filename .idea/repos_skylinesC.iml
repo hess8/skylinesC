@@ -8,7 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/ember/bower_components" />
       <excludeFolder url="file://$MODULE_DIR$/ember/node_modules" />
     </content>
-    <orderEntry type="jdk" jdkName="Pipenv (skylinesC)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.11 (teamxc)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TestRunnerService">

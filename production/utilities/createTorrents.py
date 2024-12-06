@@ -1,4 +1,5 @@
-def createTorrents(zipDir, watchDir,makeAllMagnets,landPageDest,trackerStr,forceLandPage):
+def createTorrents(zipDir, watchDir,makeAllMagnets):
+    '''Called by updateZipped.py'''
     #Notes on ***magnet links***, which are created in landscapes.py:
     # npm install -g magnet-link
     # magnet-link /home/bret/Downloads/AA2.v0.7.7z.torrent > magnet.txt
@@ -22,8 +23,6 @@ def createTorrents(zipDir, watchDir,makeAllMagnets,landPageDest,trackerStr,force
     # -v                : be verbose
 
     import os, sys
-    from datetime import datetime
-    from landscapesPage import landscapesPage
 
     def extension(filepath):
         return os.path.splitext(filepath)[1]
@@ -133,7 +132,5 @@ def createTorrents(zipDir, watchDir,makeAllMagnets,landPageDest,trackerStr,force
                 print('Error in magnet link for {}'.format(torrent))
 
     print('Torrents done')
-
-    if forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest):
-        landscapesPage(zipDir,landPageDest,trackerStr)
+    return createdTorr
 

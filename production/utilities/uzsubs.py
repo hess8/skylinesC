@@ -145,3 +145,12 @@ def renameTry(oldname, newname):
     #     sys.exit("Stop: can't rename {} to {}".format(oldname, newname))
     os.rename(oldname, newname)
     print('Renamed {} to {}'.format(oldname, newname))
+
+def get_qbtExe(qbtorrentExeDir):
+    items = os.listdir(qbtorrentExeDir)
+    items.sort()
+    for item in items:
+        if re.search("qb.*exe",item.lower()):
+            return os.path.join(qbtorrentExeDir,item)
+    else:
+        sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")

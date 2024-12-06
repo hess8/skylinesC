@@ -1,9 +1,8 @@
-def landscapesPage(zipDir,landPageDest,trackerStr):
-
+def landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr):
+    '''Called by updateZipped.py'''
     import os, sys
     sys.path.append('/mnt/L/condor-related/skylinesC/skylines')
-    from common_util import readfileNoStrip, writefile
-
+    from common_util import copy_file_to_guest, readfile, readfileNoStrip, writefile
 
     def column_table_head(version):
         lines.append('     <div class="column"> \n')
@@ -37,9 +36,6 @@ def landscapesPage(zipDir,landPageDest,trackerStr):
         lines.append('       </table> \n')
         lines.append('     </div> \n')
 
-    trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
-    landPage = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
-
     dirlist = os.listdir(zipDir)
     names = []
     sizes = []
@@ -67,6 +63,8 @@ def landscapesPage(zipDir,landPageDest,trackerStr):
 
     lines.append('  <p>  <b> {{t "landscapesPage.before"}}  {{t "install"}} qBittorrent  {{t "landscapesPage.other"}} </b> </p> \n')
     # lines.append('  <p> <a href="/files/qbittorrent_x64_setup.exe" class="btn btn-default" download>{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n')
+    exeStr = '  <p> <a href="' + qbtExePath + '" class="btn btn-default" download>{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n'
+    lines.append(exeStr)
     lines.append('  <p> {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
     lines.append('  <p> {{t "landscapesPage.makeSure"}} <b> {{t "not"}} {{t "your"}} {{t "browser"}}. </b>  {{t "landscapesPage.limits"}}  </p> \n')
     lines.append('  <p> {{t "landscapesPage.extract-with"}}  <a href="https://www.7-zip.org/download.html"> 7-zip </a>. {{t "landscapesPage.extract-here"}} {{t "landscapesPage.paste"}} </p> \n')
@@ -103,6 +101,7 @@ def landscapesPage(zipDir,landPageDest,trackerStr):
     column_table_end()
     lines.append(' </div> \n')
     lines.append('</BasePage> \n')
-
     writefile(lines,landPageDest)
+    [username,passwd] = readfile('/home/bret/.local/secure/userU')
+    copy_file_to_guest('U14 (SkylinesC server on Z) Current', landPageDest, landHBS, username, passwd)
     print('New landscapes page created for {} files'.format(len(names)))
