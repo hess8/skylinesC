@@ -19,7 +19,7 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr):
         try:
             magline = readfileNoStrip(magfilepath)[0].strip() + trackerStr
         except:
-            xx=0
+            sys.exit("Can't read {} or it's empty".format(magfilepath))
         lines.append('\t\t\t\t<td> <a href="{}">'.format(magline) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
         # lines.append('\t<td> <a href="{}"> magnet </a> </td> '.format(magline))
         GiB = 1.074e+9
@@ -36,6 +36,8 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr):
         lines.append('       </table> \n')
         lines.append('     </div> \n')
 
+
+    ##############  script  ##############
     dirlist = os.listdir(zipDir)
     names = []
     sizes = []
@@ -61,7 +63,7 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr):
     lines.append('    <h1>{{t "landscapes"}}</h1> \n')
     lines.append('  </div> \n')
 
-    lines.append('  <p>  <b> {{t "landscapesPage.before"}}  {{t "install"}} qBittorrent  {{t "landscapesPage.other"}} </b> </p> \n')
+    lines.append('  <p>  <b> {{t "landscapesPage.before"}}  {{t "install"}} qBittorrent</b> {{t "landscapesPage.other"}} </p> \n')
     # lines.append('  <p> <a href="/files/qbittorrent_x64_setup.exe" class="btn btn-default" download>{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n')
     exeStr = '  <p> <a href="' + qbtExePath + '" class="btn btn-default">{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n'
     lines.append(exeStr)

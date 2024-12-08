@@ -51,8 +51,6 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             torrPath = '{}/{}.torrent'.format(zipDir, item)
             magPath = '{}/{}.magnet'.format(zipDir, item)
             zipTime = os.path.getmtime(zipPath)
-            if 'Arequipa_Peru3' in item:
-                xx=0
             if os.path.exists(torrPath):
                 oldZipped.append(item)
                 # check for missing magnets

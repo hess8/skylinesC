@@ -32,5 +32,4 @@ def copy_file_to_guest(vm_name, host_file_path, guest_file_path,usernm,passwd):
         subprocess.check_output(cmd)
     except subprocess.CalledProcessError as e:
         print(e.output)
-    xx=0
 
