@@ -111,14 +111,12 @@ highVListA = os.listdir(highVMain)
 #             renameTry(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land!_name2))
 
 
-#remove .temp files
-if not looping:
-    for zipDir in zipPathPrior:
-        itemslist = os.listdir(zipDir)
-        for item in itemslist:
-            file_name, extension = os.path.splitext(item)
-            if extension == '.temp':
-                os.remove(os.path.join(zipDir,item))
+for zipDir in zipPathPrior:
+    itemslist = os.listdir(zipDir)
+    for item in itemslist:
+        file_name, extension = os.path.splitext(item)
+        if extension == '.temp':
+            os.remove(os.path.join(zipDir,item))
 print('Write code for:   Start the landscape dir name with "-" to move landscape to ini only directory')
 print('Write code for:   Start the landscape dir name with "." to move landscape to other landscapes folder')
 go = True
@@ -219,7 +217,7 @@ while go:
         condorVers = versionFromPath(landPath)
         zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
         if zipName not in allZips:
-            toZip.append(zipName)
+            toZip.append({'zipName': zipName, 'landPath': landPath})
     if len(toZip) > 0:
         print("Will create these zips:")
         for name in toZip:
@@ -227,20 +225,20 @@ while go:
         # create new zips
         newZipped = []
         for newZip in toZip:
-            if 'C3' in newZip:
+            landPath2 = newZip['landPath']
+            if 'C3' in landPath2:
                 mainDir = highVMain
             else:
                 mainDir = lowVMain
-            land2 = newZip.split('.')[0]
-            landPath2 = os.path.join(mainDir, land2)
+
             destination = zipDestDriveByPriority(zipPathPrior, landPath2)
-            zipPath = os.path.join(destination, newZip)  # no zips will have spaces, but landscapes folders might
+            zipPath = os.path.join(destination, newZip['zipName'])  # no zips will have spaces, but landscapes folders might
             zipPathTemp = os.path.join(zipPath + '.temp')
 
             count = 0
             print()
             print('----------------------------------------------------------')
-            print('***Creating {} in {}***'.format(newZip, destination))
+            print('***Creating {} in {}***'.format(newZip['zipName'], destination))
 
             try:
                 # create new zip
@@ -272,7 +270,7 @@ print ("Done")
     # for logfile in qbtLogLinks:
     #     shortcut = shell.CreateShortCut('{}/{}'.format(zipMain,logfile))
     #     lines = readfile(shortcut.Targetpath)
-    #     for zipped in newZipped:
+    #     for zipped in newZip['zipName']ped:
     #         for line in lines:
     #             if 'added to download list' in line and zipped in line:
     #                 print('New torrent {} found in {}').format(zipped,logfile)
