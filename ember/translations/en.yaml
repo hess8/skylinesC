@@ -270,7 +270,7 @@ about:
   task-planning: Use your browser to plan your tasks before the flight and upload them quickly to your flight computer. Integration of {prosoar} is planned.
   competitions: Create competitions to offer your spectators an even better live tracking experience by following all the participants on the same map.
   groupflights: <a href="{joinURL}">Join</a> or <a href="{joinURL}">register</a> a group!  It's fun to fly XC together or compare flights on the same Condor flight plan. Animated 2-D and 3-D overlays of your group's tracks.
-  landscapes: You can download essentially all Condor 2 <a href="{landURL}">landscapes here</a>
+  landscapes: You can download essentially all Condor <a href="{landURL}">landscapes here</a>
   achievements: Challenge yourself by trying to complete all the achievements that SkyLines offers. Fly large triangles, long final glides or just do your first outlanding.
   notifications: Comment on flights, follow your friends and get <a href="{url}">notifications</a> of their flights.
   open-data: The SkyLines flight database is made available under the {license}. Skylines is using waypoint data from the {welt2000} project.
@@ -281,7 +281,7 @@ circling-direction:
   mixed: Mixed
   total: Total
 landscapesPage:
-  download: All landscapes are for Condor 2, and download as a single file.
+  download: All landscapes download as a single file.
   paste: Put the landscape folder in Condor2/Landscapes.
 #  qbittorent: Click on "qBittorrent Windows x64" or "qBittorrent Windows" links, not the page's ad. qBittorrent (or similar torrent manager) works well for these large files.
   makeSure: Make sure your torrent manager is downloading the big torrent files,
@@ -295,7 +295,7 @@ landscapesPage:
   contact: if you see errors or have questions.
   host: You can host
   seed: ("seed") one or more of these .7z files yourself to help others get them faster. On qBittorrent (Seeds column) you'll see that many files have only one or two people seeding them ("0(1)" or "0(2)") at the moment.  Let's increase the seeds on all the landscapes!
-  easy: It's easy to seed.
+  easy: It's easy to host.
   run: Leave the .7z files where they are, let qBitTorrent run in the background and you will be seeding them for others!  In qBitTorrent go to Tools>Options>Behavior and click Desktop>"Start qBitTorrent on Windows startup".  On the dashboard, the "Ratio" column shows what fraction of a file you have shared.
   magnet: These are "magnet links", and should open directly in qBittorrent or other torrent manager and start downloading immediately.
   maglink: magnet link
