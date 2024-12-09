@@ -58,7 +58,7 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
-if [ "$color_prompt" = yes ]; then
+if [ "$color_prompt"=yes ]; then
     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
@@ -93,7 +93,7 @@ alias l='ls -CF'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+alias alert='notify-send --urgency=low -i "$([ $?=0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -141,12 +141,21 @@ alias ngvim-skylines='sudo vim /etc/nginx/sites-available/skylinescondor.com'
 alias ngvim-nginx.conf="sudo vim /etc/nginx/nginx.conf"
 alias ngtail-error.log="sudo tail -f -n200 /var/log/nginx/error.log"
 alias ngtail-access.log="sudo tail -f -n200 /var/log/nginx/access.log"
-alias ngcd="cd /etc/nginx/"
-alias ngtest="sudo nginx -t"
+alias ngcd="cd /etc/nginx/
+"alias ngtest="sudo nginx -t"
 alias ngbackup-config-skylines.conf=nginxconfigbackup
 alias bu='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/backupSkylines.py'
 alias ct='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/createTorrents.py'
 alias k42='sudo npx kill-port 4200'
+alias ufenable='sudo ufw enable'
+alias ufdisable='sudo ufw disable'
+alias ufstop='sudo ufw stop'
+alias ufrestart='sudo ufw reload'
+alias ufdefault='sudo ufw reset' #loads defaults (set with "ufw default ARG or at /etc/default/ufw"
+alias ufstatus='sudo ufw status'
+alias ufallow='sudo ufw allow'
+alias ufdeny='sudo ufw deny'
+alias ufrules='sudo ufw status numbered' #shows all rules if ufw enabled
 nginxconfigbackup() { 
   sudo cp /etc/nginx/sites-available/skylinescondor /etc/nginx/sites-available/skylinescondor.$(date "+%Y-%m-%d_%H:%M")-$1
 } #the parameter ending is the comment use dashes "-" between words
