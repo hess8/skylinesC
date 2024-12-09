@@ -255,7 +255,7 @@ while go:
     elif looping:
         for i in range(int(waitTime)):
             print("\r", end='')
-            print('Waiting {} min'.format(waitTime - i), end='')
+            print('Waiting {} min'.format(waitTime - i), flush=True, end='')
             sleep(60)
     else:
         go = False
