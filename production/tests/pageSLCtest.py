@@ -25,10 +25,11 @@ senderEmail = 'skylinesC@soardata.org'
 receiverEmail = 'bret.hess@gmail.com'
 looptime = 60 #sec
 alerttime = 300
+timeoutTest = 2 #sec
 print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"), end='\r')
 while True:
     try:
-        response = requests.get('{}/{}'.format(base,page),timeout=2)
+        response = requests.get('{}/{}'.format(base,page),timeout=timeoutTest)
         jsonr = response.json()
         if len(jsonr) > 0:
             if noloop:
