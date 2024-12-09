@@ -13,6 +13,7 @@ altitude: Altitude
 avg-speed: Average Speed
 avg-speed-abbr: Avg. speed
 avg-vario-abbr: Avg. vario
+browser: browser
 change: Change
 change-club: Change group
 change-password: Change password
@@ -49,7 +50,7 @@ date: Date
 date-compiled: Date compiled
 date-missing-in-igc-file: Date missing in IGC file
 date-must-in-filename: Date of flight must be in filename
-date-ok-filename: An easy filename is "textnotnumbers-YYYY-MM-DD.igc".  Month before day.
+date-ok-filename: An easy filename is "textnotnumbers-YYYY-MM-DD.igc", for example "Nephi JS 2023-08-14". Month before day.
 date-space-filename: Separators OK anywhere, needed in date. <space>, <dash>, <dot>, and/or <_>
 date-number-filename: No digits after the date.
 date-missing-refresh: Refresh this page to try again.
@@ -160,6 +161,7 @@ no-live-tracks-of-pilots: '{num, plural, =1 {There is currently no live track of
 no-pilots-found: No pilots found.
 no-data: No data found...
 not-condor: You submitted a file that is not a Condor .igc file.  Submit real-life flights to skylines.aero.
+not: not
 notifications: Notifications
 olc-distance: OLC Distance
 older: Older
@@ -255,6 +257,7 @@ wrong-credentials: Please check your email address and password.
 wrong-current-password: Please check your current password.
 year: Year
 'yes': 'Yes'
+your: your
 you-have-no-notifications: You have no notifications.
 your-flights-have-been-saved: Your flights have been saved.
 your-live-tracking-key: 'Your Live Tracking key is:'
@@ -267,7 +270,7 @@ about:
   task-planning: Use your browser to plan your tasks before the flight and upload them quickly to your flight computer. Integration of {prosoar} is planned.
   competitions: Create competitions to offer your spectators an even better live tracking experience by following all the participants on the same map.
   groupflights: <a href="{joinURL}">Join</a> or <a href="{joinURL}">register</a> a group!  It's fun to fly XC together or compare flights on the same Condor flight plan. Animated 2-D and 3-D overlays of your group's tracks.
-  landscapes: You can download essentially all Condor 2 <a href="{landURL}">landscapes here</a>
+  landscapes: You can download essentially all Condor <a href="{landURL}">landscapes here</a>
   achievements: Challenge yourself by trying to complete all the achievements that SkyLines offers. Fly large triangles, long final glides or just do your first outlanding.
   notifications: Comment on flights, follow your friends and get <a href="{url}">notifications</a> of their flights.
   open-data: The SkyLines flight database is made available under the {license}. Skylines is using waypoint data from the {welt2000} project.
@@ -278,19 +281,22 @@ circling-direction:
   mixed: Mixed
   total: Total
 landscapesPage:
-  download: All landscapes are for Condor 2, and download as a single file.
-  paste: and paste each folder in Condor2/Landscapes.
-  qbittorent: Click on "qBittorrent Windows x64" or "qBittorrent Windows" links, not the page's ad. qBittorrent (or similar torrent manager) works well for these large files.
+  download: All landscapes download as a single file.
+  paste: Put the landscape folder in Condor2/Landscapes.
+#  qbittorent: Click on "qBittorrent Windows x64" or "qBittorrent Windows" links, not the page's ad. qBittorrent (or similar torrent manager) works well for these large files.
+  makeSure: Make sure your torrent manager is downloading the big torrent files,
+  limits: Browsers have download size limits.
   before: Before clicking on the links,
   other: (or any other torrent manager)
-  many: You can download many landscapes at the same time.  Downloads are fast if you have fast internet. Works with slow internet and always resumes after interruptions.
+  many: You can add many landscapes to the torrent manager at the same time. Downloads can be fast, but also work with even very slow internet.  Downloads always resume after interruptions.
   extract-with: Extract with
-  after: After you have downloaded and extracted your landscape files, leave the .7z files on your computer and qBittorrent will help the next guy get them faster!
+  extract-here: With 7-zip installed, right click on the dowloaded file(s) and choose "7zip > Extract Here".
+  after: After you have downloaded and extracted your landscape folders, leave the .7z files on your computer and qBittorrent will help the next guy get them faster!
   contact: if you see errors or have questions.
-  share: You can share
-  seed: ("seed") one or more of these .7z files yourself to help others get them faster. On qBittorrent (Seeds column) you'll see that many files have only two or three people seeding them ("0(2)" or "0(3)") at the moment.  Let's increase that!
-  easy: It's easy to seed.
-  run: Just run qBittorent when your computer is on (set to run when computer starts), and leave the .7z files where they are, and you will be seeding them for others!  "Ratio" shows what fraction of a file you have shared.
+  host: You can host
+  seed: ("seed") one or more of these .7z files yourself to help others get them faster. On qBittorrent (Seeds column) you'll see that many files have only one or two people seeding them ("0(1)" or "0(2)") at the moment.  Let's increase the seeds on all the landscapes!
+  easy: It's easy to host.
+  run: Leave the .7z files where they are, let qBitTorrent run in the background and you will be seeding them for others!  In qBitTorrent go to Tools>Options>Behavior and click Desktop>"Start qBitTorrent on Windows startup".  On the dashboard, the "Ratio" column shows what fraction of a file you have shared.
   magnet: These are "magnet links", and should open directly in qBittorrent or other torrent manager and start downloading immediately.
   maglink: magnet link
   magopen: which should open directly in qBittorrent and start downloading.
@@ -349,7 +355,7 @@ scoringinfo:
   olc+: OLC+ Scoring
   olc-history: OLC+ scoring was developed by the "On-line Contest" group for any soaring flight. It is based on distances, not speed.
   distance: The program finds five turnpoints in your track that give you the most distance along line segments between the turnpoints.
-  triangle: If your path makes one or more loops, the program finds the largest triangle on your track that is symmetric enough that the smallest side is at least 28% of the total.  About 1/3 of the triangle perimeter is added to your score.
+  triangle: If your path makes one or more loops, the program finds the largest triangle that can fit in a track loop, and symmetric enough that the smallest side is at least 28% of the total.  The loop can't include the time on tow, so make sure to close your loop before you land by crossing some part of your early path that is not while on tow. About 1/3 of the triangle perimeter is added to your score.
   index: These lengths are divided by your glider's performance index.
   score: Your score is in units of km.  Score = (distance + 0.3 * triangle)/index * 100
 search:

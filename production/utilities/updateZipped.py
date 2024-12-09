@@ -1,192 +1,282 @@
-# '''
-# 1. run in windows (anaconda "conda activate bchenv") as ADMIN python d:\skylinesC\production\utilities\updateZipped.py
-# 2. conda activate bchenv
-# 3. SET PATH=%PATH%;"C:\Program Files\7-Zip"
-# 4. confirmation that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
+'''Calls landscapes.py and createTorrents.py'''
+
+# 1. Checks links
+# 2. creates new zips
+# 3. creates new links
+# 4. runs createTorrents.py
+# 5. runs landscapesPage.py
+# 6. can confirm that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
 # link target eg C:\Users\Bret\AppData\Local\qBittorrent\logs\qbittorrent.log
 #   sample line:  (N) 2022-04-03T19:07:50 - 'Falkland_Islands.v1.0.7z' added to download list.
 #
-# ssh access: make sure port 22 is open on U14.  Test ssh connection manually
-# '''
+# Add "-" to the beginning of the landscape dir name to remove all but .ini files and move to lowVini
+# xxx-legacy (kept in code, needs updating). Add "." to the beginning of the landscape dir name to move landscape to symlink directory,
 
-import os,sys,shutil
-# import py7zr
-import winsound
-import win32com.client
-import paramiko
-from subprocess import Popen, PIPE
+# landscapes.py writes the new page locally so we need to make this symbolic link on the skylinesC server:
+# ln -s /media/sf_landscapes-zip/latestLandscapesPage/landscapes.hbs ember/app/templates/landscapes.hbs
+
+import os,sys
+# import py7zr #py7zr does not follow symlinks!
+# import win32com.client
+
+# from subprocess import Popen, PIPE
 # print(os.path.abspath(os.curdir))
-sys.path.append('d:\\skylinesC\\skylines')
+from time import sleep
+from common_util import readfileNoStrip, readfile
+from uzsubs import *
+from createTorrents import createTorrents
+from datetime import datetime
+from landscapesPage import landscapesPage
 
-from common import readfileNoStrip, readfile
+## control ##
+forceLandPage = False # run it even if new files are not created.
+looping = True
+waitTime = 30 # min when idle before checking agin
+## zipping ##
+lowVMain = '/mnt/E/landscapes/landscapesC2-main'
+lowVExt1 = None #'/mnt/E/landscapes/landscapesC2-main'
+lowVini = '/mnt/E/landscapes/landscapesC2-ini'
+lowVserver = '/mnt/E/landscapes/landscapesC2-server'
+highVMain = '/mnt/E/landscapes/landscapesC3-main'
+highVExt1 = None #'/mnt/E/landscapes/landscapesC3-main'
+highVini = '/mnt/E/landscapes/landscapesC3-ini'
+highVserver = '/mnt/E/landscapes/landscapesC3-server'
+lowerVersionLandDirs = [lowVMain,lowVini,lowVserver]
+higherVersionLandDirs = [highVMain,highVini,highVserver]
+landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
+versionMainDict = {'C2': lowVMain, 'C3': highVMain}
+zipMain = '/mnt/P/landscapes-zip'
+zipExtras = None #['/mnt/E/landscapes/zipped1']
+zipDirs = [zipMain] #+ zipExtras
+zipPathPrior = [zipMain] # [zipExtras[0],zipMain] # fill up in this order
+utilitiesDir = '/mnt/L/condor-related/skylinesC/production/utilities'
+## Landscapes page ##
+landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
+qbtorrentExeDir = os.path.join(zipMain,'qbt_exe')
+qbtExePath = get_qbtExe(qbtorrentExeDir)
+landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
+# landHBS = '/home/bret/servers/repo-skylinesC/landscapes.test.hbs'
+## Torrents ##
+
+trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
+watchDir = os.path.join(zipMain + '/qbtWatch')
+makeAllMagnets = False  # needed only occasionally
+
+########
+
+if not os.path.exists(watchDir):
+    os.mkdir(watchDir)
+
+#remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
+checkLinksIni(lowVMain)
+checkLinksIni(highVMain)
+checkZipsLinks(zipMain)
+lowVListA = os.listdir(lowVMain)
+highVListA = os.listdir(highVMain)
+
+# #temp
+# print(' removing files without tag')
+# for dir in zipDirs:
+#     list = os.listdir(dir)
+#     for item in list:
+#         if '.7z' in item and '_C2.7z' not in item and 'C3' not in item:
+#             # renameTry(os.path.join(dir,item), os.path.join(dir,item.replace('.7z','_C2.7z' )))
+#             os.remove(os.path.join(dir,item))
+
+# print('adding _C2 back to zip files')
+# for dir in zipDirs:
+#     list = os.listdir(dir)
+#     for item in list:
+#         if item.split('.')[-1] == '7z' in item and '_C2.7z' not in item and 'C3' not in item\
+#           and not os.path.exists(os.path.join(dir,item.replace('.7z','_C2.7z' ))):
+#             renameTry(os.path.join(dir,item), os.path.join(dir,item.replace('.7z','_C2.7z' )))
+
+#temp add C2 back to some names
+#
+# list = os.listdir(lowVMain)
+# tochange = ['Belgium','Atlantide','','','','','',]
+# for land in list:
+#     landbase = land.replace('_C2','')
+#     if landbase not in tochange:
+#         continue
+#     dirlist = os.listdir(os.path.join(lowVMain,land))
+#     newland = land + '_C2'
+#     renameTry(os.path.join(lowVMain,land),os.path.join(lowVMain!_newland))
+#     for item in dirlist:
+#         if land in item:
+#             renameTry(os.path.join(lowVMain!_newland, item), os.path.join(lowVMain!_newland, item + '_C2'))
+#         if '_C2' in item:
+#             newname = item.replace('_C2','')
+#             name2 = newname.replace(landbase,landbase+'_C2')
+#             renameTry(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land!_name2))
 
 
-def sevenzip(tempPath,landPath):
-    os.system('7z a -t7z "{}" "{}"'.format(tempPath,landPath)) #quotes to handle spaces in windows file names
-#     os.system('py7zr c "{}" "{}"'.format(tempPath,landPath))
-#     with py7zr.SevenZipFile(tempPath, 'w') as archive:
-#                     archive.writeall(landPath, 'base')  #This seems slow, but uses threads well
+#remove .temp files
+if not looping:
+    for zipDir in zipPathPrior:
+        itemslist = os.listdir(zipDir)
+        for item in itemslist:
+            file_name, extension = os.path.splitext(item)
+            if extension == '.temp':
+                os.remove(os.path.join(zipDir,item))
+print('Write code for:   Start the landscape dir name with "-" to move landscape to ini only directory')
+print('Write code for:   Start the landscape dir name with "." to move landscape to other landscapes folder')
+go = True
+while go:
+    #if dir in main dirs begins with "-", remove all but .ini files and move to ini dirs
+    # rewrite this!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    for list in [lowVListA,highVListA]:
+        for item in list:
+            if list == lowVListA: mainPath = lowVMain; ini = lowVini
+            elif list == highVListA: mainPath = highVMain; ini = highVini
+            if item[0] == '-':
+                print("handling '-' files needs to be rewritten")
+                # path = os.path.join(mainPath,item)
+                # for item2 in os.listdir(mainPath):
+                #     if not '.ini' in item2:
+                #         if os.path.isdir(os.path.join(mainPath,item2)): # note: isdir is true for a link pointing to a dir
+                #             os.system('rmdir /S /Q "{}"'.format(os.path.join(mainPath,item2)))
+                #         else:
+                #             os.remove(os.path.join(mainPath,item2))
+                # shutil.move(path,os.path.join(ini,item.replace('-','')))
+                # print('Moved {} to {}'.format(path,ini))
 
-mainDir = 'Z:\\Condor\\Landscapes'
-otherDir1 = 'E:\\landscapes_for_symlinks'  #py7zr does not follow symlinks
-otherDir2 = 'F:\\landscapes_for_symlinks2'
-iniOnlyDir1 = 'E:\\landscapes_ini_only'
-iniOnlyDir2 = 'F:\\landscapes_ini_only2'
-zipDir = 'S:\\skylinesCfiles\landscapes-zip'
-slcServerIP = '192.168.1.50'
-user = 'bret'
-keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
-qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
+            #######
+            # elif item[0] == '.':  #legacy to move to symlinks dir...keep in code
+            #     path = os.path.join(lowVMain,item)
+            #     print('Moving {} to {}'.format(path,symLinksDir))
+            #     shutil.move(path,os.path.join(symLinksDir,item.replace('.','')))
+            #     print('Moved {} to {}'.format(path,symLinksDir))
 
-mainList0 = os.listdir(mainDir)
+    #remove extra files from ini-only dirs:
+    for dir1 in [lowVini,highVini]:
+        for landscape in os.listdir(dir1):
+            notifiedRemove = False
+            for item in os.listdir(os.path.join(dir1,landscape)):
+                if not '.ini' in item:
+                    if not notifiedRemove:
+                        print ('Removing all but .ini in {}'.format(landscape))
+                        notifiedRemove = True
+                    if os.path.isdir(os.path.join(dir1,landscape,item)): # note: isdir is true for a link pointing to a dir
+                        os.system('rmdir /S /Q "{}"'.format(os.path.join(dir1,landscape,item)))
+                    else:
+                        os.remove(os.path.join(dir1,landscape,item))
 
-#remove extra files from ini_only dirs:
-for dir in [iniOnlyDir1]:# iniOnlyDir2]:
-    for landscape in os.listdir(dir):
-        for item in os.listdir(os.path.join(dir,landscape)):
-            if not '.ini' in item:
-                print ('Removing all but .ini in {}'.format(landscape))
-                break
-        for item in os.listdir(os.path.join(dir,landscape)):
-            if not '.ini' in item:
-                if os.path.isdir(os.path.join(dir,landscape,item)):
-                    os.system('rmdir /S /Q "{}"'.format(os.path.join(dir,landscape,item)))
-                else:
-                    os.remove(os.path.join(dir,landscape,item))
+    # keepRunning = False
+    # while keepRunning: #loops infinitely
+    allLands = []
+    allLandPaths = []
+    allZips = []
+    allZipPaths = []
+    #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
+    checkLinksIni(lowVMain)
+    checkLinksIni(highVMain)
+    checkZipsLinks(zipMain)
+    #### update symbolic links to landscape folders
 
-#if folder (not symbolic link) in mainDir begins with "-", remove all but .ini files and move to iniOnlyDir1
-for item in mainList0:
-    if item[0] == '-':
-        path = os.path.join(mainDir,item)
-        for item2 in os.listdir(path):
-            if not '.ini' in item2:
-                if os.path.isdir(os.path.join(path,item2)):
-                    os.system('rmdir /S /Q "{}"'.format(os.path.join(path,item2)))
-                else:
-                    os.remove(os.path.join(path,item2))
-        shutil.move(path,os.path.join(iniOnlyDir1,item.replace('-','')))
-        print('Moved {} to {}'.format(path,iniOnlyDir1))
+    updateSymlinks(landVersionsLists)
+    ## now all landscapes are represented in main folders ##
 
-mainList = os.listdir(mainDir)
+    # get all landscape paths that have textures dir
+    for dir in [lowVMain,highVMain]:
+        items = os.listdir(dir)
+        for item in items:
+            itemPath = os.path.join(dir, item)
+            if os.path.isdir(itemPath) and \
+                'Textures' in os.listdir(itemPath) \
+                and 'WestGermany3' not in item: # note: isdir is true for a link pointing to a dir
+                    allLands.append(item)
+                    allLandPaths.append(os.path.join(dir, item))
 
-# keepRunning = False
-# while keepRunning: #loops infinitely
-allLands = []
-allLandPaths = []
-allZips = []
+    #### update symbolic links to zip files
+    updateSymlinks([zipDirs])
+    # get all zip paths from zipMain
+    items = os.listdir(zipMain)
+    for item in items:
+        if item.split('.')[-1] == '7z':
+            allZips.append(item)
+            allZipPaths.append(os.path.join(zipMain, item))
+    ## now all zips are represented in zipMain ##
 
-#update symbolic links
-#remove broken symbolic links
-for item in mainList:
-    if os.path.isdir('{}\\{}'.format(mainDir,item)) and not os.path.exists('{}\\{}\\{}.ini'.format(mainDir,item,item)):
-        os.rmdir('{}\\{}'.format(mainDir,item))
-
-for dir in [otherDir1, otherDir2,iniOnlyDir1,iniOnlyDir2]:
-# for dir in [otherDir1, iniOnlyDir1]:
-    for item in os.listdir(dir):
-        if os.path.isdir(os.path.join(dir,item)) and item not in mainList:
-            print ('Updated symlink for {}.'.format(item))
-            mainPath = '{}\\{}'.format(mainDir,item)
-            otherPath = '{}\\{}'.format(dir,item)
-            os.system('mklink /D "{}" "{}"'.format(mainPath,otherPath))
-        elif item not in mainList:
-            print ('not added', dir, item)
-            print ('isdir', os.path.isdir(os.path.join(dir,item)))
-
-#landscapes are all represented in mainDir now.
-for item in os.listdir(mainDir):
-    if os.path.isdir(os.path.join(mainDir,item)) and 'WestGermany3' not in item:
-        allLands.append(item)
-        allLandPaths.append('{}\\{}'.format(mainDir,item))
-
-#zips
-for item in os.listdir(zipDir):
-    if item.split('.')[-1] =='7z':
-        allZips.append('{}\{}'.format(zipDir,item))
-
-#create zips
-newZipped = []
-for i, landPath, in enumerate(allLandPaths):
-    land = allLands[i]
-    files = os.listdir(landPath)
-    for file in files:
-        if '.ini' in file:
-            iniFile = file
+    # list dirs to be zipped
+    toZip = []
+    for i, landPath, in enumerate(allLandPaths):
+        if os.path.basename(landPath)[0] == '_':
             break
-    if not iniFile:
-        sys.exit('Stop.  No .ini file for {}'.format(landPath))
-    iniPath = '{}/{}.ini'.format(landPath,land)
-    # if not os.path.exists(iniPath):
-    #     sys.exit('Stop.  No .ini file for {}'.format(landPath))
-    if os.path.exists(iniPath):
-        lines = readfile(iniPath)
+        land = allLands[i]
+        files = os.listdir(landPath)
+        iniFilePath = os.path.join(landPath,land+'.ini')
+        try:
+            lines = readfile(iniFilePath)
+        except:
+            xx=0
         if len(lines) > 1:
             version = lines[1].split('=')[1].split('(')[0].split(',')[0].replace('00','0').replace('.10.','.1.').replace(' ','')
         else:
             print('len lines',len(lines))
             print ('lines', lines)
-            sys.exit('Stop:  does not exist or cannot be parsed')
-        zipName = '{}.v{}.7z'.format(land.replace(' ','_'),version) #no zips will have spaces, but landscapes folders might
-        zipPathTemp = '{}\\{}'.format(mainDir,zipName)
-        zipPath = '{}\\{}'.format(zipDir,zipName) #no zips will have spaces, but landscapes folders might
-        if zipPath not in allZips:
+            sys.exit("Stop: .ini file can't be parsed {}".format(iniFilePath))
+        condorVers = versionFromPath(landPath)
+        zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
+        if zipName not in allZips:
+            toZip.append(zipName)
+    if len(toZip) > 0:
+        print("Will create these zips:")
+        for name in toZip:
+            print(name)
+        # create new zips
+        newZipped = []
+        for newZip in toZip:
+            if 'C3' in newZip:
+                mainDir = highVMain
+            else:
+                mainDir = lowVMain
+            land2 = newZip.split('.')[0]
+            landPath2 = os.path.join(mainDir, land2)
+            destination = zipDestDriveByPriority(zipPathPrior, landPath2)
+            zipPath = os.path.join(destination, newZip)  # no zips will have spaces, but landscapes folders might
+            zipPathTemp = os.path.join(zipPath + '.temp')
+
+            count = 0
             print()
             print('----------------------------------------------------------')
-            print(zipPath,)
-            try:
-                #create new zip
-                landZip = zipPath.split('.')[0].split('\\')[-1]
-                print ('***Creating {}***'.format(zipName))
-                sevenzip(zipPathTemp,landPath)
-                print('Moving to zip directory')
-                try:
-                    os.system('move {} {}'.format(zipPathTemp,zipPath))
-                    newZipped.append(zipPath)
-                except:
-                    sys.exit('Stop.  Problem with moving file')
-            except:
-                print ('Error creating {}'.format(zipPath))
-    else:
-        print ('lines', lines)
-        sys.exit('Stop: .ini file does not exist for {}'.format(landPath))
-if len(newZipped) == 0:
-    print ('No new landscapes to zip')
-# time.sleep(60)
-winsound.PlaySound("SystemHand", winsound.SND_ALIAS)
+            print('***Creating {} in {}***'.format(newZip, destination))
 
-# run createTorrents on skylinesC server
-if len(newZipped) > 0:
-    k = paramiko.Ed25519Key.from_private_key_file(keyFile)
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    try:
-        ssh.connect(hostname=slcServerIP, username=user, pkey=k)
-    except:
-        print('ssh.connect failed to {}'.format(slcServerIP))
-    print('Connecting to {} to create torrents'.format(slcServerIP))
-    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/createTorrents.py')
-    stdout = ssh_stdout.readlines()
-    stderr = ssh_stderr.readlines()
-    if len(stderr) > 0:
-        print('Errors in createTorrents command:')
-        for line in stderr:
-            print(line)
+            try:
+                # create new zip
+                status = sevenzip(zipPathTemp, landPath2)
+                if status != 0:
+                    sys.exit('Zip {} failed'.format(os.path.join(zipPathTemp, landPath2)))
+                renameTry(zipPathTemp, zipPath)
+            except:
+                print('Error creating {}'.format(zipPath))
+        updateSymlinks([zipDirs])
+
+    elif looping:
+        for i in range(int(waitTime)):
+            print("\r", end='')
+            print('Waiting {} min'.format(waitTime - i), flush=True, end='')
+            sleep(60)
     else:
-        print('Results:')
-        for line in stdout:
-            print(line)
-#check that new torrents have been added to the qbittorrent servers
-# time.sleep(5)
-# shell = win32com.client.Dispatch("WScript.Shell")
-# for logfile in qbtLogLinks:
-#     shortcut = shell.CreateShortCut('{}\\{}'.format(zipDir,logfile))
-#     lines = readfile(shortcut.Targetpath)
-#     for zipped in newZipped:
-#         for line in lines:
-#             if 'added to download list' in line and zipped in line:
-#                 print('New torrent {} found in {}').format(zipped,logfile)
-#                 break
-#         else:
-#             print('Error. {} not found in {}').format(zipped,logfile)
-# time.sleep(5)
+        go = False
+
+    createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
+
+    if forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest):
+        landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr)
+
 print ("Done")
+#check that new torrents have been added to the qbittorrent servers
+    # time.sleep(5)
+    # shell = win32com.client.Dispatch("WScript.Shell")
+    # for logfile in qbtLogLinks:
+    #     shortcut = shell.CreateShortCut('{}/{}'.format(zipMain,logfile))
+    #     lines = readfile(shortcut.Targetpath)
+    #     for zipped in newZipped:
+    #         for line in lines:
+    #             if 'added to download list' in line and zipped in line:
+    #                 print('New torrent {} found in {}').format(zipped,logfile)
+    #                 break
+    #         else:
+    #             print('Error. {} not found in {}').format(zipped,logfile)
+    # time.sleep(5)

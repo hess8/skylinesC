@@ -6,10 +6,12 @@ from funcs import emailMessage, turns
 
 '''Run with **python3** on nginx server U18
 
-# m h dom mon dow user  command
-* * * * * bret python3 /home/bret/servers/repo-skylinesC/skylinesC/production/tests/pageSLCtest.py --noloop > /home/bret/pageSLCtest/cron.log 2>&1 #run every minute
+now using cron.d/ file:
 
+# m h dom mon dow user  command
+* * * * * bret python3 /home/bret/servers/repo-skylinesC/production/tests/pageSLCtest.py --noloop # run every minute
 # Can't end command line without line break
+
 
 '''
 import argparse
@@ -25,11 +27,10 @@ senderEmail = 'skylinesC@soardata.org'
 receiverEmail = 'bret.hess@gmail.com'
 looptime = 60 #sec
 alerttime = 300
-timeoutTest = 2 #sec
 print(datetime.now().strftime("%m/%d/%Y %H:%M:%S"), end='\r')
 while True:
     try:
-        response = requests.get('{}/{}'.format(base,page),timeout=timeoutTest)
+        response = requests.get('{}/{}'.format(base,page),timeout=2)
         jsonr = response.json()
         if len(jsonr) > 0:
             if noloop:
