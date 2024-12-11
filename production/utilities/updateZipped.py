@@ -1,5 +1,8 @@
 '''Calls landscapes.py and createTorrents.py'''
 
+# Run with cpulimit -l 90 python3 production/utilities/updateZipped.py
+
+
 # 1. Checks links
 # 2. creates new zips
 # 3. creates new links
@@ -29,7 +32,7 @@ from datetime import datetime
 from landscapesPage import landscapesPage
 
 ## control ##
-forceLandPage = False # run it even if new files are not created.
+forceLandPage = True # run it even if new files are not created.
 looping = True
 waitTime = 30 # min when idle before checking agin
 ## zipping ##
@@ -198,6 +201,7 @@ while go:
 
     # list dirs to be zipped
     toZip = []
+    createdTorr = []
     for i, landPath, in enumerate(allLandPaths):
         if os.path.basename(landPath)[0] == '_':
             break
@@ -218,6 +222,7 @@ while go:
         zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
         if zipName not in allZips:
             toZip.append({'zipName': zipName, 'landPath': landPath})
+
     if len(toZip) > 0:
         print("Will create these zips:")
         for name in toZip:
@@ -249,8 +254,12 @@ while go:
             except:
                 print('Error creating {}'.format(zipPath))
         updateSymlinks([zipDirs])
+    createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
 
-    elif looping:
+    if forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest):
+        landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr)
+
+    if looping:
         for i in range(int(waitTime)):
             print("\r", end='')
             print('Waiting {} min'.format(waitTime - i), flush=True, end='')
@@ -258,10 +267,7 @@ while go:
     else:
         go = False
 
-    createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
 
-    if forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest):
-        landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr)
 
 print ("Done")
 #check that new torrents have been added to the qbittorrent servers

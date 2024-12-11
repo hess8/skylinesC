@@ -42,12 +42,10 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr):
     names = []
     sizes = []
     for item in dirlist:
-        if 'AA3' in item and item.split('.')[-1]=='torrent':
-            xx=0
         if item.split('.')[-1]=='torrent':
             name = item.split('.torrent')[0]
             names.append(name)
-
+    names.sort()
     lowVersionList = []
     highVersionList = []
     for i, name in enumerate(names):

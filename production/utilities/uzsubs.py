@@ -7,7 +7,9 @@ keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 
 def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies type of archive
+    maxCPU = 90 # %
     maxThreads = 4
+    # status = os.system('cpulimit -l {} -- a -t7z -mmt={} "{}" "{}"'.format(maxCPU, maxThreads, tempPath,landPath))  # quotes to handle spaces in windows file names
     status = os.system('7z a -t7z -mmt={} "{}" "{}"'.format(maxThreads,tempPath,landPath)) #quotes to handle spaces in windows file names
     return status
         #pyzr won't handle
@@ -149,8 +151,10 @@ def renameTry(oldname, newname):
 def get_qbtExe(qbtorrentExeDir):
     items = os.listdir(qbtorrentExeDir)
     items.sort()
+    exeDirList = qbtorrentExeDir.split(os.sep)
     for item in items:
         if re.search("qb.*exe",item.lower()):
-            return os.path.join(qbtorrentExeDir,item)
+            u14path = os.path.join('media','sf_landscapes-zip',exeDirList[-1],item)
+            return u14path
     else:
         sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")
