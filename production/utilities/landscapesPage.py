@@ -1,4 +1,6 @@
-def landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr):
+import shutil
+
+def landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,slcFilesPath,slcVMname,trackerStr):
     '''Called by updateZipped.py'''
     import os, sys
     sys.path.append('/mnt/L/condor-related/skylinesC/skylines')
@@ -38,6 +40,13 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr):
 
 
     ##############  script  ##############
+    [username,passwd] = readfile('/home/bret/.local/secure/userU')
+    # copy qbt exe to /files so it is accessible to ember
+    qbtExeName = qbtExePath.split(os.sep)[-1]
+    qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
+    # copy_file_to_guest(slcVMname,qbtExePath,qbtExeDest,username, passwd)
+
+    # get torrents
     dirlist = os.listdir(zipDir)
     names = []
     sizes = []
@@ -102,6 +111,5 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr):
     lines.append(' </div> \n')
     lines.append('</BasePage> \n')
     writefile(lines,landPageDest)
-    [username,passwd] = readfile('/home/bret/.local/secure/userU')
-    copy_file_to_guest('U14 (SkylinesC server on Z) Current', landPageDest, landHBS, username, passwd)
+    # copy_file_to_guest('U14 (SkylinesC server on Z) Current', landPageDest, landHBS, username, passwd)
     print('New landscapes page created for {} files'.format(len(names)))

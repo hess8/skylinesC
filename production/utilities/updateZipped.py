@@ -16,7 +16,6 @@
 # xxx-legacy (kept in code, needs updating). Add "." to the beginning of the landscape dir name to move landscape to symlink directory,
 
 # landscapes.py writes the new page locally so we need to make this symbolic link on the skylinesC server:
-# ln -s /media/sf_landscapes-zip/latestLandscapesPage/landscapes.hbs ember/app/templates/landscapes.hbs
 
 import os,sys
 # import py7zr #py7zr does not follow symlinks!
@@ -57,7 +56,9 @@ utilitiesDir = '/mnt/L/condor-related/skylinesC/production/utilities'
 landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
 qbtorrentExeDir = os.path.join(zipMain,'qbt_exe')
 qbtExePath = get_qbtExe(qbtorrentExeDir)
+slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/'
 landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
+slcVMname = 'U14 (SkylinesC server on Z) Current'
 # landHBS = '/home/bret/servers/repo-skylinesC/landscapes.test.hbs'
 ## Torrents ##
 
@@ -257,7 +258,7 @@ while go:
     createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
 
     if forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest):
-        landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,trackerStr)
+        landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,slcFilesPath,slcVMname,trackerStr)
 
     if looping:
         for i in range(int(waitTime)):
