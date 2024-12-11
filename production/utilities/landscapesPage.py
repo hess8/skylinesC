@@ -44,7 +44,7 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
     # copy qbt exe to /files so it is accessible to ember
     qbtExeName = qbtExeLocal.split(os.sep)[-1]
     qbtExeDest = os.path.join(slcFilesPath,qbtExeName) #if we can get directy copy through guestcontrol to work again
-    qbtExePage = os.path.join('files',qbtExeName)
+    qbtExePage = os.path.join('/files',qbtExeName)
     # copy_file_to_guest(slcVMname,qbtExeLocal,qbtExeDest,username, passwd)
 
     # get torrents
