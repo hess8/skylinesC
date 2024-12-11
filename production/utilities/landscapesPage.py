@@ -1,6 +1,6 @@
 import shutil
 
-def landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,slcFilesPath,slcVMname,trackerStr):
+def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr):
     '''Called by updateZipped.py'''
     import os, sys
     sys.path.append('/mnt/L/condor-related/skylinesC/skylines')
@@ -42,9 +42,10 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,slcFilesPath,slcVMname
     ##############  script  ##############
     [username,passwd] = readfile('/home/bret/.local/secure/userU')
     # copy qbt exe to /files so it is accessible to ember
-    qbtExeName = qbtExePath.split(os.sep)[-1]
-    qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
-    # copy_file_to_guest(slcVMname,qbtExePath,qbtExeDest,username, passwd)
+    qbtExeName = qbtExeLocal.split(os.sep)[-1]
+    qbtExeDest = os.path.join(slcFilesPath,qbtExeName) #if we can get directy copy through guestcontrol to work again
+    qbtExePage = os.path.join('files',qbtExeName)
+    # copy_file_to_guest(slcVMname,qbtExeLocal,qbtExeDest,username, passwd)
 
     # get torrents
     dirlist = os.listdir(zipDir)
@@ -72,7 +73,7 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,slcFilesPath,slcVMname
 
     lines.append('  <p>  <b> {{t "landscapesPage.before"}}  {{t "install"}} qBittorrent</b> {{t "landscapesPage.other"}} </p> \n')
     # lines.append('  <p> <a href="/files/qbittorrent_x64_setup.exe" class="btn btn-default" download>{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n')
-    exeStr = '  <p> <a href="' + qbtExePath + '" class="btn btn-default">{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n'
+    exeStr = '  <p> <a href="' + qbtExePage + '" class="btn btn-default">{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n'
     lines.append(exeStr)
     lines.append('  <p> {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
     lines.append('  <p> {{t "landscapesPage.makeSure"}} <b> {{t "not"}} {{t "your"}} {{t "browser"}}. </b>  {{t "landscapesPage.limits"}}  </p> \n')
