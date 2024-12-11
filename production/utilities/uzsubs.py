@@ -148,13 +148,13 @@ def renameTry(oldname, newname):
     os.rename(oldname, newname)
     print('Renamed {} to {}'.format(oldname, newname))
 
-def get_qbtExe(qbtorrentExeDir):
+def get_qbtExe(qbtorrentExeDir,slcFilesPath):
     items = os.listdir(qbtorrentExeDir)
     items.sort()
     exeDirList = qbtorrentExeDir.split(os.sep)
     for item in items:
         if re.search("qb.*exe",item.lower()):
-            u14path = os.path.join('media','sf_landscapes-zip',exeDirList[-1],item)
+            u14path = os.path.join(slcFilesPath,exeDirList[-1],item)
             return u14path
     else:
         sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")
