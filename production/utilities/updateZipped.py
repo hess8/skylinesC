@@ -55,8 +55,8 @@ utilitiesDir = '/mnt/L/condor-related/skylinesC/production/utilities'
 ## Landscapes page ##
 landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
 qbtorrentExeDir = os.path.join(zipMain,'qbt_exe')
-qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/'
+qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
 landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
 slcVMname = 'U14 (SkylinesC server on Z) Current'
 # landHBS = '/home/bret/servers/repo-skylinesC/landscapes.test.hbs'
