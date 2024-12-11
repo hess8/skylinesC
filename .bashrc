@@ -148,7 +148,16 @@ alias bu='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilitie
 alias ct='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/createTorrents.py'
 alias k42='sudo npx kill-port 4200'
 alias uz='skyl; nice python producation/utilities/updateZipped.py'
-nginxconfigbackup() { 
+alias ufenable='sudo ufw enable'
+alias ufdisable='sudo ufw disable'
+alias ufstop='sudo ufw stop'
+alias ufrestart='sudo ufw reload'
+alias ufdefault='sudo ufw reset' #loads defaults (set with "ufw default ARG or at /etc/default/ufw"
+alias ufstatus='sudo ufw status'
+alias ufallow='sudo ufw allow'
+alias ufdeny='sudo ufw deny'
+alias ufrules='sudo ufw status numbered' #shows all rules if ufw enabled
+nginxconfigbackup() {
   sudo cp /etc/nginx/sites-available/skylinescondor /etc/nginx/sites-available/skylinescondor.$(date "+%Y-%m-%d_%H:%M")-$1
 } #the parameter ending is the comment use dashes "-" between words
 #end bch
