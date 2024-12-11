@@ -55,6 +55,7 @@ utilitiesDir = '/mnt/L/condor-related/skylinesC/production/utilities'
 ## Landscapes page ##
 landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
 qbtorrentExeDir = os.path.join(zipMain,'qbt_exe')
+qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/'
 qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
 landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
@@ -258,7 +259,7 @@ while go:
     createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
 
     if forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest):
-        landscapesPage(zipDir,landPageDest,landHBS,qbtExePath,slcFilesPath,slcVMname,trackerStr)
+        landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
 
     if looping:
         for i in range(int(waitTime)):
