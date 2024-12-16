@@ -58,7 +58,7 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
-if [ "$color_prompt" = yes ]; then
+if [ "$color_prompt"=yes ]; then
     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
@@ -93,7 +93,7 @@ alias l='ls -CF'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+alias alert='notify-send --urgency=low -i "$([ $?=0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -120,8 +120,8 @@ export PS1='\W> '
 export POSTGIS_GDAL_ENABLED_DRIVERS=GTiff
 export POSTGIS_ENABLE_OUTDB_RASTERS=1
 export FLASK_ENV=development
-alias skyl='cd /mnt/L/condor-related/skylinesC/'
-alias esky='cd /mnt/L/condor-related/skylinesC/ember'
+alias skyl='cd /home/bret/servers/repo-skylinesC/skylinesC/'
+alias esky='cd /home/bret/servers/repo-skylinesC/skylinesC/ember'
 alias eserve42-5='esky;sudo ember serve --environment=production --port 4200 --proxy http://localhost:5000/'
 #alias mserve='skyl; pipenv run ./manage.py runserver'
 alias gserve='skyl; pipenv run gunicorn -b 127.0.0.1:5000 -w 8 --no-sendfile wsgi_skylines'
@@ -141,13 +141,12 @@ alias ngvim-skylines='sudo vim /etc/nginx/sites-available/skylinescondor.com'
 alias ngvim-nginx.conf="sudo vim /etc/nginx/nginx.conf"
 alias ngtail-error.log="sudo tail -f -n200 /var/log/nginx/error.log"
 alias ngtail-access.log="sudo tail -f -n200 /var/log/nginx/access.log"
-alias ngcd="cd /etc/nginx/"
-alias ngtest="sudo nginx -t"
+alias ngcd="cd /etc/nginx/
+"alias ngtest="sudo nginx -t"
 alias ngbackup-config-skylines.conf=nginxconfigbackup
 alias bu='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/backupSkylines.py'
 alias ct='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/createTorrents.py'
 alias k42='sudo npx kill-port 4200'
-alias uz='skyl; nice python producation/utilities/updateZipped.py'
 alias ufenable='sudo ufw enable'
 alias ufdisable='sudo ufw disable'
 alias ufstop='sudo ufw stop'
@@ -157,7 +156,8 @@ alias ufstatus='sudo ufw status'
 alias ufallow='sudo ufw allow'
 alias ufdeny='sudo ufw deny'
 alias ufrules='sudo ufw status numbered' #shows all rules if ufw enabled
-nginxconfigbackup() {
+alias cpl='skyl; cp /media/sf_landscapes-zip/latestLandscapesPage/landscapes.hbs ember/app/templates'
+nginxconfigbackup() { 
   sudo cp /etc/nginx/sites-available/skylinescondor /etc/nginx/sites-available/skylinescondor.$(date "+%Y-%m-%d_%H:%M")-$1
 } #the parameter ending is the comment use dashes "-" between words
 #end bch
