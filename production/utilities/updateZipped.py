@@ -29,10 +29,9 @@ from uzsubs import *
 from createTorrents import createTorrents
 from datetime import datetime
 from landscapesPage import landscapesPage
+import signal
 
-## control ##
-forceLandPage = True # run it even if new files are not created.
-looping = True
+looping = False
 waitTime = 30 # min when idle before checking agin
 ## zipping ##
 lowVMain = '/mnt/E/landscapes/landscapesC2-main'
@@ -53,6 +52,7 @@ zipDirs = [zipMain] #+ zipExtras
 zipPathPrior = [zipMain] # [zipExtras[0],zipMain] # fill up in this order
 utilitiesDir = '/mnt/L/condor-related/skylinesC/production/utilities'
 ## Landscapes page ##
+forceLandPage = False
 landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
 qbtorrentExeDir = os.path.join(zipMain,'qbt_exe')
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/' #only used if can get copying by guest control working again
@@ -247,14 +247,29 @@ while go:
             print('----------------------------------------------------------')
             print('***Creating {} in {}***'.format(newZip['zipName'], destination))
 
-            try:
-                # create new zip
-                status = sevenzip(zipPathTemp, landPath2)
-                if status != 0:
-                    sys.exit('Zip {} failed'.format(os.path.join(zipPathTemp, landPath2)))
-                renameTry(zipPathTemp, zipPath)
-            except:
-                print('Error creating {}'.format(zipPath))
+            # try:
+            # create new zip
+            def signal_handler(sig,frame):
+                procZip.terminate()
+                procZip.wait()
+                sys.exit('Stopped')
+            #This was an attempt to handle interrupts gracefully, but the handle
+            maxCPU = 90  # %
+            if os.path.exists(zipPathTemp):
+                os.remove(zipPathTemp)
+            cmd = ['7z', 'a', '-t7z', zipPathTemp, landPath2]
+            # zipProc = subprocess.run(cmd)
+            zipProc = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+            # zipProc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+            # zipProc.communicate()
+            for sig in [signal.SIGTERM, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]:
+                signal.signal(sig, signal_handler)
+            # procZip = sevenzip(zipPathTemp, landPath2)
+            # if procZip.returncode != 0:
+            #     sys.exit('Zip {} failed'.format(os.path.join(zipPathTemp, landPath2)))
+            renameTry(zipPathTemp, zipPath)
+            # except:
+            #     print('Error creating {}'.format(zipPath))
         updateSymlinks([zipDirs])
     createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
 

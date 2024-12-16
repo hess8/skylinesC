@@ -1,5 +1,6 @@
 import os,sys,shutil
 import re
+import subprocess
 
 slcServerIP = '192.168.1.14'
 user = 'bret'
@@ -7,15 +8,7 @@ keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 
 def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies type of archive
-    maxCPU = 90 # %
-    maxThreads = 4
-    # status = os.system('cpulimit -l {} -- a -t7z -mmt={} "{}" "{}"'.format(maxCPU, maxThreads, tempPath,landPath))  # quotes to handle spaces in windows file names
-    status = os.system('7z a -t7z -mmt={} "{}" "{}"'.format(maxThreads,tempPath,landPath)) #quotes to handle spaces in windows file names
-    return status
-        #pyzr won't handle
-#     os.system('py7zr c "{}" "{}"'.format(tempPath,landPath))
-#     with py7zr.SevenZipFile(tempPath, 'w') as archive:
-#                     archive.writeall(landPath, 'base')  #This seems slow, but uses threads well
+    pass
 
 def versionFromPath(path):
     ''''''
@@ -92,10 +85,11 @@ def checkLinksIni(mainDir):
     '''Checks for bad links and addresses mismatch between landscape and ini names'''
     mainDirList = os.listdir(mainDir)
     for mainItem in mainDirList:
-
+        if 'sweden' in mainItem:
+            xx=0
         itemMainPath = os.path.join(mainDir, mainItem)
         if not os.path.isdir(itemMainPath): continue
-        if mainItem[0] == '_':
+        if 'no_ini' in mainItem or not os.path.isdir(itemMainPath):
             continue
         elif os.path.islink(itemMainPath) and not os.path.isdir(itemMainPath):
             os.remove(itemMainPath)
@@ -106,10 +100,9 @@ def checkLinksIni(mainDir):
         for landDirItem in landscapeDirList:
             if '.ini' in landDirItem:
                 file_name, extension = os.path.splitext(landDirItem)
-                if extension != '.ini':
+                if extension != '.ini': # extension corrupted
                     newLandDirItem = landDirItem.replace(extension,'.ini')
                     renameTry(os.path.join(landscapeDir,landDirItem),os.path.join(landscapeDir,newLandDirItem))
-
                 iniName = os.path.basename(landDirItem).split('.')[0]
                 if iniName != mainItem and 'patch' not in mainItem.lower() and 'WestGermany3' not in mainItem:
                     # try:
@@ -129,8 +122,8 @@ def checkLinksIni(mainDir):
                     #     renameTry(landscapeDir, os.path.join(mainDir,'__no_match_ini_' + iniName))
                 break
         else:
-            print('no .ini file found in full dir {}; adding "!no_ini_" to name'.format(landscapeDir))
-            renameTry(landscapeDir,os.path.join(mainDir, "no_ini_" + mainItem))
+                print('no .ini file found in full dir {}; adding "!no_ini_" to name'.format(landscapeDir))
+                renameTry(landscapeDir,os.path.join(mainDir, "no_ini_" + mainItem))
 
 def makeLink(linkDir, realDir):
     try:
