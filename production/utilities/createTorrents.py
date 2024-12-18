@@ -60,13 +60,14 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
                     os.remove(magPath)
                     createMagnet(item)
                 # remove outdated torrents and magnets
-                torrTime = os.path.getmtime(torrPath)
-                if torrTime < zipTime:
-                    oldZipped.pop(-1)
-                    os.remove(torrPath)
-                    zippedForTorrent.append(item)
-                    continue
-                elif os.path.exists(magPath):
+                if os.path.exists(torrPath):
+                    torrTime = os.path.getmtime(torrPath)
+                    if torrTime < zipTime:
+                        oldZipped.pop(-1)
+                        os.remove(torrPath)
+                        zippedForTorrent.append(item)
+                        continue
+                if os.path.exists(magPath):
                     magTime = os.path.getmtime(magPath)
                     if magTime < zipTime:
                         oldZipped.pop(-1)

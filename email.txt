@@ -1,5 +1,0 @@
-SkylinesCondor is up...all Condor landscapes available
-
-The wait was long, but SkylinesCondor is on a more stable platform now.
-
-See the Landscapes page for all the Condor landscapes, including the latest for Condor 3.

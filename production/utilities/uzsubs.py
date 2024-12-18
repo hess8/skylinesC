@@ -1,6 +1,8 @@
 import os,sys,shutil
 import re
 import subprocess
+from time import sleep
+
 
 slcServerIP = '192.168.1.14'
 user = 'bret'
@@ -8,7 +10,22 @@ keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 
 def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies type of archive
-    pass
+    import signal
+    def signal_handler(sig, frame):
+        sleep(0.1)
+        zipProc.terminate()
+        sleep(0.1)
+        sys.exit('Stopped by user')
+
+    for sig in [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]:
+        signal.signal(sig, signal_handler)
+    maxCPU = 70  # %
+    trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
+    cmd = ['bash', trapSigPath, '7z', 'a', '-t7z', tempPath, landPath]
+
+    # cmd = ['cpulimit','-l',str(maxCPU),'./trapSignals.sh', '7z', 'a', '-t7z', tempPath, landPath]
+    zipProc = subprocess.Popen(cmd)
+    zipProc.communicate()
 
 def versionFromPath(path):
     ''''''
@@ -45,8 +62,6 @@ def updateSymlinks(dirsLists):
                 for item in os.listdir(dir):
                     if 'zip' in item and item.split('.')[-1] == 'temp':
                         os.remove(os.path.join(dir,item))
-
-
 
 def get_free_space_gb(drive):
     """Gets the free space on the specified drive in GB."""
@@ -123,7 +138,7 @@ def checkLinksIni(mainDir):
                 break
         else:
                 print('no .ini file found in full dir {}; adding "!no_ini_" to name'.format(landscapeDir))
-                renameTry(landscapeDir,os.path.join(mainDir, "no_ini_" + mainItem))
+                renameTry(landscapeDir,os.path.join(mainDir, "!no_ini_" + mainItem))
 
 def makeLink(linkDir, realDir):
     try:

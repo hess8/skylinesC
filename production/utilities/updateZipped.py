@@ -31,7 +31,7 @@ from datetime import datetime
 from landscapesPage import landscapesPage
 import signal
 
-looping = False
+looping = True
 waitTime = 30 # min when idle before checking agin
 ## zipping ##
 lowVMain = '/mnt/E/landscapes/landscapesC2-main'
@@ -247,26 +247,9 @@ while go:
             print('----------------------------------------------------------')
             print('***Creating {} in {}***'.format(newZip['zipName'], destination))
 
-            # try:
-            # create new zip
-            def signal_handler(sig,frame):
-                procZip.terminate()
-                procZip.wait()
-                sys.exit('Stopped')
-            #This was an attempt to handle interrupts gracefully, but the handle
-            maxCPU = 90  # %
             if os.path.exists(zipPathTemp):
                 os.remove(zipPathTemp)
-            cmd = ['7z', 'a', '-t7z', zipPathTemp, landPath2]
-            # zipProc = subprocess.run(cmd)
-            zipProc = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-            # zipProc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-            # zipProc.communicate()
-            for sig in [signal.SIGTERM, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]:
-                signal.signal(sig, signal_handler)
-            # procZip = sevenzip(zipPathTemp, landPath2)
-            # if procZip.returncode != 0:
-            #     sys.exit('Zip {} failed'.format(os.path.join(zipPathTemp, landPath2)))
+            sevenzip(zipPathTemp, landPath2)
             renameTry(zipPathTemp, zipPath)
             # except:
             #     print('Error creating {}'.format(zipPath))
@@ -281,6 +264,7 @@ while go:
             print("\r", end='')
             print('Waiting {} min'.format(waitTime - i), flush=True, end='')
             sleep(60)
+        print("\r", end='')
     else:
         go = False
 

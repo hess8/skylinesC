@@ -100,17 +100,17 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
     lines.append('   </style> \n')
 
     lines.append(' <div class="row"> \n')
-    column_table_head('2')
+    column_table_head(version='2')
     for i, name in enumerate(lowVersionList):
         tableRow()
     column_table_end()
 
-    column_table_head('3')
+    column_table_head(version='3')
     for i, name in enumerate(highVersionList):
         tableRow()
     column_table_end()
     lines.append(' </div> \n')
     lines.append('</BasePage> \n')
     writefile(lines,landPageDest)
-    # copy_file_to_guest('U14 (SkylinesC server on Z) Current', landPageDest, landHBS, username, passwd)
+    copy_file_to_guest('U14 (SkylinesC server on Z) Current', landPageDest, landHBS, username, passwd)
     print('New landscapes page created for {} files'.format(len(names)))
