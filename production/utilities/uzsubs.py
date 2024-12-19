@@ -19,11 +19,11 @@ def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies 
 
     for sig in [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]:
         signal.signal(sig, signal_handler)
-    maxCPU = 70  # %
+    maxCPU = 80  # %
     trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
     cmd = ['bash', trapSigPath, '7z', 'a', '-t7z', tempPath, landPath]
-
-    # cmd = ['cpulimit','-l',str(maxCPU),'./trapSignals.sh', '7z', 'a', '-t7z', tempPath, landPath]
+    # Following implements working cpulimit but signal handline doesn't work
+    # cmd = ['cpulimit','-l',str(maxCPU),'--','bash',trapSigPath, '7z', 'a', '-t7z', tempPath, landPath]
     zipProc = subprocess.Popen(cmd)
     zipProc.communicate()
 
