@@ -2,9 +2,9 @@
 
 # Run with cpulimit -l 90 python3 production/utilities/updateZipped.py
 
-
-# 1. Checks links
-# 2. creates new zips
+#loop
+# 1. checks links and folder size
+# 2. creates new zips for folders that are static
 # 3. creates new links
 # 4. runs createTorrents.py
 # 5. runs landscapesPage.py
@@ -31,8 +31,9 @@ from datetime import datetime
 from landscapesPage import landscapesPage
 import signal
 
+landSizes = {}
 looping = True
-waitTime = 30 # min when idle before checking agin
+loopWaitTime = 0 # min when idle before checking agin
 ## zipping ##
 lowVMain = '/mnt/E/landscapes/landscapesC2-main'
 lowVExt1 = None #'/mnt/E/landscapes/landscapesC2-main'
@@ -76,8 +77,8 @@ if not os.path.exists(watchDir):
 checkLinksIni(lowVMain)
 checkLinksIni(highVMain)
 checkZipsLinks(zipMain)
-lowVListA = os.listdir(lowVMain)
-highVListA = os.listdir(highVMain)
+lowVList = os.listdir(lowVMain)
+highVList = os.listdir(highVMain)
 
 # #temp
 # print(' removing files without tag')
@@ -128,10 +129,10 @@ go = True
 while go:
     #if dir in main dirs begins with "-", remove all but .ini files and move to ini dirs
     # rewrite this!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    for list in [lowVListA,highVListA]:
+    for list in [lowVList,highVList]:
         for item in list:
-            if list == lowVListA: mainPath = lowVMain; ini = lowVini
-            elif list == highVListA: mainPath = highVMain; ini = highVini
+            if list == lowVList: mainPath = lowVMain; ini = lowVini
+            elif list == highVList: mainPath = highVMain; ini = highVini
             if item[0] == '-':
                 print("handling '-' files needs to be rewritten")
                 # path = os.path.join(mainPath,item)
@@ -204,16 +205,36 @@ while go:
     # list dirs to be zipped
     toZip = []
     createdTorr = []
+
+    def dirSize(path):
+        result = subprocess.run(["du", "-s", path], stdout=subprocess.PIPE, text=True)
+        strOut = result.stdout
+        size = strOut.split('\t')[0]
+        print(size)
+
+    def checkGrowthWait(landPath):
+        sizeNew = dirSize(landPath)
+        if landPath in landSizes:
+            sizeStored = landSizes[landPath]
+            landSizes[landPath] = sizeNew
+            if sizeNew > sizeStored:
+                return True
+            else:
+                return False
+        else:
+            landSizes[landPath] = sizeNew
+            print()
+            return True #wait til next loop to check
+
     for i, landPath, in enumerate(allLandPaths):
-        if os.path.basename(landPath)[0] == '_':
-            break
+        if 'CA' in landPath:
+            xx=0
+        if os.path.basename(landPath)[0] == '!' or checkGrowthWait(landPath):
+            continue
         land = allLands[i]
         files = os.listdir(landPath)
         iniFilePath = os.path.join(landPath,land+'.ini')
-        try:
-            lines = readfile(iniFilePath)
-        except:
-            xx=0
+        lines = readfile(iniFilePath)
         if len(lines) > 1:
             version = lines[1].split('=')[1].split('(')[0].split(',')[0].replace('00','0').replace('.10.','.1.').replace(' ','')
         else:
@@ -260,9 +281,9 @@ while go:
         landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
 
     if looping:
-        for i in range(int(waitTime)):
+        for i in range(int(loopWaitTime)):
             print("\r", end='')
-            print('Waiting {} min'.format(waitTime - i), flush=True, end='')
+            print('Waiting {} min'.format(loopWaitTime - i), flush=True, end='')
             sleep(60)
         print("\r", end='')
     else:
