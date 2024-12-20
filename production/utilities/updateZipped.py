@@ -31,7 +31,6 @@ from datetime import datetime
 from landscapesPage import landscapesPage
 import signal
 
-landSizes = {}
 looping = True
 loopWaitTime = 0 # min when idle before checking agin
 ## zipping ##
@@ -115,8 +114,12 @@ highVList = os.listdir(highVMain)
 #             newname = item.replace('_C2','')
 #             name2 = newname.replace(landbase,landbase+'_C2')
 #             renameTry(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land!_name2))
-
-
+#initialize sizes
+landSizes = {}
+allLands, allLandPaths = getLandPaths(lowVMain, highVMain)
+for path in allLandPaths:
+    landSizes[path] = dirSize(path)
+#remove .temp 7z files
 for zipDir in zipPathPrior:
     itemslist = os.listdir(zipDir)
     for item in itemslist:
@@ -168,8 +171,6 @@ while go:
 
     # keepRunning = False
     # while keepRunning: #loops infinitely
-    allLands = []
-    allLandPaths = []
     allZips = []
     allZipPaths = []
     #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
@@ -182,15 +183,7 @@ while go:
     ## now all landscapes are represented in main folders ##
 
     # get all landscape paths that have textures dir
-    for dir in [lowVMain,highVMain]:
-        items = os.listdir(dir)
-        for item in items:
-            itemPath = os.path.join(dir, item)
-            if os.path.isdir(itemPath) and \
-                'Textures' in os.listdir(itemPath) \
-                and 'WestGermany3' not in item: # note: isdir is true for a link pointing to a dir
-                    allLands.append(item)
-                    allLandPaths.append(os.path.join(dir, item))
+    allLands, allLandPaths = getLandPaths(lowVMain,highVMain)
 
     #### update symbolic links to zip files
     updateSymlinks([zipDirs])
@@ -206,30 +199,9 @@ while go:
     toZip = []
     createdTorr = []
 
-    def dirSize(path):
-        result = subprocess.run(["du", "-s", path], stdout=subprocess.PIPE, text=True)
-        strOut = result.stdout
-        size = strOut.split('\t')[0]
-        print(size)
-
-    def checkGrowthWait(landPath):
-        sizeNew = dirSize(landPath)
-        if landPath in landSizes:
-            sizeStored = landSizes[landPath]
-            landSizes[landPath] = sizeNew
-            if sizeNew > sizeStored:
-                return True
-            else:
-                return False
-        else:
-            landSizes[landPath] = sizeNew
-            print()
-            return True #wait til next loop to check
-
     for i, landPath, in enumerate(allLandPaths):
-        if 'CA' in landPath:
-            xx=0
-        if os.path.basename(landPath)[0] == '!' or checkGrowthWait(landPath):
+        growing = checkGrowth(landPath,landSizes)
+        if os.path.basename(landPath)[0] == '!' or growing:
             continue
         land = allLands[i]
         files = os.listdir(landPath)

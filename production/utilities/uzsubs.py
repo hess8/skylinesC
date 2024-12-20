@@ -167,3 +167,35 @@ def get_qbtExe(qbtorrentExeDir,slcFilesPath):
             return u14path
     else:
         sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")
+
+def getLandPaths(lowVMain,highVMain):
+    allLands = []
+    allLandPaths = []
+    for dir in [lowVMain,highVMain]:
+        items = os.listdir(dir)
+        for item in items:
+            itemPath = os.path.join(dir, item)
+            if os.path.isdir(itemPath) and \
+                'Textures' in os.listdir(itemPath) \
+                and 'WestGermany3' not in item: # note: isdir is true for a link pointing to a dir
+                    allLands.append(item)
+                    allLandPaths.append(os.path.join(dir, item))
+    return allLands, allLandPaths
+
+def dirSize(path):
+    result = subprocess.run(["du", "-s", path], stdout=subprocess.PIPE, text=True)
+    size = result.stdout.split('\t')[0]
+    return size
+
+def checkGrowth(landPath,landSizes):
+    sizeNew = dirSize(landPath)
+    if landPath in landSizes:
+        sizeStored = landSizes[landPath]
+        landSizes[landPath] = sizeNew
+        if sizeNew > sizeStored:
+            return True
+        else:
+            return False
+    else:
+        landSizes[landPath] = sizeNew
+        return True #wait til next loop to check
