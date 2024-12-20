@@ -130,6 +130,6 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             except:
                 print('Error in magnet link for {}'.format(torrent))
 
-    print('Torrents done')
+    # print('Torrents done')
     return createdTorr
 

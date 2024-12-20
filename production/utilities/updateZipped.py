@@ -32,7 +32,7 @@ from landscapesPage import landscapesPage
 import signal
 
 looping = True
-loopWaitTime = 0 # min when idle before checking agin
+loopWaitTime = 5 # min when idle before checking agin
 ## zipping ##
 lowVMain = '/mnt/E/landscapes/landscapesC2-main'
 lowVExt1 = None #'/mnt/E/landscapes/landscapesC2-main'
@@ -68,7 +68,7 @@ watchDir = os.path.join(zipMain + '/qbtWatch')
 makeAllMagnets = False  # needed only occasionally
 
 ########
-
+print('Starting')
 if not os.path.exists(watchDir):
     os.mkdir(watchDir)
 
@@ -129,9 +129,11 @@ for zipDir in zipPathPrior:
 print('Write code for:   Start the landscape dir name with "-" to move landscape to ini only directory')
 print('Write code for:   Start the landscape dir name with "." to move landscape to other landscapes folder')
 go = True
+loopCount = 0
 while go:
-    #if dir in main dirs begins with "-", remove all but .ini files and move to ini dirs
-    # rewrite this!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    loopCount += 1
+        #if dir in main dirs begins with "-", remove all but .ini files and move to ini dirs
+        # rewrite this!!!!!!!!!!!!!!!!!!!!!!!!!!!
     for list in [lowVList,highVList]:
         for item in list:
             if list == lowVList: mainPath = lowVMain; ini = lowVini
@@ -255,7 +257,7 @@ while go:
     if looping:
         for i in range(int(loopWaitTime)):
             print("\r", end='')
-            print('Waiting {} min'.format(loopWaitTime - i), flush=True, end='')
+            print('[loop {}]  Waiting {} min '.format(loopCount, loopWaitTime - i), flush=True, end='')
             sleep(60)
         print("\r", end='')
     else:

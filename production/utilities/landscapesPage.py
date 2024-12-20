@@ -95,7 +95,7 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
     lines.append('  .row {display: flex;} \n')
     lines.append('  .column { \n')
     lines.append('   width: 330px; \n')
-    lines.append('   padding: 20px; \n')
+    lines.append('   padding: 18px; \n')
     lines.append('   } \n')
     lines.append('   </style> \n')
 
