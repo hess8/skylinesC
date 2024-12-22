@@ -88,7 +88,7 @@ first-last: First / Last
 first-name: First name
 flight-analysis: Flight Analysis
 flight-database: Flight Database
-flight-date-choose: Change this date if you want to match others' for a groupflight
+flight-date-choose: Check this flight date. You can change it to the past to match others' to be included in a groupflight
 flight-date-in-future: Date of flight in future
 flight-pinned: Flight pinned!
 flight-time: Flight Time
@@ -189,6 +189,7 @@ POINTS-points-abbr: '{points} pts.'
 privacy-policy: Privacy Policy
 processing: Processing...
 profile: Profile
+public-coplilot: Public comment (or co-pilot name if 2-seater)
 publish: Publish
 publish-flight: Publish Flight
 publish-flight-confirmation-text: Confirm to publish this flight...
@@ -228,7 +229,6 @@ this-is-you: This is you
 time: Time
 TIME-by-USER: '{time}<br>by <a href="{userURL}">{user}</a>'
 timeline: Timeline
-title: Public comment or title
 total: Total
 total-score: Total Score
 tracking-callsign: Tracking Callsign

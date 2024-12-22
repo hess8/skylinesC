@@ -5,6 +5,10 @@ import { readOnly, alias, equal } from '@ember/object/computed';
 import isNone from '../computed/is-none';
 import { validator, buildValidations } from 'ember-cp-validations';
 
+//const maximumDate =  maxDate()
+
+//      before: maximumDate,
+
 const Validations = buildValidations({
   chosenDate: {
     descriptionKey: 'chosenDate',
@@ -19,6 +23,9 @@ const Validations = buildValidations({
 });
 
 export default Component.extend({
+
+//  dateChosen: alias('flight.igcFile.filename'),
+
   classNames: ['row'],
 
   result: null,

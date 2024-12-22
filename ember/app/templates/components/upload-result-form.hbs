@@ -3,8 +3,16 @@
 
 {{#if success}}
 
-  <ValidatedBlock @label={{t "flight-date-choose"}} @value={{chosenDate}} @validation={{validations.attrs.chosenDate}} class="form-control" disabled={{uploadTask.isRunning}}>
-  </ValidatedBlock>
+  <ValidatedInput
+    @value={{chosenDate}}
+    @validation={{validations.attrs.chosenDate}}
+    @label={{t "flight-date-choose"}}
+    @disabled={{pending}}
+    @didValidate={{didValidate}}
+    class="col-sm-6" />
+
+{{!--   <ValidatedBlock @label={{t "flight-date-choose"}} @value={{chosenDate}} @validation={{validations.attrs.chosenDate}} class="form-control" disabled={{uploadTask.isRunning}}> --}}
+{{!--   </ValidatedBlock> --}}
 
   <div class="form-group col-sm-6">
     <label class="control-label">{{t "pilot"}}</label>
@@ -28,7 +36,7 @@
   <ValidatedInput
     @value={{copilotName}}
     @validation={{validations.attrs.copilotName}}
-    @label={{t "title"}}
+    @label={{t "public-coplilot"}}
     @disabled={{pending}}
     @didValidate={{didValidate}}
     class="col-sm-6" />
