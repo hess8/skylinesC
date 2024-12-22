@@ -53,12 +53,12 @@ export default Component.extend(Validations, {
 
   uploadTask: task(function*() {
     let form = this.element.querySelector('form');
-    let data = new FormData(form);
+    let data = new FormData(form); // data defined
 
     try {
-      let json = yield this.ajax.request('/api/flights/upload/', {
+      let json = yield this.ajax.request('/api/flights/upload/', { // route in upload.py
         method: 'POST',
-        data,
+        data, // data posted
         contentType: false,
         processData: false,
       });

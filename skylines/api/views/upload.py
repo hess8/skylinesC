@@ -63,8 +63,8 @@ class UploadStatus(IntEnum):
     PARSER_ERROR = 3  # _('Failed to parse file')
     NO_FLIGHT = 4  # _('No flight found in file')
     FLIGHT_IN_FUTURE = 5  # _('Date of flight in future')
-    NOT_CONDOR = 6 # _('File is not a Condor flight')
-    DATE_NOT_IN_FILENAME = 7  # _('File is not a Condor flight')
+    NOT_CONDOR = 6 # _('File is not a Condor flight, or you submitted a .fpl instead of a .igc')
+    DATE_NOT_FOUND = 7  # _('No flight date assigned')
 
 
 class UploadResult(
@@ -98,8 +98,8 @@ class UploadResult(
         return cls(name, None, UploadStatus.NOT_CONDOR, prefix, None, None, None)
 
     @classmethod
-    def date_not_in_filename(cls, name, prefix):
-        return cls(name, None, UploadStatus.DATE_NOT_IN_FILENAME, prefix, None, None, None)
+    def date_not_found(cls, name, prefix):
+        return cls(name, None, UploadStatus.DATE_NOT_FOUND, prefix, None, None, None)
 
 
 class TraceSchema(Schema):
@@ -197,8 +197,8 @@ def _encode_flight_path(fp, qnh):
         igc_end_time=fp[-1].datetime,
     )
 
-def get_date_from_name(filename):
-    #Local date must be somewhere in the file name.  It will guess a date if ambiguous
+def get_date_from_name_or_curr(filename):
+    #If date is in the file name it replaces the current date
     now = datetime.utcnow()
     condorCreation = dparser.parse('2005-04-05')
     trialStr = filename.replace(".igc", "").replace('_', '-').replace(' ', '-').replace('.', '-').replace(',', '-')
@@ -209,20 +209,23 @@ def get_date_from_name(filename):
             return trialDate  # success
         else:
             raise Exception('Bad date')
-    except: #run through 10-character segments of string (maximum length of date YYYYxMMxDD):
-        for istart in range(0,len(trialStr)-10):
-            if trialStr[istart].isdigit(): #check only strings starting with digit, not separator
-                try:
-                    # print 'test', trialStr[istart:istart + 10]
-                    trialDate = dparser.parse(trialStr[istart:istart+10], fuzzy=True)
-                except:
-                    continue
-                else:
-                    if condorCreation <= trialDate <= now + timedelta(hours=24): #reasonable dates
-                        return trialDate #success
-            else:
-                continue
-        return dparser.parse('', fuzzy=True) #this line will throw an error
+    except:
+        return now
+
+    # except: #run through 10-character segments of string (maximum length of date YYYYxMMxDD):
+    #     for istart in range(0,len(trialStr)-10):
+    #         if trialStr[istart].isdigit(): #check only strings starting with digit, not separator
+    #             try:
+    #                 # print 'test', trialStr[istart:istart + 10]
+    #                 trialDate = dparser.parse(trialStr[istart:istart+10], fuzzy=True)
+    #             except:
+    #                 continue
+    #             else:
+    #                 if condorCreation <= trialDate <= now + timedelta(hours=24): #reasonable dates
+    #                     return trialDate #success
+    #         else:
+    #             continue
+    #     return dparser.parse('', fuzzy=True) #this line will throw an error
 
 
 @upload_blueprint.route("/flights/upload", methods=("POST",), strict_slashes=False)
@@ -255,12 +258,12 @@ def index_post():
         igc_file = IGCFile()
         prefix += 1
         try:
-            igc_file.date_condor = get_date_from_name(name) #name differs from filename which has _1 etc appended
+            igc_file.date_condor = get_date_from_name_or_curr(name) #name differs from filename which has _1 etc appended
             igc_file.time_created = igc_file.date_condor
             igc_file.time_modified = datetime.utcnow()
         except:
             files.delete_file(name)
-            results.append(UploadResult.date_not_in_filename(name, str(prefix)))
+            results.append(UploadResult.date_not_found(name, str(prefix)))
             continue
         filename = files.sanitise_filename(name)
         filename = files.add_file(filename, f)

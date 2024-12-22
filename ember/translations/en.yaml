@@ -49,8 +49,8 @@ current-password: Current password
 date: Date
 date-compiled: Date compiled
 date-missing-in-igc-file: Date missing in IGC file
-date-must-in-filename: Date of flight must be in filename
-date-ok-filename: An easy filename is "textnotnumbers-YYYY-MM-DD.igc", for example "Nephi JS 2023-08-14". Month before day.
+date-may-in-filename: If the date of flight is in the filename, you won't need to enter it later.
+date-ok-filename: For example "JS 2023-08-14" or "2023-08-14 JS". Month before day.
 date-space-filename: Separators OK anywhere, needed in date. <space>, <dash>, <dot>, and/or <_>
 date-number-filename: No digits after the date.
 date-missing-refresh: Refresh this page to try again.
@@ -88,6 +88,7 @@ first-last: First / Last
 first-name: First name
 flight-analysis: Flight Analysis
 flight-database: Flight Database
+flight-date-choose: Change this date if you want to match others' for a groupflight
 flight-date-in-future: Date of flight in future
 flight-pinned: Flight pinned!
 flight-time: Flight Time

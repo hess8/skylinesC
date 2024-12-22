@@ -3,6 +3,20 @@ import { computed } from '@ember/object';
 import { readOnly, alias, equal } from '@ember/object/computed';
 
 import isNone from '../computed/is-none';
+import { validator, buildValidations } from 'ember-cp-validations';
+
+const Validations = buildValidations({
+  chosenDate: {
+    descriptionKey: 'chosenDate',
+    validators: [validator('date', {
+      after: '2005-04-03',
+      before: maxDate,
+      format: 'YYYY-MM-DD',
+      errorFormat: 'YYYY-MM-DD',
+      })],
+    debounce: 0,
+  },
+});
 
 export default Component.extend({
   classNames: ['row'],
@@ -118,4 +132,10 @@ function computedDate(aliasKey) {
       return value;
     },
   });
+}
+
+function maxDate() {
+  const d = new Date();
+  const defaultDate = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toJSON().slice(0, 10);
+  return defaultDate.setDate(defaultDate.getDate() + 2);
 }

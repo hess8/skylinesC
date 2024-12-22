@@ -2,6 +2,10 @@
 <input type="hidden" name="{{prefix}}-name" value="{{name}}" />
 
 {{#if success}}
+
+  <ValidatedBlock @label={{t "flight-date-choose"}} @value={{chosenDate}} @validation={{validations.attrs.chosenDate}} class="form-control" disabled={{uploadTask.isRunning}}>
+  </ValidatedBlock>
+
   <div class="form-group col-sm-6">
     <label class="control-label">{{t "pilot"}}</label>
     <PilotSelect @clubMembers={{clubMembers}} @pilotId={{pilotId}} @onChange={{action (mut pilotId)}} />

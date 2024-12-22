@@ -8,19 +8,19 @@
   {{#if error}}
     <BsAlert @type="danger" @dismissible={{false}}>{{error}}</BsAlert>
   {{/if}}
-  {{t "date-must-in-filename"}}
-  <li>{{t "date-ok-filename"}}</li>
-  <li>{{t "date-space-filename"}}</li>
+  {{t "date-may-in-filename"}}
+{{!--   <li>{{t "date-ok-filename"}}</li> --}}
+{{!--   <li>{{t "date-space-filename"}}</li> --}}
   <li>{{t "date-number-filename"}}</li>
   <p></p>
-  {{t "agree-public"}}
+{{!--   {{t "agree-public"}} --}}
   <p></p>
   <ValidatedBlock @label={{t "igc-or-zip-files"}} @validation={{validations.attrs.files}} @hasContent={{files}} @didValidate={{didValidate}}>
     <input type="file" name="files" multiple="multiple" onchange={{action "setFilesFromEvent"}} class="form-control" disabled={{uploadTask.isRunning}}>
   </ValidatedBlock>
 
 
-{{!--  ####################################  Upload Bocking ######################################################   --}}
+{{!--  ####################################  Upload Blocking ######################################################   --}}
 {{!--       <span class="label label-warning"> --}}
 {{!--         {{fa-icon "warning"}} --}}
 {{!--         {{'Uploads are blocked for debugging :('}} --}}
