@@ -40,11 +40,13 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
 
 
     ##############  script  ##############
+    colWidth = 330
+    colPad = 18
     [username,passwd] = readfile('/home/bret/.local/secure/userU')
     # copy qbt exe to /files so it is accessible to ember
     qbtExeName = qbtExeLocal.split(os.sep)[-1]
     qbtExeDest = os.path.join(slcFilesPath,qbtExeName) #if we can get directy copy through guestcontrol to work again
-    qbtExePage = os.path.join('/files',qbtExeName)
+    qbtExePage = os.path.join('../../../htdocs/files',qbtExeName)
     # copy_file_to_guest(slcVMname,qbtExeLocal,qbtExeDest,username, passwd)
 
     # get torrents
@@ -94,23 +96,23 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
     lines.append('  * {box-sizing: border-box;} \n')
     lines.append('  .row {display: flex;} \n')
     lines.append('  .column { \n')
-    lines.append('   width: 330px; \n')
-    lines.append('   padding: 20px; \n')
+    lines.append('   width: {}px; \n'.format(colWidth))
+    lines.append('   padding: {}}px; \n'.format(colPad))
     lines.append('   } \n')
     lines.append('   </style> \n')
 
     lines.append(' <div class="row"> \n')
-    column_table_head('2')
+    column_table_head(version='2')
     for i, name in enumerate(lowVersionList):
         tableRow()
     column_table_end()
 
-    column_table_head('3')
+    column_table_head(version='3')
     for i, name in enumerate(highVersionList):
         tableRow()
     column_table_end()
     lines.append(' </div> \n')
     lines.append('</BasePage> \n')
     writefile(lines,landPageDest)
-    # copy_file_to_guest('U14 (SkylinesC server on Z) Current', landPageDest, landHBS, username, passwd)
+    copy_file_to_guest('U14 (SkylinesC server on Z) Current', landPageDest, landHBS, username, passwd)
     print('New landscapes page created for {} files'.format(len(names)))
