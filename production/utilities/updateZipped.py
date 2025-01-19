@@ -24,6 +24,7 @@ import os,sys
 # from subprocess import Popen, PIPE
 # print(os.path.abspath(os.curdir))
 from time import sleep
+import platform
 from common_util import readfileNoStrip, readfile
 from uzsubs import *
 from createTorrents import createTorrents
@@ -34,23 +35,29 @@ import signal
 looping = True
 loopWaitTime = 5 # min when idle before checking agin
 ## zipping ##
-lowVMain = '/mnt/E/landscapes/landscapesC2-main'
-lowVExt1 = None #'/mnt/E/landscapes/landscapesC2-main'
-lowVini = '/mnt/E/landscapes/landscapesC2-ini'
-lowVserver = '/mnt/E/landscapes/landscapesC2-server'
-highVMain = '/mnt/E/landscapes/landscapesC3-main'
-highVExt1 = None #'/mnt/E/landscapes/landscapesC3-main'
-highVini = '/mnt/E/landscapes/landscapesC3-ini'
-highVserver = '/mnt/E/landscapes/landscapesC3-server'
+linuxPathStart = '/mnt/'
+winPathStart = 'S:\\' #includes Samba windows mapped drive
+if platform.system() == 'Windows':
+    pathStart = winPathStart
+else:
+    pathStart =linuxPathStart
+lowVMain = os.path.join(pathStart,'E','landscapes','landscapesC2-main')
+lowVExt1 = None #os.path.join(pathStart,'E','landscapes','landscapesC2-main')
+lowVini = os.path.join(pathStart,'E','landscapes','landscapesC2-ini')
+lowVserver = os.path.join(pathStart,'E','landscapes','landscapesC2-server')
+highVMain = os.path.join(pathStart,'E','landscapes','landscapesC3-main')
+highVExt1 = None #os.path.join(pathStart,'E','landscapes','landscapesC3-main')
+highVini = os.path.join(pathStart,'E','landscapes','landscapesC3-ini')
+highVserver = os.path.join(pathStart,'E','landscapes','landscapesC3-server')
 lowerVersionLandDirs = [lowVMain,lowVini,lowVserver]
 higherVersionLandDirs = [highVMain,highVini,highVserver]
 landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
 versionMainDict = {'C2': lowVMain, 'C3': highVMain}
-zipMain = '/mnt/P/landscapes-zip'
-zipExtras = None #['/mnt/E/landscapes/zipped1']
+zipMain = os.path.join(pathStart,'P','landscapes-zip')
+zipExtras = None #[os.path.join(pathStart,'E','landscapes','zipped1']
 zipDirs = [zipMain] #+ zipExtras
 zipPathPrior = [zipMain] # [zipExtras[0],zipMain] # fill up in this order
-utilitiesDir = '/mnt/L/condor-related/skylinesC/production/utilities'
+utilitiesDir = os.path.join(pathStart,'L','condor-related','skylinesC','production','utilities')
 ## Landscapes page ##
 forceLandPage = False
 landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
@@ -252,7 +259,7 @@ while go:
     createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
 
     if forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest):
-        landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
+        landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
 
     if looping:
         for i in range(int(loopWaitTime)):

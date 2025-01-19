@@ -1,6 +1,6 @@
 import shutil
 
-def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr):
+def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr):
     '''Called by updateZipped.py'''
     import os, sys
     sys.path.append('/mnt/L/condor-related/skylinesC/skylines')
@@ -17,7 +17,7 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
 
     def tableRow():
         lines.append('\t<tr> \n')
-        magfilepath = zipDir + os.sep + '{}.magnet'.format(name)
+        magfilepath = zipMain + os.sep + '{}.magnet'.format(name)
         try:
             magline = readfileNoStrip(magfilepath)[0].strip() + trackerStr
         except:
@@ -25,7 +25,7 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
         lines.append('\t\t\t\t<td> <a href="{}">'.format(magline) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
         # lines.append('\t<td> <a href="{}"> magnet </a> </td> '.format(magline))
         GiB = 1.074e+9
-        size = os.stat(os.path.join(zipDir, name)).st_size
+        size = os.stat(os.path.join(zipMain, name)).st_size
         if size > 0.1 * GiB:
             sizeStr = '{:.1f} GB"'.format(size / GiB)
         else:
@@ -48,7 +48,7 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
     # copy_file_to_guest(slcVMname,qbtExeLocal,qbtExeDest,username, passwd)
 
     # get torrents
-    dirlist = os.listdir(zipDir)
+    dirlist = os.listdir(zipMain)
     names = []
     sizes = []
     for item in dirlist:

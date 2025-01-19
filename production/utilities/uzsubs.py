@@ -4,10 +4,10 @@ import subprocess
 from time import sleep
 
 
-slcServerIP = '192.168.1.14'
-user = 'bret'
-keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
-qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
+# slcServerIP = '192.168.1.14'
+# user = 'bret'
+# keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
+# qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 
 def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies type of archive
     import signal
