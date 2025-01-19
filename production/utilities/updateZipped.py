@@ -25,7 +25,7 @@ import os,sys
 # print(os.path.abspath(os.curdir))
 from time import sleep
 import platform
-from common_util import readfileNoStrip, readfile
+from common_util import readfileNoStrip, readfile, renameTry
 from uzsubs import *
 from createTorrents import createTorrents
 from datetime import datetime

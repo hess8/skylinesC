@@ -40,11 +40,13 @@ def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMna
 
 
     ##############  script  ##############
+    colWidth = 330
+    colPad = 18
     [username,passwd] = readfile('/home/bret/.local/secure/userU')
     # copy qbt exe to /files so it is accessible to ember
     qbtExeName = qbtExeLocal.split(os.sep)[-1]
     qbtExeDest = os.path.join(slcFilesPath,qbtExeName) #if we can get directy copy through guestcontrol to work again
-    qbtExePage = os.path.join('/files',qbtExeName)
+    qbtExePage = os.path.join('../../../htdocs/files',qbtExeName)
     # copy_file_to_guest(slcVMname,qbtExeLocal,qbtExeDest,username, passwd)
 
     # get torrents
@@ -94,8 +96,8 @@ def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMna
     lines.append('  * {box-sizing: border-box;} \n')
     lines.append('  .row {display: flex;} \n')
     lines.append('  .column { \n')
-    lines.append('   width: 330px; \n')
-    lines.append('   padding: 18px; \n')
+    lines.append('   width: {}px; \n'.format(colWidth))
+    lines.append('   padding: {}}px; \n'.format(colPad))
     lines.append('   } \n')
     lines.append('   </style> \n')
 

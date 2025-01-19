@@ -148,15 +148,6 @@ def makeLink(linkDir, realDir):
     except:
         print('Problem creating symblolic link {} -> {}'.format(linkDir, realDir))
 
-def renameTry(oldname, newname):
-    # try:
-    #     os.rename(oldname, newname)
-    #     print('Renamed {} to {}'.format(oldname, newname))
-    # except:
-    #     sys.exit("Stop: can't rename {} to {}".format(oldname, newname))
-    os.rename(oldname, newname)
-    print('Renamed {} to {}'.format(oldname, newname))
-
 def get_qbtExe(qbtorrentExeDir,slcFilesPath):
     items = os.listdir(qbtorrentExeDir)
     items.sort()
@@ -177,7 +168,7 @@ def getLandPaths(lowVMain,highVMain):
             itemPath = os.path.join(dir, item)
             if os.path.isdir(itemPath) and \
                 'Textures' in os.listdir(itemPath) \
-                and 'WestGermany3' not in item: # note: isdir is true for a link pointing to a dir
+                and 'WestGermany3' not in item and 'Slovenia' not in item: # note: isdir is true for a link pointing to a dir
                     allLands.append(item)
                     allLandPaths.append(os.path.join(dir, item))
     return allLands, allLandPaths

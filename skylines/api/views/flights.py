@@ -67,19 +67,29 @@ def writefile(lines,filepath): #need to have \n's inserted already
     file1.close()
     return
 
-def create_fpl_file(igc_filename):
+def extract_fpl_file(igc_filename):
     '''Extract fpl file from igc and save in files section'''
+    ignoreTags = ['Name=','RaceStartDelay','StartTimeWindow',',']
     lines = readfileNoStrip(igc_filename)
-    backupdir = '/home/bret/servers/repo-skylinesC/skylinesC/filesBackup'
+    #backupdir = '/home/bret/servers/repo-skylinesC/skylinesC/filesBackup'
     filebase = igc_filename.split('/')[-1].replace('.igc','')
-    shutil.copy(igc_filename, backupdir + '/{}.igc'.format(filebase))
-    keep = []
+    #shutil.copy(igc_filename, backupdir + '/{}.igc'.format(filebase))
+    fplLines = []
     for line in lines:
         if "LCONFPL" in line:
-            keep.append(line.replace('LCONFPL',''))
+            fplLines.append(line.replace('LCONFPL',''))
+    planeStart = None
+    #remove Plane section, which changes with user
+    for il,line in enumerate(fplLines):
+        if 'plane' in line.lower():
+            planeStart = il
+        if planeStart and '[' in line:
+            nextSection = il
+            break
+    keep = fplLines[:planeStart] + fplLines[nextSection:]
     fpl_file = igc_filename.replace('.igc','.fpl')
     writefile(keep, fpl_file)
-    shutil.copy(fpl_file, backupdir + '/{}.fpl'.format(filebase))
+    #shutil.copy(fpl_file, backupdir + '/{}.fpl'.format(filebase))
 
 def mark_user_notifications_read(pilot):
     if not request.user_id:
@@ -570,7 +580,7 @@ def json(flight_id):
     )
     igc_file = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/{}'.format(flight.igc_file.filename)
     if not os.path.exists(igc_file.replace('.igc', '.fpl')):
-        create_fpl_file(igc_file)
+        extract_fpl_file(igc_file)
     current_user = User.get(request.user_id) if request.user_id else None
     if not flight.is_viewable(current_user):
         return jsonify(), 404
