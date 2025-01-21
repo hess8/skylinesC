@@ -41,6 +41,7 @@ windowsThreads = 6
 linuxPathStart = '/mnt/'
 winPathStart = 'S:\\' #includes Samba windows mapped drive
 if platform.system() == 'Windows':
+    print("Running on Windows...no work on links, and won't copy landscapes.hbs")
     pathStart = winPathStart
     linux = False
 else:
@@ -305,7 +306,7 @@ while go:
             print('[loop {}]  Waiting {} min '.format(loopCount, waitTime - i), flush=True, end='')
             sleep(60)
         print("\r", end='')
-print ("Done")
+print ("Windows work done.  Now run on Linux for links and to copy landscapes.hbs to U14")
 #check that new torrents have been added to the qbittorrent servers
     # time.sleep(5)
     # shell = win32com.client.Dispatch("WScript.Shell")
