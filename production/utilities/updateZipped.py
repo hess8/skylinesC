@@ -35,6 +35,8 @@ import signal
 
 looping = True
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
+nThreads = {'linux': 1, 'windows': 6}
+windowsThreads = 6
 ## zipping ##
 linuxPathStart = '/mnt/'
 winPathStart = 'S:\\' #includes Samba windows mapped drive
@@ -286,7 +288,7 @@ while go:
 
             if os.path.exists(zipPathTemp):
                 os.remove(zipPathTemp)
-            sevenzip(zipPathTemp, landPath2)
+            sevenzip(zipPathTemp, landPath2, nThreads)
             renameTry(zipPathTemp, zipPath)
             # except:
             #     print('Error creating {}'.format(zipPath))
@@ -303,12 +305,6 @@ while go:
             print('[loop {}]  Waiting {} min '.format(loopCount, waitTime - i), flush=True, end='')
             sleep(60)
         print("\r", end='')
-    # else:
-    #     waitTime = int(max(0,60-(startTime-perf_counter())))
-    #     print('Waiting {} sec to omit growing folders from zips '.format(waitTime), flush=True, end='')
-    #     sleep(waitTime)
-    #     if loopCount > 1:
-    #         go = False
 print ("Done")
 #check that new torrents have been added to the qbittorrent servers
     # time.sleep(5)

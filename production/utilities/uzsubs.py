@@ -10,7 +10,7 @@ from common_util import dirSize, renameTry
 # keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
 # qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
 
-def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies type of archive
+def sevenzip(tempPath,landPath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
     import signal
     def signal_handler(sig, frame):
         sleep(0.1)
@@ -21,11 +21,11 @@ def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies 
         sigs = [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]
         for sig in sigs:
             signal.signal(sig, signal_handler)
-        maxThreads = 1# On Soto with base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
+        maxThreads = nThreads['linux']# On Soto with base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
         trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
         cmd = ['bash', trapSigPath, '7z', 'a', '-t7z', '-mmt={}'.format(maxThreads), tempPath, landPath]
     elif platform.system() == 'Windows':
-        maxThreads = 12
+        maxThreads = nThreads['windows']
         cmd = ['C:\\Program Files\\7-Zip\\7z.exe', 'a', '-t7z', '-mmt={}'.format(maxThreads), tempPath, landPath]
     zipProc = subprocess.Popen(cmd)
     zipProc.communicate()
