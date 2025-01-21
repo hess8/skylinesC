@@ -2,12 +2,7 @@ import os,sys,shutil
 import re
 import subprocess
 from time import sleep
-
-
-slcServerIP = '192.168.1.14'
-user = 'bret'
-keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
-qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
+from common_util import readfileNoStrip, readfile, renameTry
 
 def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies type of archive
     import signal
@@ -20,7 +15,7 @@ def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies 
     for sig in [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]:
         signal.signal(sig, signal_handler)
     maxCPU = 80  # %
-    maxThreads = 4# With base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
+    maxThreads = 1# With base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
     trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
     cmd = ['bash', trapSigPath, '7z', 'a', '-t7z', '-mmt={}'.format(maxThreads),tempPath, landPath]
     # Following implements working cpulimit but signal handline doesn't work

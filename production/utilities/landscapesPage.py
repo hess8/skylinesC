@@ -97,7 +97,7 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
     lines.append('  .row {display: flex;} \n')
     lines.append('  .column { \n')
     lines.append('   width: {}px; \n'.format(colWidth))
-    lines.append('   padding: {}}px; \n'.format(colPad))
+    lines.append('   padding: {}px; \n'.format(colPad))
     lines.append('   } \n')
     lines.append('   </style> \n')
 
@@ -114,5 +114,5 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
     lines.append(' </div> \n')
     lines.append('</BasePage> \n')
     writefile(lines,landPageDest)
-    copy_file_to_guest('U14 (SkylinesC server on Z) Current', landPageDest, landHBS, username, passwd)
+    copy_file_to_guest(slcVMname, landPageDest, landHBS, username, passwd)
     print('New landscapes page created for {} files'.format(len(names)))

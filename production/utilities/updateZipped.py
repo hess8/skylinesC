@@ -31,7 +31,7 @@ from datetime import datetime
 from landscapesPage import landscapesPage
 import signal
 
-looping = True
+looping = False
 loopWaitTime = 5 # min when idle before checking agin
 ## zipping ##
 lowVMain = '/mnt/E/landscapes/landscapesC2-main'
@@ -52,14 +52,14 @@ zipDirs = [zipMain] #+ zipExtras
 zipPathPrior = [zipMain] # [zipExtras[0],zipMain] # fill up in this order
 utilitiesDir = '/mnt/L/condor-related/skylinesC/production/utilities'
 ## Landscapes page ##
-forceLandPage = False
+forceLandPage = True
 landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
 qbtorrentExeDir = os.path.join(zipMain,'qbt_exe')
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/' #only used if can get copying by guest control working again
 qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
 qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
 landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
-slcVMname = 'U14 (SkylinesC server on Z) Current'
+slcVMname = 'U14 (SkylinesC server) Current'
 # landHBS = '/home/bret/servers/repo-skylinesC/landscapes.test.hbs'
 ## Torrents ##
 
@@ -263,9 +263,9 @@ while go:
     else:
         go = False
 
-
-
 print ("Done")
+
+
 #check that new torrents have been added to the qbittorrent servers
     # time.sleep(5)
     # shell = win32com.client.Dispatch("WScript.Shell")
