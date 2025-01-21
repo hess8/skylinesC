@@ -1,4 +1,6 @@
-import os,subprocess,sys
+import os,subprocess
+import platform
+# import pathlib
 
 def readfile(filepath):
     with open(filepath) as f:
@@ -17,12 +19,13 @@ def writefile(lines,filepath): #need to have \n's inserted already
     return
 
 def renameTry(oldname, newname):
-    try:
-        os.rename(oldname, newname)
-        print('Renamed {} to {}'.format(oldname, newname))
-    except:
-        sys.exit("Stop: can't rename {} to {}".format(oldname, newname))
-    # os.rename(oldname, newname)
+    # try:
+    #     os.rename(oldname, newname)
+    #     print('Renamed {} to {}'.format(oldname, newname))
+    # except:
+    #     sys.exit("Stop: can't rename {} to {}".format(oldname, newname))
+    os.rename(oldname, newname)
+    print('Renamed {} to {}'.format(oldname, newname))
 
 def copy_file_to_guest(vm_name, host_file_path, guest_file_path,usernm,passwd):
     """Copies a file from host to guest using VBoxManage."""
@@ -36,20 +39,23 @@ def copy_file_to_guest(vm_name, host_file_path, guest_file_path,usernm,passwd):
         '--username={}'.format(usernm),
         '--password={}'.format(passwd)
     ]
-
-    # cmd = [
-    #     "vboxmanage",
-    #     "showvminfo",
-    #     vm_name
-    # ]
-
     try:
         subprocess.check_output(cmd)
     except subprocess.CalledProcessError as e:
         print(e.output)
 
-    # print('Trying direct')
-    # strcmd = ' '.join(cmd)
-    # strcmd = 'vboxmanage showvminfo "U14 (SkylinesC server) Current"'
-    # print (strcmd)
-    # os.system(strcmd)
+def dirSize(path):
+    # This is very slow sum(f.stat().st_size for f in pathlib.Path(path).glob('**/*') if f.is_file())
+    if platform.system() == 'Linux':
+        size = subprocess.run(["du", "-s", path], stdout=subprocess.PIPE, text=True).stdout.split('\t')[0]
+    else:
+        size = 0
+        with os.scandir(path) as it:
+            for entry in it:
+                if entry.is_file():
+                    size += entry.stat().st_size
+                elif entry.is_dir():
+                    size += dirSize(entry.path) #recursive
+        return size
+
+

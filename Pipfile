@@ -46,6 +46,7 @@ immobilus = "*"
 requests-oauthlib = "*"
 blinker = "*"
 gitflask = "*"
+pipfile = "*"
 
 [dev-packages]
 fabric = "==1.14.0"

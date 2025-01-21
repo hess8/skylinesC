@@ -147,6 +147,7 @@ alias ngbackup-config-skylines.conf=nginxconfigbackup
 alias bu='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/backupSkylines.py'
 alias ct='python /home/bret/servers/repo-skylinesC/skylinesC/production/utilities/createTorrents.py'
 alias k42='sudo npx kill-port 4200'
+alias k50='sudo npx kill-port 5000'
 alias ufenable='sudo ufw enable'
 alias ufdisable='sudo ufw disable'
 alias ufstop='sudo ufw stop'

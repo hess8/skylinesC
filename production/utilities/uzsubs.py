@@ -1,27 +1,38 @@
 import os,sys,shutil
 import re
 import subprocess
+import platform
 from time import sleep
-from common_util import readfileNoStrip, readfile, renameTry
+from common_util import dirSize, renameTry
 
-def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies type of archive
+# slcServerIP = '192.168.1.14'
+# user = 'bret'
+# keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
+# qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
+
+def sevenzip(tempPath,landPath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
     import signal
     def signal_handler(sig, frame):
         sleep(0.1)
         zipProc.terminate()
         sleep(0.1)
         sys.exit('Stopped by user')
-
-    for sig in [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]:
-        signal.signal(sig, signal_handler)
-    maxCPU = 80  # %
-    maxThreads = 1# With base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
-    trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
-    cmd = ['bash', trapSigPath, '7z', 'a', '-t7z', '-mmt={}'.format(maxThreads),tempPath, landPath]
-    # Following implements working cpulimit but signal handline doesn't work
-    # cmd = ['cpulimit','-l',str(maxCPU),'--','bash',trapSigPath, '7z', 'a', '-t7z', tempPath, landPath]
+    if platform.system() == 'Linux':
+        sigs = [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]
+        for sig in sigs:
+            signal.signal(sig, signal_handler)
+        maxThreads = nThreads['linux']# On Soto with base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
+        trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
+        cmd = ['bash', trapSigPath, '7z', 'a', '-t7z', '-mmt={}'.format(maxThreads), tempPath, landPath]
+    elif platform.system() == 'Windows':
+        maxThreads = nThreads['windows']
+        cmd = ['C:\\Program Files\\7-Zip\\7z.exe', 'a', '-t7z', '-mmt={}'.format(maxThreads), tempPath, landPath]
     zipProc = subprocess.Popen(cmd)
     zipProc.communicate()
+        # Following implements working cpulimit but signal handline doesn't work
+    # maxCPU = 80  # %
+    # cmd = ['cpulimit','-l',str(maxCPU),'--','bash',trapSigPath, '7z', 'a', '-t7z', tempPath, landPath]
+
 
 def versionFromPath(path):
     ''''''
@@ -168,10 +179,7 @@ def getLandPaths(lowVMain,highVMain):
                     allLandPaths.append(os.path.join(dir, item))
     return allLands, allLandPaths
 
-def dirSize(path):
-    result = subprocess.run(["du", "-s", path], stdout=subprocess.PIPE, text=True)
-    size = result.stdout.split('\t')[0]
-    return size
+
 
 def checkGrowth(landPath,landSizes):
     sizeNew = dirSize(landPath)

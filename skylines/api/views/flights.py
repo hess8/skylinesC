@@ -71,9 +71,9 @@ def extract_fpl_file(igc_filename):
     '''Extract fpl file from igc and save in files section'''
     ignoreTags = ['Name=','RaceStartDelay','StartTimeWindow',',']
     lines = readfileNoStrip(igc_filename)
-    backupdir = '/home/bret/servers/repo-skylinesC/skylinesC/filesBackup'
+    #backupdir = '/home/bret/servers/repo-skylinesC/skylinesC/filesBackup'
     filebase = igc_filename.split('/')[-1].replace('.igc','')
-    shutil.copy(igc_filename, backupdir + '/{}.igc'.format(filebase))
+    #shutil.copy(igc_filename, backupdir + '/{}.igc'.format(filebase))
     fplLines = []
     for line in lines:
         if "LCONFPL" in line:
@@ -89,7 +89,7 @@ def extract_fpl_file(igc_filename):
     keep = fplLines[:planeStart] + fplLines[nextSection:]
     fpl_file = igc_filename.replace('.igc','.fpl')
     writefile(keep, fpl_file)
-    shutil.copy(fpl_file, backupdir + '/{}.fpl'.format(filebase))
+    #shutil.copy(fpl_file, backupdir + '/{}.fpl'.format(filebase))
 
 def mark_user_notifications_read(pilot):
     if not request.user_id:

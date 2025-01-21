@@ -1,6 +1,6 @@
 '''Calls landscapes.py and createTorrents.py'''
 
-# Run with cpulimit -l 90 python3 production/utilities/updateZipped.py
+# Not used...use threads limits...Run with cpulimit -l 90 python3 production/utilities/updateZipped.py
 
 #loop
 # 1. checks links and folder size
@@ -24,42 +24,54 @@ import os,sys
 # from subprocess import Popen, PIPE
 # print(os.path.abspath(os.curdir))
 from time import sleep
-from common_util import readfileNoStrip, readfile, renameTry
+import platform
+from common_util import dirSize, readfileNoStrip, readfile, renameTry
 from uzsubs import *
 from createTorrents import createTorrents
 from datetime import datetime
+from time import perf_counter
 from landscapesPage import landscapesPage
 import signal
 
-looping = False
-loopWaitTime = 5 # min when idle before checking agin
+looping = True
+loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
+nThreads = {'linux': 1, 'windows': 6}
+windowsThreads = 6
 ## zipping ##
-lowVMain = '/mnt/E/landscapes/landscapesC2-main'
-lowVExt1 = None #'/mnt/E/landscapes/landscapesC2-main'
-lowVini = '/mnt/E/landscapes/landscapesC2-ini'
-lowVserver = '/mnt/E/landscapes/landscapesC2-server'
-highVMain = '/mnt/E/landscapes/landscapesC3-main'
-highVExt1 = None #'/mnt/E/landscapes/landscapesC3-main'
-highVini = '/mnt/E/landscapes/landscapesC3-ini'
-highVserver = '/mnt/E/landscapes/landscapesC3-server'
+linuxPathStart = '/mnt/'
+winPathStart = 'S:\\' #includes Samba windows mapped drive
+if platform.system() == 'Windows':
+    pathStart = winPathStart
+    linux = False
+else:
+    pathStart = linuxPathStart
+    linux = True
+lowVMain = os.path.join(pathStart,'E','landscapes','landscapesC2-main')
+lowVExt1 = None #os.path.join(pathStart,'E','landscapes','landscapesC2-main')
+lowVini = os.path.join(pathStart,'E','landscapes','landscapesC2-ini')
+lowVserver = os.path.join(pathStart,'E','landscapes','landscapesC2-server')
+highVMain = os.path.join(pathStart,'E','landscapes','landscapesC3-main')
+highVExt1 = None #os.path.join(pathStart,'E','landscapes','landscapesC3-main')
+highVini = os.path.join(pathStart,'E','landscapes','landscapesC3-ini')
+highVserver = os.path.join(pathStart,'E','landscapes','landscapesC3-server')
 lowerVersionLandDirs = [lowVMain,lowVini,lowVserver]
 higherVersionLandDirs = [highVMain,highVini,highVserver]
 landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
 versionMainDict = {'C2': lowVMain, 'C3': highVMain}
-zipMain = '/mnt/P/landscapes-zip'
-zipExtras = None #['/mnt/E/landscapes/zipped1']
+zipMain = os.path.join(pathStart,'P','landscapes-zip')
+zipExtras = None #[os.path.join(pathStart,'E','landscapes','zipped1']
 zipDirs = [zipMain] #+ zipExtras
 zipPathPrior = [zipMain] # [zipExtras[0],zipMain] # fill up in this order
-utilitiesDir = '/mnt/L/condor-related/skylinesC/production/utilities'
+utilitiesDir = os.path.join(pathStart,'L','condor-related','skylinesC','production','utilities')
 ## Landscapes page ##
-forceLandPage = True
+forceLandPage = False
 landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
 qbtorrentExeDir = os.path.join(zipMain,'qbt_exe')
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/' #only used if can get copying by guest control working again
 qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
 qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
 landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
-slcVMname = 'U14 (SkylinesC server) Current'
+slcVMname = 'U14 (SkylinesC server on Z) Current'
 # landHBS = '/home/bret/servers/repo-skylinesC/landscapes.test.hbs'
 ## Torrents ##
 
@@ -69,13 +81,15 @@ makeAllMagnets = False  # needed only occasionally
 
 ########
 print('Starting')
+startTime = perf_counter()
 if not os.path.exists(watchDir):
     os.mkdir(watchDir)
 
 #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
-checkLinksIni(lowVMain)
-checkLinksIni(highVMain)
-checkZipsLinks(zipMain)
+if linux:
+    checkLinksIni(lowVMain)
+    checkLinksIni(highVMain)
+    checkZipsLinks(zipMain)
 lowVList = os.listdir(lowVMain)
 highVList = os.listdir(highVMain)
 
@@ -117,8 +131,21 @@ highVList = os.listdir(highVMain)
 #initialize sizes
 landSizes = {}
 allLands, allLandPaths = getLandPaths(lowVMain, highVMain)
-for path in allLandPaths:
-    landSizes[path] = dirSize(path)
+print('Number of landscapes dirs:', len(allLands))
+# print('Reading sizes')
+# totSize = 0
+# sizeCount = 0
+# for path in allLandPaths: #run whether looping or not...don't want to zip if being written to
+#     sizeCount += 1
+#     # print(f" Reading sizes{sizeCount}...", end="\r")
+#     print('Reading sizes', end = '\r')
+#     # print('   ',end='\r')
+#     print(sizeCount,end='')#,end='\r')
+#     # print("\r", end='')
+#     # size = dirSize(path)
+#     # landSizes[path] = size
+#     # totSize += size
+# print('\nTotal size {} Gb'.format(totSize//1024**3))
 #remove .temp 7z files
 for zipDir in zipPathPrior:
     itemslist = os.listdir(zipDir)
@@ -176,19 +203,20 @@ while go:
     allZips = []
     allZipPaths = []
     #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
-    checkLinksIni(lowVMain)
-    checkLinksIni(highVMain)
-    checkZipsLinks(zipMain)
-    #### update symbolic links to landscape folders
+    if linux:
+        checkLinksIni(lowVMain)
+        checkLinksIni(highVMain)
+        checkZipsLinks(zipMain)
+        #### update symbolic links to landscape folders
 
-    updateSymlinks(landVersionsLists)
-    ## now all landscapes are represented in main folders ##
+        updateSymlinks(landVersionsLists)
+        ## now all landscapes are represented in main folders ##
 
     # get all landscape paths that have textures dir
     allLands, allLandPaths = getLandPaths(lowVMain,highVMain)
 
     #### update symbolic links to zip files
-    updateSymlinks([zipDirs])
+    if linux: updateSymlinks([zipDirs])
     # get all zip paths from zipMain
     items = os.listdir(zipMain)
     for item in items:
@@ -198,12 +226,13 @@ while go:
     ## now all zips are represented in zipMain ##
 
     # list dirs to be zipped
+    toTestGrowth = []
     toZip = []
+
     createdTorr = []
 
     for i, landPath, in enumerate(allLandPaths):
-        growing = checkGrowth(landPath,landSizes)
-        if os.path.basename(landPath)[0] == '!' or growing:
+        if os.path.basename(landPath)[0] == '!':
             continue
         land = allLands[i]
         files = os.listdir(landPath)
@@ -217,13 +246,28 @@ while go:
             sys.exit("Stop: .ini file can't be parsed {}".format(iniFilePath))
         condorVers = versionFromPath(landPath)
         zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
+
         if zipName not in allZips:
-            toZip.append({'zipName': zipName, 'landPath': landPath})
+            if checkGrowth(landPath, landSizes):
+                print('Will check {} for growth'.format(os.path.basename(landPath)))
+                toTestGrowth.append({'zipName': zipName, 'landPath': landPath})
+            else:
+                toZip.append({'zipName': zipName, 'landPath': landPath})
+
+    #this code works, but may be too short to check for growth, so for now let loop time determine it
+    # if len(toTestGrowth) > 0:
+    #     print('Waiting 30sec to check for growth')
+    #     sleep(60)
+    #     for landDict in toTestGrowth:
+    #         if not checkGrowth(landDict['landPath'], landSizes):
+    #             toZip.append(landDict)
+    #         else:
+    #             print('{} is still growing'.format(landDict['landPath']))
 
     if len(toZip) > 0:
         print("Will create these zips:")
-        for name in toZip:
-            print(name)
+        for land in toZip:
+            print(land['landPath'])
         # create new zips
         newZipped = []
         for newZip in toZip:
@@ -244,28 +288,24 @@ while go:
 
             if os.path.exists(zipPathTemp):
                 os.remove(zipPathTemp)
-            sevenzip(zipPathTemp, landPath2)
+            sevenzip(zipPathTemp, landPath2, nThreads)
             renameTry(zipPathTemp, zipPath)
             # except:
             #     print('Error creating {}'.format(zipPath))
+    if linux:
         updateSymlinks([zipDirs])
-    createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
-
-    if forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest):
-        landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
+        createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
+        if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
+            landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
 
     if looping:
-        for i in range(int(loopWaitTime)):
+        waitTime = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
+        for i in range(waitTime):
             print("\r", end='')
-            print('[loop {}]  Waiting {} min '.format(loopCount, loopWaitTime - i), flush=True, end='')
+            print('[loop {}]  Waiting {} min '.format(loopCount, waitTime - i), flush=True, end='')
             sleep(60)
         print("\r", end='')
-    else:
-        go = False
-
 print ("Done")
-
-
 #check that new torrents have been added to the qbittorrent servers
     # time.sleep(5)
     # shell = win32com.client.Dispatch("WScript.Shell")
