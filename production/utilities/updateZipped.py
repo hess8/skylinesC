@@ -29,6 +29,7 @@ from common_util import dirSize, readfileNoStrip, readfile, renameTry
 from uzsubs import *
 from createTorrents import createTorrents
 from datetime import datetime
+from time import perf_counter
 from landscapesPage import landscapesPage
 import signal
 
@@ -78,6 +79,7 @@ makeAllMagnets = False  # needed only occasionally
 
 ########
 print('Starting')
+startTime = perf_counter()
 if not os.path.exists(watchDir):
     os.mkdir(watchDir)
 
@@ -138,10 +140,10 @@ for path in allLandPaths: #run whether looping or not...don't want to zip if bei
     # print('   ',end='\r')
     print(sizeCount,end='')#,end='\r')
     # print("\r", end='')
-    size = dirSize(path)
-    landSizes[path] = size
-    totSize += size
-print('Total size', totSize)
+    # size = dirSize(path)
+    # landSizes[path] = size
+    # totSize += size
+print('\nTotal size {} Gb'.format(totSize//1024**3))
 #remove .temp 7z files
 for zipDir in zipPathPrior:
     itemslist = os.listdir(zipDir)
@@ -286,15 +288,12 @@ while go:
             print('[loop {}]  Waiting {} min '.format(loopCount, loopWaitTime - i), flush=True, end='')
             sleep(60)
         print("\r", end='')
-    else:
-        print('Waiting 1 min to omit growing folders from zips '.format(loopCount, loopWaitTime - i), flush=True, end='')
-        sleep(60)
-        print("\r", end='')
-        if loopCount > 1:
-            go = False
-
-
-
+    # else:
+    #     waitTime = int(max(0,60-(startTime-perf_counter())))
+    #     print('Waiting {} sec to omit growing folders from zips '.format(waitTime), flush=True, end='')
+    #     sleep(waitTime)
+    #     if loopCount > 1:
+    #         go = False
 print ("Done")
 #check that new torrents have been added to the qbittorrent servers
     # time.sleep(5)

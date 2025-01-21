@@ -1,8 +1,9 @@
 import os,sys,shutil
 import re
 import subprocess
+import platform
 from time import sleep
-from common_util import dirSize
+from common_util import dirSize, renameTry
 
 # slcServerIP = '192.168.1.14'
 # user = 'bret'
@@ -16,17 +17,22 @@ def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies 
         zipProc.terminate()
         sleep(0.1)
         sys.exit('Stopped by user')
-
-    for sig in [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]:
-        signal.signal(sig, signal_handler)
-    maxThreads = 4# With base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
-    trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
-    cmd = ['bash', trapSigPath, '7z', 'a', '-t7z', '-mmt={}'.format(maxThreads), tempPath, landPath]
-    # Following implements working cpulimit but signal handline doesn't work
-    # maxCPU = 80  # %
-    # cmd = ['cpulimit','-l',str(maxCPU),'--','bash',trapSigPath, '7z', 'a', '-t7z', tempPath, landPath]
+    if platform.system() == 'Linux':
+        sigs = [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]
+        for sig in sigs:
+            signal.signal(sig, signal_handler)
+        maxThreads = 1# On Soto with base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
+        trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
+        cmd = ['bash', trapSigPath, '7z', 'a', '-t7z', '-mmt={}'.format(maxThreads), tempPath, landPath]
+    elif platform.system() == 'Windows':
+        maxThreads = 12
+        cmd = ['C:\\Program Files\\7-Zip\\7z.exe', 'a', '-t7z', '-mmt={}'.format(maxThreads), tempPath, landPath]
     zipProc = subprocess.Popen(cmd)
     zipProc.communicate()
+        # Following implements working cpulimit but signal handline doesn't work
+    # maxCPU = 80  # %
+    # cmd = ['cpulimit','-l',str(maxCPU),'--','bash',trapSigPath, '7z', 'a', '-t7z', tempPath, landPath]
+
 
 def versionFromPath(path):
     ''''''
