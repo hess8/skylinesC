@@ -1,6 +1,6 @@
 '''Calls landscapes.py and createTorrents.py'''
 
-# Run with cpulimit -l 90 python3 production/utilities/updateZipped.py
+# Not used...use threads limits...Run with cpulimit -l 90 python3 production/utilities/updateZipped.py
 
 #loop
 # 1. checks links and folder size
@@ -25,22 +25,24 @@ import os,sys
 # print(os.path.abspath(os.curdir))
 from time import sleep
 import platform
-from common_util import readfileNoStrip, readfile, renameTry
+from common_util import dirSize, readfileNoStrip, readfile, renameTry
 from uzsubs import *
 from createTorrents import createTorrents
 from datetime import datetime
 from landscapesPage import landscapesPage
 import signal
 
-looping = True
+looping = False
 loopWaitTime = 5 # min when idle before checking agin
 ## zipping ##
 linuxPathStart = '/mnt/'
 winPathStart = 'S:\\' #includes Samba windows mapped drive
 if platform.system() == 'Windows':
     pathStart = winPathStart
+    createLinks = False
 else:
     pathStart =linuxPathStart
+    createLinks = True
 lowVMain = os.path.join(pathStart,'E','landscapes','landscapesC2-main')
 lowVExt1 = None #os.path.join(pathStart,'E','landscapes','landscapesC2-main')
 lowVini = os.path.join(pathStart,'E','landscapes','landscapesC2-ini')
@@ -80,9 +82,10 @@ if not os.path.exists(watchDir):
     os.mkdir(watchDir)
 
 #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
-checkLinksIni(lowVMain)
-checkLinksIni(highVMain)
-checkZipsLinks(zipMain)
+if createLinks:
+    checkLinksIni(lowVMain)
+    checkLinksIni(highVMain)
+    checkZipsLinks(zipMain)
 lowVList = os.listdir(lowVMain)
 highVList = os.listdir(highVMain)
 
@@ -124,8 +127,21 @@ highVList = os.listdir(highVMain)
 #initialize sizes
 landSizes = {}
 allLands, allLandPaths = getLandPaths(lowVMain, highVMain)
-for path in allLandPaths:
-    landSizes[path] = dirSize(path)
+print('Number of landscapes dirs:', len(allLands))
+print('Reading sizes')
+totSize = 0
+sizeCount = 0
+for path in allLandPaths: #run whether looping or not...don't want to zip if being written to
+    sizeCount += 1
+    # print(f" Reading sizes{sizeCount}...", end="\r")
+    print('Reading sizes', end = '\r')
+    # print('   ',end='\r')
+    print(sizeCount,end='')#,end='\r')
+    # print("\r", end='')
+    size = dirSize(path)
+    landSizes[path] = size
+    totSize += size
+print('Total size', totSize)
 #remove .temp 7z files
 for zipDir in zipPathPrior:
     itemslist = os.listdir(zipDir)
@@ -183,19 +199,20 @@ while go:
     allZips = []
     allZipPaths = []
     #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
-    checkLinksIni(lowVMain)
-    checkLinksIni(highVMain)
-    checkZipsLinks(zipMain)
-    #### update symbolic links to landscape folders
+    if createLinks:
+        checkLinksIni(lowVMain)
+        checkLinksIni(highVMain)
+        checkZipsLinks(zipMain)
+        #### update symbolic links to landscape folders
 
-    updateSymlinks(landVersionsLists)
-    ## now all landscapes are represented in main folders ##
+        updateSymlinks(landVersionsLists)
+        ## now all landscapes are represented in main folders ##
 
     # get all landscape paths that have textures dir
     allLands, allLandPaths = getLandPaths(lowVMain,highVMain)
 
     #### update symbolic links to zip files
-    updateSymlinks([zipDirs])
+    if createLinks: updateSymlinks([zipDirs])
     # get all zip paths from zipMain
     items = os.listdir(zipMain)
     for item in items:
@@ -209,8 +226,10 @@ while go:
     createdTorr = []
 
     for i, landPath, in enumerate(allLandPaths):
-        growing = checkGrowth(landPath,landSizes)
-        if os.path.basename(landPath)[0] == '!' or growing:
+        if os.path.basename(landPath)[0] == '!':
+            continue
+        growing = checkGrowth(landPath,landSizes) #run whether looping or not...don't want to zip if being written to
+        if growing:
             continue
         land = allLands[i]
         files = os.listdir(landPath)
@@ -255,7 +274,7 @@ while go:
             renameTry(zipPathTemp, zipPath)
             # except:
             #     print('Error creating {}'.format(zipPath))
-        updateSymlinks([zipDirs])
+    if createLinks: updateSymlinks([zipDirs])
     createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
 
     if forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest):
@@ -268,7 +287,11 @@ while go:
             sleep(60)
         print("\r", end='')
     else:
-        go = False
+        print('Waiting 1 min to omit growing folders from zips '.format(loopCount, loopWaitTime - i), flush=True, end='')
+        sleep(60)
+        print("\r", end='')
+        if loopCount > 1:
+            go = False
 
 
 

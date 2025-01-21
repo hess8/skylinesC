@@ -2,7 +2,7 @@ import os,sys,shutil
 import re
 import subprocess
 from time import sleep
-
+from common_util import dirSize
 
 # slcServerIP = '192.168.1.14'
 # user = 'bret'
@@ -19,11 +19,11 @@ def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies 
 
     for sig in [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]:
         signal.signal(sig, signal_handler)
-    maxCPU = 80  # %
     maxThreads = 4# With base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
     trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
-    cmd = ['bash', trapSigPath, '7z', 'a', '-t7z', '-mmt={}'.format(maxThreads),tempPath, landPath]
+    cmd = ['bash', trapSigPath, '7z', 'a', '-t7z', '-mmt={}'.format(maxThreads), tempPath, landPath]
     # Following implements working cpulimit but signal handline doesn't work
+    # maxCPU = 80  # %
     # cmd = ['cpulimit','-l',str(maxCPU),'--','bash',trapSigPath, '7z', 'a', '-t7z', tempPath, landPath]
     zipProc = subprocess.Popen(cmd)
     zipProc.communicate()
@@ -173,10 +173,7 @@ def getLandPaths(lowVMain,highVMain):
                     allLandPaths.append(os.path.join(dir, item))
     return allLands, allLandPaths
 
-def dirSize(path):
-    result = subprocess.run(["du", "-s", path], stdout=subprocess.PIPE, text=True)
-    size = result.stdout.split('\t')[0]
-    return size
+
 
 def checkGrowth(landPath,landSizes):
     sizeNew = dirSize(landPath)
