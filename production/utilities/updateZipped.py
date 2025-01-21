@@ -33,17 +33,17 @@ from time import perf_counter
 from landscapesPage import landscapesPage
 import signal
 
-looping = False
-loopWaitTime = 5 # min when idle before checking agin
+looping = True
+loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
 ## zipping ##
 linuxPathStart = '/mnt/'
 winPathStart = 'S:\\' #includes Samba windows mapped drive
 if platform.system() == 'Windows':
     pathStart = winPathStart
-    createLinks = False
+    linux = False
 else:
-    pathStart =linuxPathStart
-    createLinks = True
+    pathStart = linuxPathStart
+    linux = True
 lowVMain = os.path.join(pathStart,'E','landscapes','landscapesC2-main')
 lowVExt1 = None #os.path.join(pathStart,'E','landscapes','landscapesC2-main')
 lowVini = os.path.join(pathStart,'E','landscapes','landscapesC2-ini')
@@ -84,7 +84,7 @@ if not os.path.exists(watchDir):
     os.mkdir(watchDir)
 
 #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
-if createLinks:
+if linux:
     checkLinksIni(lowVMain)
     checkLinksIni(highVMain)
     checkZipsLinks(zipMain)
@@ -130,20 +130,20 @@ highVList = os.listdir(highVMain)
 landSizes = {}
 allLands, allLandPaths = getLandPaths(lowVMain, highVMain)
 print('Number of landscapes dirs:', len(allLands))
-print('Reading sizes')
-totSize = 0
-sizeCount = 0
-for path in allLandPaths: #run whether looping or not...don't want to zip if being written to
-    sizeCount += 1
-    # print(f" Reading sizes{sizeCount}...", end="\r")
-    print('Reading sizes', end = '\r')
-    # print('   ',end='\r')
-    print(sizeCount,end='')#,end='\r')
-    # print("\r", end='')
-    # size = dirSize(path)
-    # landSizes[path] = size
-    # totSize += size
-print('\nTotal size {} Gb'.format(totSize//1024**3))
+# print('Reading sizes')
+# totSize = 0
+# sizeCount = 0
+# for path in allLandPaths: #run whether looping or not...don't want to zip if being written to
+#     sizeCount += 1
+#     # print(f" Reading sizes{sizeCount}...", end="\r")
+#     print('Reading sizes', end = '\r')
+#     # print('   ',end='\r')
+#     print(sizeCount,end='')#,end='\r')
+#     # print("\r", end='')
+#     # size = dirSize(path)
+#     # landSizes[path] = size
+#     # totSize += size
+# print('\nTotal size {} Gb'.format(totSize//1024**3))
 #remove .temp 7z files
 for zipDir in zipPathPrior:
     itemslist = os.listdir(zipDir)
@@ -201,7 +201,7 @@ while go:
     allZips = []
     allZipPaths = []
     #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
-    if createLinks:
+    if linux:
         checkLinksIni(lowVMain)
         checkLinksIni(highVMain)
         checkZipsLinks(zipMain)
@@ -214,7 +214,7 @@ while go:
     allLands, allLandPaths = getLandPaths(lowVMain,highVMain)
 
     #### update symbolic links to zip files
-    if createLinks: updateSymlinks([zipDirs])
+    if linux: updateSymlinks([zipDirs])
     # get all zip paths from zipMain
     items = os.listdir(zipMain)
     for item in items:
@@ -224,14 +224,13 @@ while go:
     ## now all zips are represented in zipMain ##
 
     # list dirs to be zipped
+    toTestGrowth = []
     toZip = []
+
     createdTorr = []
 
     for i, landPath, in enumerate(allLandPaths):
         if os.path.basename(landPath)[0] == '!':
-            continue
-        growing = checkGrowth(landPath,landSizes) #run whether looping or not...don't want to zip if being written to
-        if growing:
             continue
         land = allLands[i]
         files = os.listdir(landPath)
@@ -245,13 +244,28 @@ while go:
             sys.exit("Stop: .ini file can't be parsed {}".format(iniFilePath))
         condorVers = versionFromPath(landPath)
         zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
+
         if zipName not in allZips:
-            toZip.append({'zipName': zipName, 'landPath': landPath})
+            if checkGrowth(landPath, landSizes):
+                print('Will check {} for growth'.format(os.path.basename(landPath)))
+                toTestGrowth.append({'zipName': zipName, 'landPath': landPath})
+            else:
+                toZip.append({'zipName': zipName, 'landPath': landPath})
+
+    #this code works, but may be too short to check for growth, so for now let loop time determine it
+    # if len(toTestGrowth) > 0:
+    #     print('Waiting 30sec to check for growth')
+    #     sleep(60)
+    #     for landDict in toTestGrowth:
+    #         if not checkGrowth(landDict['landPath'], landSizes):
+    #             toZip.append(landDict)
+    #         else:
+    #             print('{} is still growing'.format(landDict['landPath']))
 
     if len(toZip) > 0:
         print("Will create these zips:")
-        for name in toZip:
-            print(name)
+        for land in toZip:
+            print(land['landPath'])
         # create new zips
         newZipped = []
         for newZip in toZip:
@@ -276,16 +290,17 @@ while go:
             renameTry(zipPathTemp, zipPath)
             # except:
             #     print('Error creating {}'.format(zipPath))
-    if createLinks: updateSymlinks([zipDirs])
-    createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
-
-    if forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest):
-        landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
+    if linux:
+        updateSymlinks([zipDirs])
+        createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
+        if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
+            landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
 
     if looping:
-        for i in range(int(loopWaitTime)):
+        waitTime = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
+        for i in range(waitTime):
             print("\r", end='')
-            print('[loop {}]  Waiting {} min '.format(loopCount, loopWaitTime - i), flush=True, end='')
+            print('[loop {}]  Waiting {} min '.format(loopCount, waitTime - i), flush=True, end='')
             sleep(60)
         print("\r", end='')
     # else:
