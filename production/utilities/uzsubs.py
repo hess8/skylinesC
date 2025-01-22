@@ -3,12 +3,36 @@ import re
 import subprocess
 import platform
 from time import sleep
+from datetime import datetime
 from common_util import dirSize, renameTry
 
-# slcServerIP = '192.168.1.14'
-# user = 'bret'
-# keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
-# qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
+def modeDateAndAppend(toMatchDateTimeStamp, path, matching):
+    modTimeStamp = os.path.getmtime(path)
+    timeDiffAllowed = 15 #min
+    if abs(modTimeStamp - toMatchDateTimeStamp)/60 < timeDiffAllowed:
+        matching.append(path)
+    return matching
+def getFilesByModDate(path,toMatchDateTimeStamp,matching):
+    with os.scandir(path) as entries:
+        for entry in entries:
+            if entry.is_file():
+                entryPath = os.path.join(path,entry)
+                matching = modeDateAndAppend(toMatchDateTimeStamp, entryPath, matching)
+            elif entry.is_dir():
+                getFilesByModDate(entry.path,toMatchDateTimeStamp,matching) #recursive
+    return matching
+
+def lowVtoHighVFiles(landPath):
+    items = os.listdir(landPath)
+    condorHighVersionTimeStamp = None
+    for item in items:
+        if '.tm3' in item:
+            condorHighVersionTimeStamp = os.path.getmtime(os.path.join(landPath,item))
+            matching = []
+            return getFilesByModDate(landPath,condorHighVersionTimeStamp,matching)
+    else:
+        print('{} has not been upgraded to the new version')
+        return None
 
 def sevenzip(tempPath,landPath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
     import signal
@@ -27,12 +51,15 @@ def sevenzip(tempPath,landPath,nThreads): # -mmt limits number of threads -t7z s
     elif platform.system() == 'Windows':
         maxThreads = nThreads['windows']
         cmd = ['C:\\Program Files\\7-Zip\\7z.exe', 'a', '-t7z', '-mmt={}'.format(maxThreads), tempPath, landPath]
-    zipProc = subprocess.Popen(cmd)
-    zipProc.communicate()
+    try:
+        zipProc = subprocess.Popen(cmd)
+        zipProc.communicate()
+        print ("Windows 7zip done.  Run on Linux for links, torrents and page work")
+    except:
+        sys.exit('Stop. Problems with creation of {}'.format(os.path.basename(tempPath)))
         # Following implements working cpulimit but signal handline doesn't work
     # maxCPU = 80  # %
     # cmd = ['cpulimit','-l',str(maxCPU),'--','bash',trapSigPath, '7z', 'a', '-t7z', tempPath, landPath]
-
 
 def versionFromPath(path):
     ''''''
@@ -170,6 +197,7 @@ def getLandPaths(lowVMain,highVMain):
     allLandPaths = []
     for dir in [lowVMain,highVMain]:
         items = os.listdir(dir)
+        items.sort()
         for item in items:
             itemPath = os.path.join(dir, item)
             if os.path.isdir(itemPath) and \

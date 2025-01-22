@@ -31,17 +31,19 @@ from createTorrents import createTorrents
 from datetime import datetime
 from time import perf_counter
 from landscapesPage import landscapesPage
+import shutil
 import signal
 
 looping = True
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
 nThreads = {'linux': 1, 'windows': 6}
 windowsThreads = 6
+versions = ['C2','C3']
 ## zipping ##
 linuxPathStart = '/mnt/'
 winPathStart = 'S:\\' #includes Samba windows mapped drive
 if platform.system() == 'Windows':
-    print("Running on Windows...no work on links, and won't copy landscapes.hbs")
+    print("Running on Windows...no work on links, torrents or page")
     pathStart = winPathStart
     linux = False
 else:
@@ -129,24 +131,48 @@ highVList = os.listdir(highVMain)
 #             newname = item.replace('_C2','')
 #             name2 = newname.replace(landbase,landbase+'_C2')
 #             renameTry(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land!_name2))
-#initialize sizes
 landSizes = {}
 allLands, allLandPaths = getLandPaths(lowVMain, highVMain)
 print('Number of landscapes dirs:', len(allLands))
-# print('Reading sizes')
-# totSize = 0
-# sizeCount = 0
-# for path in allLandPaths: #run whether looping or not...don't want to zip if being written to
-#     sizeCount += 1
-#     # print(f" Reading sizes{sizeCount}...", end="\r")
-#     print('Reading sizes', end = '\r')
-#     # print('   ',end='\r')
-#     print(sizeCount,end='')#,end='\r')
-#     # print("\r", end='')
-#     # size = dirSize(path)
-#     # landSizes[path] = size
-#     # totSize += size
-# print('\nTotal size {} Gb'.format(totSize//1024**3))
+
+#temp check for higher Condor version files:
+checkCount = 0
+# remove unwanted folders
+# for i, landPath, in enumerate(allLandPaths):
+#     checkCount += 1
+#     print(checkCount, landPath)
+    # if lowVMain in landPath:
+    #     landBase,name = os.path.split(landPath)
+    #     badDir = os.path.join(landBase,'{}_newFiles'.format(name))
+    #     if os.path.exists(badDir):
+    #         shutil.rmtree(badDir)
+for i, landPath, in enumerate(allLandPaths):
+    checkCount += 1
+    print(checkCount, landPath)
+    if lowVMain in landPath:
+        landBase,name = os.path.split(landPath)
+        highVFilesDir = os.path.join(landBase,'{}_newFiles'.format(name))
+        if os.path.exists(highVFilesDir):
+            continue
+        highVFiles = lowVtoHighVFiles(landPath)
+        if not highVFiles:
+            continue
+        if highVFiles:
+            print(highVFiles)
+            os.mkdir(highVFilesDir)
+            for newFileExistingPath in highVFiles:
+                # newBase, newName = os.path.split(newFileExistingPath)
+                newFileSavePath = newFileExistingPath.replace(landPath,highVFilesDir)
+                dirsInPath = newFileSavePath.split(highVFilesDir)[1].split(os.sep)[:-1]
+                if len(dirsInPath) > 0: #create dir structure needed for file
+                    nextDirPath = highVFilesDir
+                    for dir in dirsInPath:
+                        nextDirPath = os.path.join(nextDirPath,dir)
+                        if not os.path.exists(nextDirPath):
+                            os.mkdir(nextDirPath)
+                shutil.copy2(newFileExistingPath, newFileSavePath)
+sys.exit('Stop.  Done copying high version new files')
+
 #remove .temp 7z files
 for zipDir in zipPathPrior:
     itemslist = os.listdir(zipDir)
@@ -160,14 +186,14 @@ go = True
 loopCount = 0
 while go:
     loopCount += 1
-        #if dir in main dirs begins with "-", remove all but .ini files and move to ini dirs
-        # rewrite this!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    for list in [lowVList,highVList]:
-        for item in list:
-            if list == lowVList: mainPath = lowVMain; ini = lowVini
-            elif list == highVList: mainPath = highVMain; ini = highVini
-            if item[0] == '-':
-                print("handling '-' files needs to be rewritten")
+
+    # '.' and '-' tags
+    # for list in [lowVList,highVList]:
+    #     for item in list:
+    #         if list == lowVList: mainPath = lowVMain; ini = lowVini
+    #         elif list == highVList: mainPath = highVMain; ini = highVini
+    #         if item[0] == '-':
+    #             print("handling '-' files needs to be rewritten")
                 # path = os.path.join(mainPath,item)
                 # for item2 in os.listdir(mainPath):
                 #     if not '.ini' in item2:
@@ -300,13 +326,13 @@ while go:
             landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
 
     if looping:
-        waitTime = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
-        for i in range(waitTime):
+        waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
+        for i in range(waitTimeMins):
             print("\r", end='')
-            print('[loop {}]  Waiting {} min '.format(loopCount, waitTime - i), flush=True, end='')
+            print('[loop {}]  Waiting {} min '.format(loopCount, waitTimeMins - i), flush=True, end='')
             sleep(60)
         print("\r", end='')
-print ("Windows work done.  Now run on Linux for links and to copy landscapes.hbs to U14")
+print('Done')
 #check that new torrents have been added to the qbittorrent servers
     # time.sleep(5)
     # shell = win32com.client.Dispatch("WScript.Shell")
