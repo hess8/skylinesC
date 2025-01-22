@@ -37,8 +37,9 @@ import signal
 looping = True
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
 nThreads = {'linux': 1, 'windows': 6}
-windowsThreads = 6
+
 versions = ['C2','C3']
+versionUpdateTag = '_to_{}'.format(versions[1])
 ## zipping ##
 linuxPathStart = '/mnt/'
 winPathStart = 'S:\\' #includes Samba windows mapped drive
@@ -132,9 +133,7 @@ highVList = os.listdir(highVMain)
 #             name2 = newname.replace(landbase,landbase+'_C2')
 #             renameTry(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land!_name2))
 landSizes = {}
-allLands, allLandPaths = getLandPaths(lowVMain, highVMain)
-print('Number of landscapes dirs:', len(allLands))
-
+allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag)
 #temp check for higher Condor version files:
 checkCount = 0
 # remove unwanted folders
@@ -146,19 +145,43 @@ checkCount = 0
     #     badDir = os.path.join(landBase,'{}_newFiles'.format(name))
     #     if os.path.exists(badDir):
     #         shutil.rmtree(badDir)
+# rename some folders
+# for landPath in allLandPaths:
+#     # badTags = ['_C2toC3_C2toC3','_toC3_toC3','_toC3',]
+#     badTags = ['_toC3']
+#     if lowVMain in landPath:
+#         for tag in badTags:
+#             if tag in landPath:
+#                 newName = landPath.replace(tag,'_to_C3')
+#                 renameTry(landPath, newName)
+#                 break
+
+for landPath in allLandPaths:
+    if versionUpdateTag in landPath and 'Airports' in os.listdir(landPath):
+        airportsDir = os.path.join(landPath,'Airports')
+        nAirports = len(os.listdir(airportsDir))
+        print('Airports',nAirports,landPath)
+
+        # landBase,name = os.path.split(landPath)
+        # badDir = os.path.join(landBase,name + versionUpdateTag)
+        # if os.path.exists(badDir):
+        #     newName = badDir.replace(versionUpdateTag,versionUpdateTag.replace('_C2toC3','_to_C3'))
+        #     renameTry(badDir,newName)
+allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag) #all folders to consider for zipping
+####
 for i, landPath, in enumerate(allLandPaths):
-    checkCount += 1
-    print(checkCount, landPath)
     if lowVMain in landPath:
+        if versionUpdateTag in landPath:
+            continue
         landBase,name = os.path.split(landPath)
-        highVFilesDir = os.path.join(landBase,'{}_newFiles'.format(name))
+        highVFilesDir = os.path.join(landBase, name + versionUpdateTag)
         if os.path.exists(highVFilesDir):
             continue
         highVFiles = lowVtoHighVFiles(landPath)
         if not highVFiles:
             continue
-        if highVFiles:
-            print(highVFiles)
+        else:
+            print(versionUpdateTag, highVFiles)
             os.mkdir(highVFilesDir)
             for newFileExistingPath in highVFiles:
                 # newBase, newName = os.path.split(newFileExistingPath)
@@ -171,7 +194,6 @@ for i, landPath, in enumerate(allLandPaths):
                         if not os.path.exists(nextDirPath):
                             os.mkdir(nextDirPath)
                 shutil.copy2(newFileExistingPath, newFileSavePath)
-sys.exit('Stop.  Done copying high version new files')
 
 #remove .temp 7z files
 for zipDir in zipPathPrior:
@@ -239,8 +261,7 @@ while go:
         updateSymlinks(landVersionsLists)
         ## now all landscapes are represented in main folders ##
 
-    # get all landscape paths that have textures dir
-    allLands, allLandPaths = getLandPaths(lowVMain,highVMain)
+    allLands, allLandPaths = getLandPaths(lowVMain,highVMain,versionUpdateTag)
 
     #### update symbolic links to zip files
     if linux: updateSymlinks([zipDirs])
@@ -261,6 +282,11 @@ while go:
     for i, landPath, in enumerate(allLandPaths):
         if os.path.basename(landPath)[0] == '!':
             continue
+        if versionUpdateTag in landPath:
+            base,name = os.path.split('')
+            zipName = name
+            toZip.append({'zipName': zipName, 'landPath': landPath})
+            continue
         land = allLands[i]
         files = os.listdir(landPath)
         iniFilePath = os.path.join(landPath,land+'.ini')
@@ -280,6 +306,8 @@ while go:
                 toTestGrowth.append({'zipName': zipName, 'landPath': landPath})
             else:
                 toZip.append({'zipName': zipName, 'landPath': landPath})
+        # add C2_C3 folder
+
 
     #this code works, but may be too short to check for growth, so for now let loop time determine it
     # if len(toTestGrowth) > 0:

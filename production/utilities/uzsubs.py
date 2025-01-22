@@ -192,7 +192,7 @@ def get_qbtExe(qbtorrentExeDir,slcFilesPath):
     else:
         sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")
 
-def getLandPaths(lowVMain,highVMain):
+def getLandPaths(lowVMain,highVMain, versionUpdateTag):
     allLands = []
     allLandPaths = []
     for dir in [lowVMain,highVMain]:
@@ -200,9 +200,8 @@ def getLandPaths(lowVMain,highVMain):
         items.sort()
         for item in items:
             itemPath = os.path.join(dir, item)
-            if os.path.isdir(itemPath) and \
-                'Textures' in os.listdir(itemPath) \
-                and 'WestGermany3' not in item and 'Slovenia' not in item: # note: isdir is true for a link pointing to a dir
+            if os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'WestGermany3' not in item and 'Slovenia' not in item)
+                                             or versionUpdateTag in item): # note: isdir is true for a link pointing to a dir
                     allLands.append(item)
                     allLandPaths.append(os.path.join(dir, item))
     return allLands, allLandPaths
