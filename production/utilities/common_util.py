@@ -50,12 +50,5 @@ def dirSize(path):
         size = subprocess.run(["du", "-s", path], stdout=subprocess.PIPE, text=True).stdout.split('\t')[0]
     else:
         size = 0
-        with os.scandir(path) as it:
-            for entry in it:
-                if entry.is_file():
-                    size += entry.stat().st_size
-                elif entry.is_dir():
-                    size += dirSize(entry.path) #recursive
-        return size
 
 

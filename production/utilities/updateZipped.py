@@ -31,16 +31,20 @@ from createTorrents import createTorrents
 from datetime import datetime
 from time import perf_counter
 from landscapesPage import landscapesPage
+import shutil
 import signal
 
 looping = True
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
 nThreads = {'linux': 1, 'windows': 6}
-windowsThreads = 6
+
+versions = ['C2','C3']
+versionUpdateTag = '_to_{}'.format(versions[1])
 ## zipping ##
 linuxPathStart = '/mnt/'
 winPathStart = 'S:\\' #includes Samba windows mapped drive
 if platform.system() == 'Windows':
+    print("Running on Windows...no work on links, torrents or page")
     pathStart = winPathStart
     linux = False
 else:
@@ -93,6 +97,9 @@ if linux:
 lowVList = os.listdir(lowVMain)
 highVList = os.listdir(highVMain)
 
+landSizes = {}
+allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag)
+
 # #temp
 # print(' removing files without tag')
 # for dir in zipDirs:
@@ -128,24 +135,73 @@ highVList = os.listdir(highVMain)
 #             newname = item.replace('_C2','')
 #             name2 = newname.replace(landbase,landbase+'_C2')
 #             renameTry(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land!_name2))
-#initialize sizes
-landSizes = {}
-allLands, allLandPaths = getLandPaths(lowVMain, highVMain)
-print('Number of landscapes dirs:', len(allLands))
-# print('Reading sizes')
-# totSize = 0
-# sizeCount = 0
-# for path in allLandPaths: #run whether looping or not...don't want to zip if being written to
-#     sizeCount += 1
-#     # print(f" Reading sizes{sizeCount}...", end="\r")
-#     print('Reading sizes', end = '\r')
-#     # print('   ',end='\r')
-#     print(sizeCount,end='')#,end='\r')
-#     # print("\r", end='')
-#     # size = dirSize(path)
-#     # landSizes[path] = size
-#     # totSize += size
-# print('\nTotal size {} Gb'.format(totSize//1024**3))
+
+#temp check for higher Condor version files:
+# remove unwanted folders
+# for i, landPath, in enumerate(allLandPaths):
+#     checkCount += 1
+#     print(checkCount, landPath)
+    # if lowVMain in landPath:
+    #     landBase,name = os.path.split(landPath)
+    #     badDir = os.path.join(landBase,'{}_newFiles'.format(name))
+    #     if os.path.exists(badDir):
+    #         shutil.rmtree(badDir)
+# rename some folders
+# for landPath in allLandPaths:
+#     # badTags = ['_C2toC3_C2toC3','_toC3_toC3','_toC3',]
+#     badTags = ['_toC3']
+#     if lowVMain in landPath:
+#         for tag in badTags:
+#             if tag in landPath:
+#                 newName = landPath.replace(tag,'_to_C3')
+#                 renameTry(landPath, newName)
+#                 break
+
+# for landPath in allLandPaths:
+#     if versionUpdateTag in landPath and 'Airports' in os.listdir(landPath):
+#         airportsDir = os.path.join(landPath,'Airports')
+#         nAirports = len(os.listdir(airportsDir))
+#         print('Airports',nAirports,landPath)
+
+        # landBase,name = os.path.split(landPath)
+        # badDir = os.path.join(landBase,name + versionUpdateTag)
+        # if os.path.exists(badDir):
+        #     newName = badDir.replace(versionUpdateTag,versionUpdateTag.replace('_C2toC3','_to_C3'))
+        #     renameTry(badDir,newName)
+####
+
+# Copy files from high version update
+for i, landPath, in enumerate(allLandPaths):
+    if lowVMain in landPath:
+        if versionUpdateTag in landPath: #create a link in the higher version folder
+            base,name = os.path.split(landPath)
+            linkDest = os.path.join(highVMain,name)
+            if not os.path.exists(linkDest):
+                if platform.system() == 'Linux':
+                    os.symlink(landPath,linkDest)
+            continue
+        landBase,name = os.path.split(landPath)
+        highVFilesDir = os.path.join(landBase, name + versionUpdateTag)
+        if os.path.exists(highVFilesDir):
+            continue
+        highVFiles = lowVtoHighVFiles(landPath)
+        if not highVFiles:
+            continue
+        else:
+            print(versionUpdateTag, highVFiles)
+            os.mkdir(highVFilesDir)
+            for newFileExistingPath in highVFiles:
+                # newBase, newName = os.path.split(newFileExistingPath)
+                newFileSavePath = newFileExistingPath.replace(landPath,highVFilesDir)
+                dirsInPath = newFileSavePath.split(highVFilesDir)[1].split(os.sep)[:-1]
+                if len(dirsInPath) > 0: #create dir structure needed for file
+                    nextDirPath = highVFilesDir
+                    for dir in dirsInPath:
+                        nextDirPath = os.path.join(nextDirPath,dir)
+                        if not os.path.exists(nextDirPath):
+                            os.mkdir(nextDirPath)
+                shutil.copy2(newFileExistingPath, newFileSavePath)
+
 #remove .temp 7z files
 for zipDir in zipPathPrior:
     itemslist = os.listdir(zipDir)
@@ -159,14 +215,14 @@ go = True
 loopCount = 0
 while go:
     loopCount += 1
-        #if dir in main dirs begins with "-", remove all but .ini files and move to ini dirs
-        # rewrite this!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    for list in [lowVList,highVList]:
-        for item in list:
-            if list == lowVList: mainPath = lowVMain; ini = lowVini
-            elif list == highVList: mainPath = highVMain; ini = highVini
-            if item[0] == '-':
-                print("handling '-' files needs to be rewritten")
+
+    # '.' and '-' tags
+    # for list in [lowVList,highVList]:
+    #     for item in list:
+    #         if list == lowVList: mainPath = lowVMain; ini = lowVini
+    #         elif list == highVList: mainPath = highVMain; ini = highVini
+    #         if item[0] == '-':
+    #             print("handling '-' files needs to be rewritten")
                 # path = os.path.join(mainPath,item)
                 # for item2 in os.listdir(mainPath):
                 #     if not '.ini' in item2:
@@ -212,8 +268,7 @@ while go:
         updateSymlinks(landVersionsLists)
         ## now all landscapes are represented in main folders ##
 
-    # get all landscape paths that have textures dir
-    allLands, allLandPaths = getLandPaths(lowVMain,highVMain)
+    allLands, allLandPaths = getLandPaths(lowVMain,highVMain,versionUpdateTag)
 
     #### update symbolic links to zip files
     if linux: updateSymlinks([zipDirs])
@@ -234,6 +289,12 @@ while go:
     for i, landPath, in enumerate(allLandPaths):
         if os.path.basename(landPath)[0] == '!':
             continue
+        if versionUpdateTag in landPath:
+            base,name = os.path.split(landPath)
+            zipName = name + '.7z'
+            if zipName not in allZips:
+                toZip.append({'zipName': zipName, 'landPath': landPath})
+            continue
         land = allLands[i]
         files = os.listdir(landPath)
         iniFilePath = os.path.join(landPath,land+'.ini')
@@ -253,6 +314,8 @@ while go:
                 toTestGrowth.append({'zipName': zipName, 'landPath': landPath})
             else:
                 toZip.append({'zipName': zipName, 'landPath': landPath})
+        # add C2_C3 folder
+
 
     #this code works, but may be too short to check for growth, so for now let loop time determine it
     # if len(toTestGrowth) > 0:
@@ -299,13 +362,13 @@ while go:
             landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
 
     if looping:
-        waitTime = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
-        for i in range(waitTime):
+        waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
+        for i in range(waitTimeMins):
             print("\r", end='')
-            print('[loop {}]  Waiting {} min '.format(loopCount, waitTime - i), flush=True, end='')
+            print('[loop {}]  Waiting {} min '.format(loopCount, waitTimeMins - i), flush=True, end='')
             sleep(60)
         print("\r", end='')
-print ("Done")
+print('Done')
 #check that new torrents have been added to the qbittorrent servers
     # time.sleep(5)
     # shell = win32com.client.Dispatch("WScript.Shell")
