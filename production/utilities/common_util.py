@@ -1,5 +1,6 @@
 import os,subprocess
 import platform
+import shutil
 # import pathlib
 
 def readfile(filepath):
@@ -24,7 +25,7 @@ def renameTry(oldname, newname):
     #     print('Renamed {} to {}'.format(oldname, newname))
     # except:
     #     sys.exit("Stop: can't rename {} to {}".format(oldname, newname))
-    os.rename(oldname, newname)
+    shutil.move(oldname, newname)
     print('Renamed {} to {}'.format(oldname, newname))
 
 def copy_file_to_guest(vm_name, host_file_path, guest_file_path,usernm,passwd):

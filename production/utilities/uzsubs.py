@@ -125,12 +125,12 @@ def checkZipsLinks(zipMain):
             print('Removed broken link {}'.format(mainItem))
 
 
-def checkLinksIni(mainDir):
+def checkLinksIni(mainDir,versionUpdateTag):
     '''Checks for bad links and addresses mismatch between landscape and ini names'''
     mainDirList = os.listdir(mainDir)
     for mainItem in mainDirList:
-        if 'sweden' in mainItem:
-            xx=0
+        if versionUpdateTag in mainItem:
+            continue
         itemMainPath = os.path.join(mainDir, mainItem)
         if not os.path.isdir(itemMainPath): continue
         if 'no_ini' in mainItem or not os.path.isdir(itemMainPath):

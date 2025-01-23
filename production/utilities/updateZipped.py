@@ -91,8 +91,8 @@ if not os.path.exists(watchDir):
 
 #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
 if linux:
-    checkLinksIni(lowVMain)
-    checkLinksIni(highVMain)
+    checkLinksIni(lowVMain, versionUpdateTag)
+    checkLinksIni(highVMain, versionUpdateTag)
     checkZipsLinks(zipMain)
 lowVList = os.listdir(lowVMain)
 highVList = os.listdir(highVMain)
@@ -146,14 +146,14 @@ allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag)
     #     badDir = os.path.join(landBase,'{}_newFiles'.format(name))
     #     if os.path.exists(badDir):
     #         shutil.rmtree(badDir)
-# rename some folders
+# # rename some folders
 # for landPath in allLandPaths:
 #     # badTags = ['_C2toC3_C2toC3','_toC3_toC3','_toC3',]
-#     badTags = ['_toC3']
+#     badTags = [' ']
 #     if lowVMain in landPath:
 #         for tag in badTags:
 #             if tag in landPath:
-#                 newName = landPath.replace(tag,'_to_C3')
+#                 newName = landPath.replace(tag,'_')
 #                 renameTry(landPath, newName)
 #                 break
 
@@ -181,7 +181,7 @@ for i, landPath, in enumerate(allLandPaths):
                     os.symlink(landPath,linkDest)
             continue
         landBase,name = os.path.split(landPath)
-        highVFilesDir = os.path.join(landBase, name + versionUpdateTag)
+        highVFilesDir = os.path.join(landBase, name + versionUpdateTag).replace(' ', '_')
         if os.path.exists(highVFilesDir):
             continue
         highVFiles = lowVtoHighVFiles(landPath)
@@ -254,14 +254,12 @@ while go:
                     else:
                         os.remove(os.path.join(dir1,landscape,item))
 
-    # keepRunning = False
-    # while keepRunning: #loops infinitely
     allZips = []
     allZipPaths = []
     #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
     if linux:
-        checkLinksIni(lowVMain)
-        checkLinksIni(highVMain)
+        checkLinksIni(lowVMain,versionUpdateTag)
+        checkLinksIni(highVMain,versionUpdateTag)
         checkZipsLinks(zipMain)
         #### update symbolic links to landscape folders
 
