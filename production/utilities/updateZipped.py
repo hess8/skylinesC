@@ -247,7 +247,6 @@ while go:
                         os.remove(os.path.join(dir1,landscape,item))
 
     allZips = []
-    allZipPaths = []
     #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
     if linux:
         checkLinksIni(lowVMain,versionUpdateTag)
@@ -267,7 +266,7 @@ while go:
     for item in items:
         if item.split('.')[-1] == '7z':
             allZips.append(item)
-            allZipPaths.append(os.path.join(zipMain, item))
+    all
     ## now all zips are represented in zipMain ##
 
     # list dirs to be zipped
@@ -278,11 +277,14 @@ while go:
     lowVLands = []
     for i, landPath, in enumerate(allLandPaths):
         land = allLands[i]
-        lowVLands.append(land)
+        if lowVMain in landPath:
+            lowVLands.append(land)
 
     for i, landPath, in enumerate(allLandPaths):
         land = allLands[i]
-        if os.path.basename(landPath)[0] == '!' or (highVMain in landPath and os.path.islink(landPath) and land in lowVLands):
+        if 'Alps' in land:
+            xx=0
+        if os.path.basename(landPath)[0] == '!' or (highVMain in landPath and land in lowVLands):
             continue                      # no zips of C2 folders linked to C3
         if versionUpdateTag in landPath:
             base,name = os.path.split(landPath)
