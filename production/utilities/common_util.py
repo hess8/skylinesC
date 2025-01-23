@@ -56,6 +56,6 @@ def dirSize(path):
                     size += entry.stat().st_size
                 elif entry.is_dir():
                     size += dirSize(entry.path)
-        return size
+    return size
 
 
