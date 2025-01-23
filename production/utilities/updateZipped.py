@@ -25,7 +25,7 @@ import os,sys
 # print(os.path.abspath(os.curdir))
 from time import sleep
 import platform
-from common_util import dirSize, readfileNoStrip, readfile, renameTry
+from common import dirSize, readfileNoStrip, readfile, renameTry
 from uzsubs import *
 from createTorrents import createTorrents
 from datetime import datetime
@@ -90,10 +90,10 @@ if not os.path.exists(watchDir):
     os.mkdir(watchDir)
 
 #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
-if linux:
-    checkLinksIni(lowVMain, versionUpdateTag)
-    checkLinksIni(highVMain, versionUpdateTag)
-    checkZipsLinks(zipMain)
+# if linux:
+#     checkLinksIni(lowVMain, versionUpdateTag)
+#     checkLinksIni(highVMain, versionUpdateTag)
+#     checkZipsLinks(zipMain)
 lowVList = os.listdir(lowVMain)
 highVList = os.listdir(highVMain)
 
@@ -136,16 +136,14 @@ allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag)
 #             name2 = newname.replace(landbase,landbase+'_C2')
 #             renameTry(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land!_name2))
 
-#temp check for higher Condor version files:
-# remove unwanted folders
+
+#remove unwanted folders
 # for i, landPath, in enumerate(allLandPaths):
-#     checkCount += 1
-#     print(checkCount, landPath)
-    # if lowVMain in landPath:
-    #     landBase,name = os.path.split(landPath)
-    #     badDir = os.path.join(landBase,'{}_newFiles'.format(name))
-    #     if os.path.exists(badDir):
-    #         shutil.rmtree(badDir)
+#     if highVMain in landPath:
+#         if os.path.islink(landPath):
+#             os.unlink(landPath)
+
+
 # # rename some folders
 # for landPath in allLandPaths:
 #     # badTags = ['_C2toC3_C2toC3','_toC3_toC3','_toC3',]
@@ -175,10 +173,11 @@ for i, landPath, in enumerate(allLandPaths):
     if lowVMain in landPath:
         if versionUpdateTag in landPath: #create a link in the higher version folder
             base,name = os.path.split(landPath)
-            linkDest = os.path.join(highVMain,name)
-            if not os.path.exists(linkDest):
+            linkSource = landPath.replace(versionUpdateTag,'') # the full landscape folder
+            linkDest = os.path.join(highVMain,name.replace(versionUpdateTag,''))
+            if not os.path.islink(linkDest):
                 if platform.system() == 'Linux':
-                    os.symlink(landPath,linkDest)
+                    os.symlink(linkSource,linkDest)
             continue
         landBase,name = os.path.split(landPath)
         highVFilesDir = os.path.join(landBase, name + versionUpdateTag).replace(' ', '_')
@@ -202,13 +201,6 @@ for i, landPath, in enumerate(allLandPaths):
                             os.mkdir(nextDirPath)
                 shutil.copy2(newFileExistingPath, newFileSavePath)
 
-#remove .temp 7z files
-for zipDir in zipPathPrior:
-    itemslist = os.listdir(zipDir)
-    for item in itemslist:
-        file_name, extension = os.path.splitext(item)
-        if extension == '.temp':
-            os.remove(os.path.join(zipDir,item))
 print('Write code for:   Start the landscape dir name with "-" to move landscape to ini only directory')
 print('Write code for:   Start the landscape dir name with "." to move landscape to other landscapes folder')
 go = True

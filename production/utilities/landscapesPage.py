@@ -1,10 +1,11 @@
 import shutil
+from common import landscapesMap
 
 def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr):
     '''Called by updateZipped.py'''
     import os, sys
     sys.path.append('/mnt/L/condor-related/skylinesC/skylines')
-    from common_util import copy_file_to_guest, readfile, readfileNoStrip, writefile
+    from common import copy_file_to_guest, readfile, readfileNoStrip, writefile
 
     def column_table_head(version):
         lines.append('     <div class="column"> \n')
@@ -50,18 +51,27 @@ def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMna
     # copy_file_to_guest(slcVMname,qbtExeLocal,qbtExeDest,username, passwd)
 
     # get torrents
-    dirlist = os.listdir(zipMain)
+    dirList = os.listdir(zipMain)
+    dirList.sort()
     names = []
     sizes = []
-    for item in dirlist:
+    for item in dirList:
+        print(item)
+        if 'AA3' in item:
+            xx=0
         if item.split('.')[-1]=='torrent':
             name = item.split('.torrent')[0]
+            if '_to_C3' in name: #don't add if there is a version 3 for this landscape
+                landName1 = name.replace('_to_C3.7z','')
+                landName2 = landName1.replace('_',' ')
+                if landName1 in landscapesMap or landName2 in landscapesMap:
+                    continue
             names.append(name)
     names.sort()
     lowVersionList = []
     highVersionList = []
     for i, name in enumerate(names):
-        if '_C3' in name:
+        if '_C3' in name and '_to_C3' not in name and 'AA2v' not in name:
             highVersionList.append(name)
         else:
             lowVersionList.append(name)

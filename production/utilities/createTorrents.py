@@ -42,6 +42,7 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
     os.chdir(workDir)
 
     zipDirList = os.listdir(zipDir)
+    torrentsList = []
     toMakeTorrent  = []
     toMakeMagnet = []
 
@@ -59,16 +60,20 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
                 if torrTime < zipTime or os.stat(torrPath).st_size == 0:
                     os.remove(zipPath)
                     toMakeTorrent.append(zipPath)
+                else:
+                    torrentsList.append(torrPath)
+                    if not os.path.exists(magPath):
+                        toMakeMagnet.append(zipPath)
             else:
                 toMakeTorrent.append(zipPath)
             # check for outdated magnet
             if makeAllMagnets:
-                toMakeMagnet.append(torrPath)
+                toMakeMagnet.append(zipPath)
             elif os.path.exists(magPath):
                 magTime = os.path.getmtime(magPath)
                 if magTime < zipTime or os.stat(magPath).st_size == 0:
                     os.remove(magPath)
-                    toMakeMagnet.append(torrPath)
+                    toMakeMagnet.append(zipPath)
         # Check for missing .7z file
         if extension(item) in ['.torrent', '.magnet'] and not os.path.exists(filename(item)):
             os.remove(item)
@@ -86,7 +91,7 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             print('{}.torrent created'.format(zippedPath))
             createdTorr.append(toMakeTorrent)
             magPath = zippedPath.replace('.7z','.magnet')
-            toMakeMagnet.append(magPath)
+            toMakeMagnet.append(zipPath)
         except:
             sys.exit('Stop.Error in torrent {}'.format(zippedPath))
         try:
@@ -109,9 +114,9 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
                 if os.path.exists(magnetVersion):
                     os.remove(magnetVersion)
                     print('removed',magnetVersion)
+    # make new magnets
     for magPath in toMakeMagnet:
         createMagnet(magPath)
-
     # print('Torrents done')
     return createdTorr
 
