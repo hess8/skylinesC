@@ -274,17 +274,22 @@ while go:
     toTestGrowth = []
     toZip = []
     createdTorr = []
+    #get low version list to avoid making zips of C2 folders linked to C3
+    lowVLands = []
+    for i, landPath, in enumerate(allLandPaths):
+        land = allLands[i]
+        lowVLands.append(land)
 
     for i, landPath, in enumerate(allLandPaths):
-        if os.path.basename(landPath)[0] == '!':
-            continue
+        land = allLands[i]
+        if os.path.basename(landPath)[0] == '!' or (highVMain in landPath and os.path.islink(landPath) and land in lowVLands):
+            continue                      # no zips of C2 folders linked to C3
         if versionUpdateTag in landPath:
             base,name = os.path.split(landPath)
             zipName = name.replace(' ', '_') + '.7z'
             if zipName not in allZips:
                 toZip.append({'zipName': zipName, 'landPath': landPath})
             continue
-        land = allLands[i]
         files = os.listdir(landPath)
         iniFilePath = os.path.join(landPath,land+'.ini')
         lines = readfile(iniFilePath)
