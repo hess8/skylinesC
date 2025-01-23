@@ -281,7 +281,6 @@ while go:
     # list dirs to be zipped
     toTestGrowth = []
     toZip = []
-
     createdTorr = []
 
     for i, landPath, in enumerate(allLandPaths):
@@ -289,7 +288,7 @@ while go:
             continue
         if versionUpdateTag in landPath:
             base,name = os.path.split(landPath)
-            zipName = name + '.7z'
+            zipName = name.replace(' ', '_') + '.7z'
             if zipName not in allZips:
                 toZip.append({'zipName': zipName, 'landPath': landPath})
             continue
@@ -332,8 +331,8 @@ while go:
         # create new zips
         newZipped = []
         for newZip in toZip:
-            print('skipping zipping')
-            continue
+            # print('skipping zipping')
+            # continue
             landPath2 = newZip['landPath']
             if 'C3' in landPath2:
                 mainDir = highVMain

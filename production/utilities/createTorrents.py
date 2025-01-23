@@ -46,7 +46,7 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
     toMakeMagnet = []
 
     for item in zipDirList:
-        if 'Cascade_' in item:
+        if 'Cascade_' in item :
             xx = 0
         if extension(item) == '.7z':
             zipPath = os.path.join(zipDir, item)
@@ -56,7 +56,7 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             # Check for outdated torrent
             if os.path.exists(torrPath):
                 torrTime = os.path.getmtime(torrPath)
-                if torrTime < zipTime:
+                if torrTime < zipTime or os.stat(torrPath).st_size == 0:
                     os.remove(zipPath)
                     toMakeTorrent.append(zipPath)
             else:
@@ -66,7 +66,7 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
                 toMakeMagnet.append(torrPath)
             elif os.path.exists(magPath):
                 magTime = os.path.getmtime(magPath)
-                if os.stat(magPath).st_size == 0 or magTime < zipTime:
+                if magTime < zipTime or os.stat(magPath).st_size == 0:
                     os.remove(magPath)
                     toMakeMagnet.append(torrPath)
         # Check for missing .7z file
