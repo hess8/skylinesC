@@ -12,6 +12,7 @@ def modeDateAndAppend(toMatchDateTimeStamp, path, matching):
     if abs(modTimeStamp - toMatchDateTimeStamp)/60 < timeDiffAllowed:
         matching.append(path)
     return matching
+
 def getFilesByModDate(path,toMatchDateTimeStamp,matching):
     with os.scandir(path) as entries:
         for entry in entries:

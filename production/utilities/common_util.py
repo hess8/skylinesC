@@ -45,10 +45,17 @@ def copy_file_to_guest(vm_name, host_file_path, guest_file_path,usernm,passwd):
         print(e.output)
 
 def dirSize(path):
-    # This is very slow sum(f.stat().st_size for f in pathlib.Path(path).glob('**/*') if f.is_file())
+    # This suggestion is very slow: sum(f.stat().st_size for f in pathlib.Path(path).glob('**/*') if f.is_file())
     if platform.system() == 'Linux':
         size = subprocess.run(["du", "-s", path], stdout=subprocess.PIPE, text=True).stdout.split('\t')[0]
     else:
         size = 0
+        with os.scandir(path) as entries:
+            for entry in entries:
+                if entry.is_file():
+                    size += entry.stat().st_size
+                elif entry.is_dir():
+                    size += dirSize(entry.path)
+        return size
 
 
