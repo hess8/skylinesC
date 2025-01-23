@@ -3,6 +3,35 @@ import platform
 import shutil
 # import pathlib
 
+landscapesMap = {
+    'AA2': 'AA3',
+    'Arequipa_Peru':'Arequipa_Peru3',
+    'Atacama_C2': 'Atacama3',
+    'Cajamarca_Peru': 'Cajamarca_Peru3',
+    'Centro_Italia': 'Centro_Italia3',
+    'Coquimbo_SanJuan': 'CoquimboSanJuan3',
+    'Cuzco_Peru': 'Cuzco_Peru3',
+    'Husacaran': 'Huascaran_Peru3',
+    'Lima_Peru': 'Lima_Peru3',
+    'North-UK2': 'United Kingdom3',
+    'Pumalin_Park': 'Pumalin_Park3',
+    'Scotland3': 'United Kingdom3',
+    'Scotland4': 'United Kingdom3',
+    'Slovenia2': 'Slovenia3',
+    'South East UK3': 'United Kingdom3',
+    'Talca_Los_Andes': 'TalcaLosAndes3',
+    'Temuco_Los_Andes': 'TemucoLosAndes3',
+    'Transandino': 'Transandino3',
+    'United Kingdom': 'United Kingdom3',
+    'West_Balkans': 'West_Balkans3',
+    'West_Balkans2': 'West_Balkans3',
+    'West_Patgonia': 'West_Patagonia3',
+    'West-UK': 'United Kingdom3',
+    'West-UK2': 'United Kingdom3',
+    '': '',
+}
+
+
 def readfile(filepath):
     with open(filepath) as f:
         lines = f.read().splitlines() #strips the lines of \n

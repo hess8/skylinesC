@@ -4,7 +4,7 @@ import subprocess
 import platform
 from time import sleep
 from datetime import datetime
-from common_util import dirSize, renameTry
+from common import dirSize, renameTry
 
 def modeDateAndAppend(toMatchDateTimeStamp, path, matching):
     modTimeStamp = os.path.getmtime(path)
