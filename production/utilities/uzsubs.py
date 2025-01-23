@@ -31,7 +31,7 @@ def lowVtoHighVFiles(landPath):
             matching = []
             return getFilesByModDate(landPath,condorHighVersionTimeStamp,matching)
     else:
-        print('{} has not been upgraded to the new version')
+        print('{} has not been upgraded to the new version'.format(landPath))
         return None
 
 def sevenzip(tempPath,landPath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
@@ -90,12 +90,6 @@ def updateSymlinks(dirsLists):
                         makeLink(mainPath, otherPath)
                 elif not os.path.islink(otherPath):
                     makeLink(mainPath, otherPath)
-        #remove .temp files
-        if 'zip' in mainDir.lower():
-            for dir in list:
-                for item in os.listdir(dir):
-                    if 'zip' in item and item.split('.')[-1] == 'temp':
-                        os.remove(os.path.join(dir,item))
 
 def get_free_space_gb(drive):
     """Gets the free space on the specified drive in GB."""

@@ -97,6 +97,9 @@ if linux:
 lowVList = os.listdir(lowVMain)
 highVList = os.listdir(highVMain)
 
+landSizes = {}
+allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag)
+
 # #temp
 # print(' removing files without tag')
 # for dir in zipDirs:
@@ -132,10 +135,8 @@ highVList = os.listdir(highVMain)
 #             newname = item.replace('_C2','')
 #             name2 = newname.replace(landbase,landbase+'_C2')
 #             renameTry(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land!_name2))
-landSizes = {}
-allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag)
+
 #temp check for higher Condor version files:
-checkCount = 0
 # remove unwanted folders
 # for i, landPath, in enumerate(allLandPaths):
 #     checkCount += 1
@@ -156,22 +157,28 @@ checkCount = 0
 #                 renameTry(landPath, newName)
 #                 break
 
-for landPath in allLandPaths:
-    if versionUpdateTag in landPath and 'Airports' in os.listdir(landPath):
-        airportsDir = os.path.join(landPath,'Airports')
-        nAirports = len(os.listdir(airportsDir))
-        print('Airports',nAirports,landPath)
+# for landPath in allLandPaths:
+#     if versionUpdateTag in landPath and 'Airports' in os.listdir(landPath):
+#         airportsDir = os.path.join(landPath,'Airports')
+#         nAirports = len(os.listdir(airportsDir))
+#         print('Airports',nAirports,landPath)
 
         # landBase,name = os.path.split(landPath)
         # badDir = os.path.join(landBase,name + versionUpdateTag)
         # if os.path.exists(badDir):
         #     newName = badDir.replace(versionUpdateTag,versionUpdateTag.replace('_C2toC3','_to_C3'))
         #     renameTry(badDir,newName)
-allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag) #all folders to consider for zipping
 ####
+
+# Copy files from high version update
 for i, landPath, in enumerate(allLandPaths):
     if lowVMain in landPath:
-        if versionUpdateTag in landPath:
+        if versionUpdateTag in landPath: #create a link in the higher version folder
+            base,name = os.path.split(landPath)
+            linkDest = os.path.join(highVMain,name)
+            if not os.path.exists(linkDest):
+                if platform.system() == 'Linux':
+                    os.symlink(landPath,linkDest)
             continue
         landBase,name = os.path.split(landPath)
         highVFilesDir = os.path.join(landBase, name + versionUpdateTag)
@@ -283,9 +290,10 @@ while go:
         if os.path.basename(landPath)[0] == '!':
             continue
         if versionUpdateTag in landPath:
-            base,name = os.path.split('')
-            zipName = name
-            toZip.append({'zipName': zipName, 'landPath': landPath})
+            base,name = os.path.split(landPath)
+            zipName = name + '.7z'
+            if zipName not in allZips:
+                toZip.append({'zipName': zipName, 'landPath': landPath})
             continue
         land = allLands[i]
         files = os.listdir(landPath)
