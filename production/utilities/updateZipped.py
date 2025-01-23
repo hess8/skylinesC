@@ -332,6 +332,8 @@ while go:
         # create new zips
         newZipped = []
         for newZip in toZip:
+            print('skipping zipping')
+            continue
             landPath2 = newZip['landPath']
             if 'C3' in landPath2:
                 mainDir = highVMain
