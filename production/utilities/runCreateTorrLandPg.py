@@ -14,8 +14,7 @@ slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/' #only
 qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
 qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
 landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
-slcVMname = 'U14 (SkylinesC server on Z) Current'
-# landHBS = '/home/bret/servers/repo-skylinesC/landscapes.test.hbs'
+slcVMname = 'U14 (SkylinesC server) Current'
 ## Torrents ##
 
 trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"

@@ -1,10 +1,11 @@
 import shutil
+from common import landscapesMap
 
-def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr):
+def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr):
     '''Called by updateZipped.py'''
     import os, sys
     sys.path.append('/mnt/L/condor-related/skylinesC/skylines')
-    from common_util import copy_file_to_guest, readfile, readfileNoStrip, writefile
+    from common import copy_file_to_guest, readfile, readfileNoStrip, writefile
 
     def column_table_head(version):
         lines.append('     <div class="column"> \n')
@@ -17,7 +18,7 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
 
     def tableRow():
         lines.append('\t<tr> \n')
-        magfilepath = zipDir + os.sep + '{}.magnet'.format(name)
+        magfilepath = zipMain + os.sep + '{}.magnet'.format(name)
         try:
             magline = readfileNoStrip(magfilepath)[0].strip() + trackerStr
         except:
@@ -25,7 +26,7 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
         lines.append('\t\t\t\t<td> <a href="{}">'.format(magline) + ' {{fa-icon "download" size="sm"}}' + ' {} </a> </td> \n'.format(name.replace('.7z','')))
         # lines.append('\t<td> <a href="{}"> magnet </a> </td> '.format(magline))
         GiB = 1.074e+9
-        size = os.stat(os.path.join(zipDir, name)).st_size
+        size = os.stat(os.path.join(zipMain, name)).st_size
         if size > 0.1 * GiB:
             sizeStr = '{:.1f} GB"'.format(size / GiB)
         else:
@@ -50,18 +51,27 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
     # copy_file_to_guest(slcVMname,qbtExeLocal,qbtExeDest,username, passwd)
 
     # get torrents
-    dirlist = os.listdir(zipDir)
+    dirList = os.listdir(zipMain)
+    dirList.sort()
     names = []
     sizes = []
-    for item in dirlist:
+    for item in dirList:
+        print(item)
+        if 'AA3' in item:
+            xx=0
         if item.split('.')[-1]=='torrent':
             name = item.split('.torrent')[0]
+            if '_to_C3' in name: #don't add if there is a version 3 for this landscape
+                landName1 = name.replace('_to_C3.7z','')
+                landName2 = landName1.replace('_',' ')
+                if landName1 in landscapesMap or landName2 in landscapesMap:
+                    continue
             names.append(name)
     names.sort()
     lowVersionList = []
     highVersionList = []
     for i, name in enumerate(names):
-        if '_C3' in name:
+        if '_C3' in name and '_to_C3' not in name and 'AA2v' not in name:
             highVersionList.append(name)
         else:
             lowVersionList.append(name)
@@ -97,7 +107,7 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
     lines.append('  .row {display: flex;} \n')
     lines.append('  .column { \n')
     lines.append('   width: {}px; \n'.format(colWidth))
-    lines.append('   padding: {}}px; \n'.format(colPad))
+    lines.append('   padding: {}px; \n'.format(colPad))
     lines.append('   } \n')
     lines.append('   </style> \n')
 
@@ -114,5 +124,5 @@ def landscapesPage(zipDir,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMnam
     lines.append(' </div> \n')
     lines.append('</BasePage> \n')
     writefile(lines,landPageDest)
-    copy_file_to_guest('U14 (SkylinesC server on Z) Current', landPageDest, landHBS, username, passwd)
+    copy_file_to_guest(slcVMname, landPageDest, landHBS, username, passwd)
     print('New landscapes page created for {} files'.format(len(names)))

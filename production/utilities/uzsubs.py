@@ -1,32 +1,66 @@
 import os,sys,shutil
 import re
 import subprocess
+import platform
 from time import sleep
+from datetime import datetime
+from common import dirSize, renameTry
 
+def modeDateAndAppend(toMatchDateTimeStamp, path, matching):
+    modTimeStamp = os.path.getmtime(path)
+    timeDiffAllowed = 15 #min
+    if abs(modTimeStamp - toMatchDateTimeStamp)/60 < timeDiffAllowed:
+        matching.append(path)
+    return matching
 
-slcServerIP = '192.168.1.14'
-user = 'bret'
-keyFile = 'C:\\Users\\Bret\\.ssh\\id_ed25519' #only shows up in PowerShell
-qbtLogLinks = ['Einsteinqbittorrent.log.lnk','Sotoqbittorrent.log.lnk']
+def getFilesByModDate(path,toMatchDateTimeStamp,matching):
+    with os.scandir(path) as entries:
+        for entry in entries:
+            if entry.is_file():
+                entryPath = os.path.join(path,entry)
+                matching = modeDateAndAppend(toMatchDateTimeStamp, entryPath, matching)
+            elif entry.is_dir():
+                getFilesByModDate(entry.path,toMatchDateTimeStamp,matching) #recursive
+    return matching
 
-def sevenzip(tempPath,landPath): # -mmt limits number of threads -t7z specifies type of archive
+def lowVtoHighVFiles(landPath):
+    items = os.listdir(landPath)
+    condorHighVersionTimeStamp = None
+    for item in items:
+        if '.tm3' in item:
+            condorHighVersionTimeStamp = os.path.getmtime(os.path.join(landPath,item))
+            matching = []
+            return getFilesByModDate(landPath,condorHighVersionTimeStamp,matching)
+    else:
+        print('{} has not been upgraded to the new version'.format(landPath))
+        return None
+
+def sevenzip(tempPath,landPath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
     import signal
     def signal_handler(sig, frame):
         sleep(0.1)
         zipProc.terminate()
         sleep(0.1)
         sys.exit('Stopped by user')
-
-    for sig in [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]:
-        signal.signal(sig, signal_handler)
-    maxCPU = 80  # %
-    maxThreads = 4# With base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
-    trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
-    cmd = ['bash', trapSigPath, '7z', 'a', '-t7z', '-mmt={}'.format(maxThreads),tempPath, landPath]
-    # Following implements working cpulimit but signal handline doesn't work
+    if platform.system() == 'Linux':
+        sigs = [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]
+        for sig in sigs:
+            signal.signal(sig, signal_handler)
+        maxThreads = nThreads['linux']# On Soto with base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
+        trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
+        cmd = ['bash', trapSigPath, '7z', 'a', '-t7z', '-mmt={}'.format(maxThreads), tempPath, landPath]
+    elif platform.system() == 'Windows':
+        maxThreads = nThreads['windows']
+        cmd = ['C:\\Program Files\\7-Zip\\7z.exe', 'a', '-t7z', '-mmt={}'.format(maxThreads), tempPath, landPath]
+    try:
+        zipProc = subprocess.Popen(cmd)
+        zipProc.communicate()
+        print ("Windows 7zip done.  Run on Linux for links, torrents and page work")
+    except:
+        sys.exit('Stop. Problems with creation of {}'.format(os.path.basename(tempPath)))
+        # Following implements working cpulimit but signal handline doesn't work
+    # maxCPU = 80  # %
     # cmd = ['cpulimit','-l',str(maxCPU),'--','bash',trapSigPath, '7z', 'a', '-t7z', tempPath, landPath]
-    zipProc = subprocess.Popen(cmd)
-    zipProc.communicate()
 
 def versionFromPath(path):
     ''''''
@@ -57,12 +91,6 @@ def updateSymlinks(dirsLists):
                         makeLink(mainPath, otherPath)
                 elif not os.path.islink(otherPath):
                     makeLink(mainPath, otherPath)
-        #remove .temp files
-        if 'zip' in mainDir.lower():
-            for dir in list:
-                for item in os.listdir(dir):
-                    if 'zip' in item and item.split('.')[-1] == 'temp':
-                        os.remove(os.path.join(dir,item))
 
 def get_free_space_gb(drive):
     """Gets the free space on the specified drive in GB."""
@@ -97,12 +125,12 @@ def checkZipsLinks(zipMain):
             print('Removed broken link {}'.format(mainItem))
 
 
-def checkLinksIni(mainDir):
+def checkLinksIni(mainDir,versionUpdateTag):
     '''Checks for bad links and addresses mismatch between landscape and ini names'''
     mainDirList = os.listdir(mainDir)
     for mainItem in mainDirList:
-        if 'sweden' in mainItem:
-            xx=0
+        if versionUpdateTag in mainItem:
+            continue
         itemMainPath = os.path.join(mainDir, mainItem)
         if not os.path.isdir(itemMainPath): continue
         if 'no_ini' in mainItem or not os.path.isdir(itemMainPath):
@@ -159,24 +187,21 @@ def get_qbtExe(qbtorrentExeDir,slcFilesPath):
     else:
         sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")
 
-def getLandPaths(lowVMain,highVMain):
+def getLandPaths(lowVMain,highVMain, versionUpdateTag):
     allLands = []
     allLandPaths = []
     for dir in [lowVMain,highVMain]:
         items = os.listdir(dir)
+        items.sort()
         for item in items:
             itemPath = os.path.join(dir, item)
-            if os.path.isdir(itemPath) and \
-                'Textures' in os.listdir(itemPath) \
-                and 'WestGermany3' not in item and 'Slovenia' not in item: # note: isdir is true for a link pointing to a dir
+            if os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'WestGermany3' not in item and 'Slovenia' not in item)
+                                             or versionUpdateTag in item): # note: isdir is true for a link pointing to a dir
                     allLands.append(item)
                     allLandPaths.append(os.path.join(dir, item))
     return allLands, allLandPaths
 
-def dirSize(path):
-    result = subprocess.run(["du", "-s", path], stdout=subprocess.PIPE, text=True)
-    size = result.stdout.split('\t')[0]
-    return size
+
 
 def checkGrowth(landPath,landSizes):
     sizeNew = dirSize(landPath)
