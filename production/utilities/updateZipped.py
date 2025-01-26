@@ -36,7 +36,7 @@ import signal
 
 looping = True
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
-nThreads = {'linux': 1, 'windows': 6}
+nThreads = {'linux': 1, 'windows': 10}
 
 versions = ['C2','C3']
 versionUpdateTag = '_to_{}'.format(versions[1])
