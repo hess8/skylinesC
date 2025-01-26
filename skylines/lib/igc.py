@@ -9,6 +9,7 @@ from . import base36
 from .string import import_ascii, import_alnum
 from skylines.lib.types import is_string, is_bytes
 from skylines.lib.files import read_file, write_file
+from skylines.common import readfileNoStrip, writefile, readfile
 
 hfdte_re = re.compile(br"HFDTE(\d{6})", re.IGNORECASE)
 hfgid_re = re.compile(br"HFGID\s*GLIDER\s*ID\s*:(.*)", re.IGNORECASE)
@@ -59,18 +60,33 @@ def read_igc_headers(f):
 
     return igc_headers
 
-def read_condor_fpl(file):
-    lines = read_file(file)
-    fpl_lines = []
-    landscape = None
-    strsExcluded = ['Class','Name=','Water','Fixed','CGBia','RandS'] #5 characters
-    for line in lines[-400:]:
-        if line.startswith(b"LCONFPL") and line[7:12] not in strsExcluded: #first 5 characters after LCONFPLg
-            fpl_lines.append(line)
+def extract_fpl_file(igc_filename):
+    '''Extract fpl file from igc and save in files section'''
+    ignoreTags = ['Name=','RaceStartDelay','StartTimeWindow',',']
+    lines = readfileNoStrip(igc_filename)
+    #backupdir = '/home/bret/servers/repo-skylinesC/skylinesC/filesBackup'
+    filebase = igc_filename.split('/')[-1].replace('.igc','')
+    #shutil.copy(igc_filename, backupdir + '/{}.igc'.format(filebase))
+    fplLines = []
+    for line in lines:
+        if "LCONFPL" in line:
+            fplLines.append(line.replace('LCONFPL',''))
             if "landscape" in line.lower():
                 landscape = line.split("=")[1].strip()
 
-    return fpl_lines, landscape
+    planeStart = None
+    #remove Plane section, which changes with user
+    for il,line in enumerate(fplLines):
+        if 'plane' in line.lower():
+            planeStart = il
+        if planeStart and '[' in line:
+            nextSection = il
+            break
+    keep = fplLines[:planeStart] + fplLines[nextSection:]
+    fpl_file = igc_filename.replace('.igc','.fpl')
+    writefile(keep, fpl_file)
+    # shutil.copy(fpl_file, backupdir + '/{}.fpl'.format(filebase))
+    return keep, landscape
 
 def parse_logger_id(line):
     # non IGC loggers may use more than 3 characters as unique ID.

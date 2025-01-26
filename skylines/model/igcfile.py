@@ -8,7 +8,7 @@ from sqlalchemy.types import Integer, DateTime, String, Unicode, Date
 
 from skylines.database import db
 from skylines.lib import files
-from skylines.lib.igc import read_igc_headers, read_condor_fpl
+from skylines.lib.igc import read_igc_headers, extract_fpl_file
 from skylines.lib.string import unicode_to_str
 from skylines.lib.md5 import file_md5
 from skylines.lib.files import read_file, write_file
@@ -59,7 +59,7 @@ class IGCFile(db.Model):
     def update_igc_headers(self):
         path = files.filename_to_path(self.filename)
         igc_headers = read_igc_headers(path)
-        condor_fpl,landscape = read_condor_fpl(path)
+        condor_fpl,landscape = extract_fpl_file(path)
         if igc_headers is None:
             return
 
