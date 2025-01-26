@@ -28,9 +28,12 @@ import platform
 from common import dirSize, readfileNoStrip, readfile, renameTry
 from uzsubs import *
 from common import landscapesMap
-from createTorrents import createTorrents
-from datetime import datetime
 from time import perf_counter
+import argparse
+parser = argparse.ArgumentParser(description="Description of your script")
+parser.add_argument("-r", "--reverse", help="Goes through landscapes and zip lists in reverse order", action="store_true")
+args = parser.parse_args()
+reverse = False
 
 looping = True
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
@@ -102,15 +105,21 @@ allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag)
 print('extracting zips of lands not updated')
 # destination = 'A:\\landscapes'
 for dir in zipDirs:
-    list = sorted(os.listdir(dir))
-    for item in list:
-
+    dirList = sorted(os.listdir(dir))
+    if args.reverse:
+        dirList = sorted(os.listdir(dir), reverse=True)
+    for item in dirList:
         match = re.search(r'(.*)\.v.*\.7z$',item)
         if not match or '_C3' in item:
             continue
         name_underscores = match.group(1)
         archive = os.path.join(dir,item)
-        trueLandName = sevenName(archive)
+        response = sevenName(archive)
+        if 'error' in response.lower():
+            os.remove(archive)
+            continue
+        else:
+            trueLandName = response
         convertedFilesPath = os.path.join(dir,name_underscores + '_to_C3')
         destination = os.path.join('A:\\landscapes',trueLandName)
         if os.path.exists(convertedFilesPath) or os.path.exists(destination) or trueLandName in landscapesMap:
@@ -339,7 +348,7 @@ while go:
             #     print('Error creating {}'.format(zipPath))
     if linux:
         updateSymlinks([zipDirs])
-        createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
+        createdTorr = createTrrents(zipMain,watchDir,makeAllMagnets)
         if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
             landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
 

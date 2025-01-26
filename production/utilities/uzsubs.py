@@ -52,6 +52,7 @@ def upLevelDel(highestDir,upperName,lowerName):
     lowerDir = os.path.join(renamedUpper, lowerName)
     shutil.move(lowerDir,highestDir)
     shutil.rmtree(renamedUpper)
+    print('removed',renamedUpper)
 
 def sevenName(archivePath): # -mmt limits number of threads -t7z specifies type of archive
     if platform.system() == 'Linux':
@@ -60,16 +61,18 @@ def sevenName(archivePath): # -mmt limits number of threads -t7z specifies type 
         cmd = ['C:\\Program Files\\7-Zip\\7z.exe', 'l', archivePath]
     output = None
     try:
-        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True,shell=True)
-        output = zipProc.communicate()[0]
+        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,shell=True)
+        output, error = zipProc.communicate()
+        if zipProc.returncode != 0:
+            raise subprocess.CalledProcessError(zipProc.returncode, zipProc.args, output=output, stderr=error)
         lines = output.splitlines()
-        for il,line in enumerate(lines):
-            if "---------" in line:
-                name = lines[il+1].split('0')[-1].strip()
-                break
-    except:
-        sys.exit('Stop. Problems with getting name of landscape from zip')
-    return name
+    except subprocess.CalledProcessError as e:
+        print("Error output:", e.stderr)
+        return e.stderr
+    for il,line in enumerate(lines):
+        if "---------" in line:
+            name = lines[il+1].split('0')[-1].strip()
+            return name
 
 def sevenTest(archivePath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
     if platform.system() == 'Linux':
@@ -85,8 +88,11 @@ def sevenTest(archivePath,nThreads): # -mmt limits number of threads -t7z specif
     output = None
     try:
         zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True,shell=True)
-        output = zipProc.communicate()[0]
-    except:
+        output, error = zipProc.communicate()
+        if zipProc.returncode != 0:
+            raise subprocess.CalledProcessError(zipProc.returncode, zipProc.args, output=output, stderr=error)
+    except subprocess.CalledProcessError as e:
+        print("Error output:", e.stderr)
         sys.exit('Stop. Problems with testing')
     return output
 
@@ -99,7 +105,6 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
     elif action == 'extraction':
         command = 'x' # 'e' doesn't keep dir structure
         folderPath += extractTemp
-
     if platform.system() == 'Linux':
         sigs = [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]
         for sig in sigs:
@@ -111,9 +116,16 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
         maxThreads = nThreads['windows']
         cmd = ['C:\\Program Files\\7-Zip\\7z.exe', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, '-o'+folderPath]
     output = None
-    # try:
-    zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True, shell=True)
-    output = zipProc.communicate()[0]
+    try:
+        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True, shell=True)
+        output = zipProc.communicate()[0]
+        if zipProc.returncode != 0:
+            raise subprocess.CalledProcessError(zipProc.returncode, zipProc.args, output=output, stderr=error)
+    except subprocess.CalledProcessError as e:
+        print("Error output:", e.stderr)
+        sys.exit('Stop. Problems with {}'.format(action))
+        return e.stderr
+    lines = output.splitlines()
     # output = zipProc.stdout
     print(output)
     # print ("Windows 7zip done.  Run on Linux for links, torrents and page work")
@@ -127,8 +139,7 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
         finalPath = os.path.join(base,trueLandName)
         renameTry(folderPath, finalPath)
         upLevelDel(base,trueLandName,trueLandName)
-    # except:
-    #     sys.exit('Stop. Problems with {}'.format(action))
+    print()
     return output
         # Following implements working cpulimit but signal handline doesn't work
     # maxCPU = 80  # %
