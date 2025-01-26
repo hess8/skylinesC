@@ -27,16 +27,14 @@ from time import sleep
 import platform
 from common import dirSize, readfileNoStrip, readfile, renameTry
 from uzsubs import *
+from common import landscapesMap
 from createTorrents import createTorrents
 from datetime import datetime
 from time import perf_counter
-from landscapesPage import landscapesPage
-import shutil
-import signal
 
 looping = True
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
-nThreads = {'linux': 1, 'windows': 10}
+nThreads = {'linux': 1, 'windows': 12}
 
 versions = ['C2','C3']
 versionUpdateTag = '_to_{}'.format(versions[1])
@@ -104,20 +102,21 @@ allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag)
 print('extracting zips of lands not updated')
 # destination = 'A:\\landscapes'
 for dir in zipDirs:
-    list = os.listdir(dir)
+    list = sorted(os.listdir(dir))
     for item in list:
+
         match = re.search(r'(.*)\.v.*\.7z$',item)
-        if match:
-            name = match.group(1)
-        else:
+        if not match or '_C3' in item:
             continue
+        else:
+            name = match.group(1)
+        archive = os.path.join(dir,item)
         convertedFilesPath = os.path.join(dir,name + '_to_C3')
         destination = os.path.join('A:\\landscapes',name)
-        if os.path.exists(convertedFilesPath) or os.path.exists(destination):
+        if os.path.exists(convertedFilesPath) or os.path.exists(destination) or name in landscapesMap:
             continue
-        archive = os.path.join(dir,item)
-        print('Extracting {} to {}'.format(convertedFilesPath,destination))
-        # output = sevenTest(archive,nThreads)
+        print('Extracting {} to {}'.format(archive,destination))
+        sevenName(archive)
         output = sevenzip("extraction", archive, destination, nThreads)
         if "Can't open as archive" in output:
             os.remove(archive)
@@ -336,7 +335,7 @@ while go:
             if os.path.exists(zipPathTemp):
                 os.remove(zipPathTemp)
             output = sevenzip("compression", zipPathTemp, landPath2, nThreads)
-            renameTry(zipPathTemp, zipPath)
+
             # except:
             #     print('Error creating {}'.format(zipPath))
     if linux:

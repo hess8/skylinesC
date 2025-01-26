@@ -41,6 +41,36 @@ def signal_handler(sig, frame):
     zipProc.terminate()
     sleep(0.1)
     sys.exit('Stopped by user')
+
+def upLevelDel(highestDir,upperName,lowerName):
+    '''Renames upper level dir to mark for deletion.
+     Moves the lowerPath to the highestDir level (where upperDir is.
+     Deletes the '''
+    upperDir = os.path.join(highestDir,upperName)
+    renamedUpper = upperDir+'_to_del'
+    renameTry(upperDir, renamedUpper)
+    lowerDir = os.path.join(renamedUpper, lowerName)
+    shutil.move(lowerDir,highestDir)
+    shutil.rmtree(renamedUpper)
+
+def sevenName(archivePath): # -mmt limits number of threads -t7z specifies type of archive
+    if platform.system() == 'Linux':
+        cmd = ['7z', 'l', archivePath]
+    elif platform.system() == 'Windows':
+        cmd = ['C:\\Program Files\\7-Zip\\7z.exe', 'l', archivePath]
+    output = None
+    try:
+        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True,shell=True)
+        output = zipProc.communicate()[0]
+        lines = output.splitlines()
+        for il,line in enumerate(lines):
+            if "---------" in line:
+                name = lines[il+1].split('0')[-1].strip()
+                break
+    except:
+        sys.exit('Stop. Problems with getting name of landscape from zip')
+    return name
+
 def sevenTest(archivePath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
     if platform.system() == 'Linux':
         sigs = [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]
@@ -54,19 +84,21 @@ def sevenTest(archivePath,nThreads): # -mmt limits number of threads -t7z specif
         cmd = ['C:\\Program Files\\7-Zip\\7z.exe', 't', '-mmt={}'.format(maxThreads), archivePath]
     output = None
     try:
-        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True)
+        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True,shell=True)
         output = zipProc.communicate()[0]
     except:
         sys.exit('Stop. Problems with testing')
     return output
 
-
-def sevenzip(action,archivePath,outputPath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
+def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
+    compressTemp  = '.temp'
+    extractTemp = '_temp'
     if action == 'compression':
         command = 'a'
-
+        archivePath += compressTemp
     elif action == 'extraction':
-        command = 'e'
+        command = 'x' # 'e' doesn't keep dir structure
+        folderPath += extractTemp #this landscape name may have too many underscores in it.
 
     if platform.system() == 'Linux':
         sigs = [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]
@@ -74,24 +106,34 @@ def sevenzip(action,archivePath,outputPath,nThreads): # -mmt limits number of th
             signal.signal(sig, signal_handler)
         maxThreads = nThreads['linux']# On Soto with base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
         trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
-        cmd = ['bash', trapSigPath, '7z', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, '-o'+outputPath]
+        cmd = ['bash', trapSigPath, '7z', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, '-o'+folderPath]
     elif platform.system() == 'Windows':
         maxThreads = nThreads['windows']
-        cmd = ['C:\\Program Files\\7-Zip\\7z.exe', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, '-o'+outputPath]
+        cmd = ['C:\\Program Files\\7-Zip\\7z.exe', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, '-o'+folderPath]
     output = None
-    try:
-        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True)
-        output = zipProc.communicate()[0]
-        # output = zipProc.stdout
-        print(output)
-        # print ("Windows 7zip done.  Run on Linux for links, torrents and page work")
-        print("7zip finished {}".format(action))
-    except:
-        sys.exit('Stop. Problems with {}'.format(action))
+    # try:
+    zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True, shell=True)
+    output = zipProc.communicate()[0]
+    # output = zipProc.stdout
+    print(output)
+    # print ("Windows 7zip done.  Run on Linux for links, torrents and page work")
+    print("7zip finished {}".format(action))
+    if action == 'compression':
+        finalPath = archivePath - compressTemp
+        renameTry(archivePath, finalPath)
+    elif action == 'extraction':
+        base, _ = os.path.split(folderPath)
+        #Now we can get the landscape name without our possibly added underscores:
+        name = os.listdir(folderPath)[0]
+        finalPath = os.path.join(base,name)
+        renameTry(folderPath, finalPath)
+        upLevelDel(base,name,name)
+    # except:
+    #     sys.exit('Stop. Problems with {}'.format(action))
     return output
         # Following implements working cpulimit but signal handline doesn't work
     # maxCPU = 80  # %
-    # cmd = ['cpulimit','-l',str(maxCPU),'--','bash',trapSigPath, '7z', 'a', '-t7z', archivePath, outputPath]
+    # cmd = ['cpulimit','-l',str(maxCPU),'--','bash',trapSigPath, '7z', 'a', '-t7z', archivePath, folderPath]
 
 def versionFromPath(path):
     ''''''
