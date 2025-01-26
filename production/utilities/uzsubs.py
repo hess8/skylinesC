@@ -98,7 +98,7 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
         archivePath += compressTemp
     elif action == 'extraction':
         command = 'x' # 'e' doesn't keep dir structure
-        folderPath += extractTemp #this landscape name may have too many underscores in it.
+        folderPath += extractTemp
 
     if platform.system() == 'Linux':
         sigs = [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]
@@ -123,11 +123,10 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
         renameTry(archivePath, finalPath)
     elif action == 'extraction':
         base, _ = os.path.split(folderPath)
-        #Now we can get the landscape name without our possibly added underscores:
-        name = os.listdir(folderPath)[0]
-        finalPath = os.path.join(base,name)
+        trueLandName = sevenName(archivePath)
+        finalPath = os.path.join(base,trueLandName)
         renameTry(folderPath, finalPath)
-        upLevelDel(base,name,name)
+        upLevelDel(base,trueLandName,trueLandName)
     # except:
     #     sys.exit('Stop. Problems with {}'.format(action))
     return output

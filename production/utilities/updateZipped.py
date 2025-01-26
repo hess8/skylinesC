@@ -108,15 +108,14 @@ for dir in zipDirs:
         match = re.search(r'(.*)\.v.*\.7z$',item)
         if not match or '_C3' in item:
             continue
-        else:
-            name = match.group(1)
+        name_underscores = match.group(1)
         archive = os.path.join(dir,item)
-        convertedFilesPath = os.path.join(dir,name + '_to_C3')
-        destination = os.path.join('A:\\landscapes',name)
-        if os.path.exists(convertedFilesPath) or os.path.exists(destination) or name in landscapesMap:
+        trueLandName = sevenName(archive)
+        convertedFilesPath = os.path.join(dir,name_underscores + '_to_C3')
+        destination = os.path.join('A:\\landscapes',trueLandName)
+        if os.path.exists(convertedFilesPath) or os.path.exists(destination) or trueLandName in landscapesMap:
             continue
         print('Extracting {} to {}'.format(archive,destination))
-        sevenName(archive)
         output = sevenzip("extraction", archive, destination, nThreads)
         if "Can't open as archive" in output:
             os.remove(archive)
