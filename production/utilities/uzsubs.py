@@ -2,6 +2,7 @@ import os,sys,shutil
 import re
 import subprocess
 import platform
+import signal
 from time import sleep
 from datetime import datetime
 from common import dirSize, renameTry
@@ -35,21 +36,37 @@ def lowVtoHighVFiles(landPath):
         print('{} has not been upgraded to the new version'.format(landPath))
         return None
 
-def sevenzip(action,archivePath,outputPath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
-    import signal
-    def signal_handler(sig, frame):
-        sleep(0.1)
-        zipProc.terminate()
-        sleep(0.1)
-        sys.exit('Stopped by user')
+def signal_handler(sig, frame):
+    sleep(0.1)
+    zipProc.terminate()
+    sleep(0.1)
+    sys.exit('Stopped by user')
+def sevenTest(archivePath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
+    if platform.system() == 'Linux':
+        sigs = [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]
+        for sig in sigs:
+            signal.signal(sig, signal_handler)
+        maxThreads = nThreads['linux']# On Soto with base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
+        trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
+        cmd = ['bash', trapSigPath, '7z', 't', '-mmt={}'.format(maxThreads), archivePath]
+    elif platform.system() == 'Windows':
+        maxThreads = nThreads['windows']
+        cmd = ['C:\\Program Files\\7-Zip\\7z.exe', 't', '-mmt={}'.format(maxThreads), archivePath]
+    output = None
+    try:
+        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True)
+        output = zipProc.communicate()[0]
+    except:
+        sys.exit('Stop. Problems with testing')
+    return output
 
+
+def sevenzip(action,archivePath,outputPath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
     if action == 'compression':
         command = 'a'
-        outputSwitch = '' #outputPath is file we specify
 
     elif action == 'extraction':
         command = 'e'
-        outputSwitch = '-o' #outputPath is directory to hold the archive created
 
     if platform.system() == 'Linux':
         sigs = [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]
@@ -57,17 +74,21 @@ def sevenzip(action,archivePath,outputPath,nThreads): # -mmt limits number of th
             signal.signal(sig, signal_handler)
         maxThreads = nThreads['linux']# On Soto with base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
         trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
-        cmd = ['bash', trapSigPath, '7z', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, outputSwitch+outputPath]
+        cmd = ['bash', trapSigPath, '7z', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, '-o'+outputPath]
     elif platform.system() == 'Windows':
         maxThreads = nThreads['windows']
-        cmd = ['C:\\Program Files\\7-Zip\\7z.exe', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, outputSwitch+outputPath]
+        cmd = ['C:\\Program Files\\7-Zip\\7z.exe', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, '-o'+outputPath]
+    output = None
     try:
-        zipProc = subprocess.Popen(cmd)
-        zipProc.communicate()
+        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True)
+        output = zipProc.communicate()[0]
+        # output = zipProc.stdout
+        print(output)
         # print ("Windows 7zip done.  Run on Linux for links, torrents and page work")
         print("7zip finished {}".format(action))
     except:
         sys.exit('Stop. Problems with {}'.format(action))
+    return output
         # Following implements working cpulimit but signal handline doesn't work
     # maxCPU = 80  # %
     # cmd = ['cpulimit','-l',str(maxCPU),'--','bash',trapSigPath, '7z', 'a', '-t7z', archivePath, outputPath]

@@ -102,22 +102,25 @@ allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag)
 
 #temp
 print('extracting zips of lands not updated')
-destination = 'A:\\landscapes'
+# destination = 'A:\\landscapes'
 for dir in zipDirs:
     list = os.listdir(dir)
     for item in list:
-        match = re.search(r'(.*)\.v.*\.7z',item)
+        match = re.search(r'(.*)\.v.*\.7z$',item)
         if match:
             name = match.group(1)
         else:
             continue
-        newFilesPath = os.path.join(dir,name + '_to_C3')
-        if os.path.exists(newFilesPath):
+        convertedFilesPath = os.path.join(dir,name + '_to_C3')
+        destination = os.path.join('A:\\landscapes',name)
+        if os.path.exists(convertedFilesPath) or os.path.exists(destination):
             continue
         archive = os.path.join(dir,item)
-        print('Extracting {} to {}'.format(newFilesPath,destination))
-        sevenzip("extraction", archive, destination, nThreads)
-        xx=0
+        print('Extracting {} to {}'.format(convertedFilesPath,destination))
+        # output = sevenTest(archive,nThreads)
+        output = sevenzip("extraction", archive, destination, nThreads)
+        if "Can't open as archive" in output:
+            os.remove(archive)
 
 sys.exit('Stop')
 #remove unwanted folders
@@ -332,7 +335,7 @@ while go:
 
             if os.path.exists(zipPathTemp):
                 os.remove(zipPathTemp)
-            sevenzip("compression", zipPathTemp, landPath2, nThreads)
+            output = sevenzip("compression", zipPathTemp, landPath2, nThreads)
             renameTry(zipPathTemp, zipPath)
             # except:
             #     print('Error creating {}'.format(zipPath))
