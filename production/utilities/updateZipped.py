@@ -89,7 +89,7 @@ startTime = perf_counter()
 if not os.path.exists(watchDir):
     os.mkdir(watchDir)
 
-#remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
+# #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
 # if linux:
 #     checkLinksIni(lowVMain, versionUpdateTag)
 #     checkLinksIni(highVMain, versionUpdateTag)
@@ -100,43 +100,26 @@ highVList = os.listdir(highVMain)
 landSizes = {}
 allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag)
 
-# #temp
-# print(' removing files without tag')
-# for dir in zipDirs:
-#     list = os.listdir(dir)
-#     for item in list:
-#         if '.7z' in item and '_C2.7z' not in item and 'C3' not in item:
-#             # renameTry(os.path.join(dir,item), os.path.join(dir,item.replace('.7z','_C2.7z' )))
-#             os.remove(os.path.join(dir,item))
+#temp
+print('extracting zips of lands not updated')
+destination = 'A:\\landscapes'
+for dir in zipDirs:
+    list = os.listdir(dir)
+    for item in list:
+        match = re.search(r'(.*)\.v.*\.7z',item)
+        if match:
+            name = match.group(1)
+        else:
+            continue
+        newFilesPath = os.path.join(dir,name + '_to_C3')
+        if os.path.exists(newFilesPath):
+            continue
+        archive = os.path.join(dir,item)
+        print('Extracting {} to {}'.format(newFilesPath,destination))
+        sevenzip("extraction", archive, destination, nThreads)
+        xx=0
 
-# print('adding _C2 back to zip files')
-# for dir in zipDirs:
-#     list = os.listdir(dir)
-#     for item in list:
-#         if item.split('.')[-1] == '7z' in item and '_C2.7z' not in item and 'C3' not in item\
-#           and not os.path.exists(os.path.join(dir,item.replace('.7z','_C2.7z' ))):
-#             renameTry(os.path.join(dir,item), os.path.join(dir,item.replace('.7z','_C2.7z' )))
-
-#temp add C2 back to some names
-#
-# list = os.listdir(lowVMain)
-# tochange = ['Belgium','Atlantide','','','','','',]
-# for land in list:
-#     landbase = land.replace('_C2','')
-#     if landbase not in tochange:
-#         continue
-#     dirlist = os.listdir(os.path.join(lowVMain,land))
-#     newland = land + '_C2'
-#     renameTry(os.path.join(lowVMain,land),os.path.join(lowVMain!_newland))
-#     for item in dirlist:
-#         if land in item:
-#             renameTry(os.path.join(lowVMain!_newland, item), os.path.join(lowVMain!_newland, item + '_C2'))
-#         if '_C2' in item:
-#             newname = item.replace('_C2','')
-#             name2 = newname.replace(landbase,landbase+'_C2')
-#             renameTry(os.path.join(lowVMain,land,item),os.path.join(lowVMain,land!_name2))
-
-
+sys.exit('Stop')
 #remove unwanted folders
 # for i, landPath, in enumerate(allLandPaths):
 #     if highVMain in landPath:
@@ -349,7 +332,7 @@ while go:
 
             if os.path.exists(zipPathTemp):
                 os.remove(zipPathTemp)
-            sevenzip(zipPathTemp, landPath2, nThreads)
+            sevenzip("compression", zipPathTemp, landPath2, nThreads)
             renameTry(zipPathTemp, zipPath)
             # except:
             #     print('Error creating {}'.format(zipPath))
