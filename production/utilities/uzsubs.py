@@ -71,7 +71,7 @@ def sevenName(archivePath): # -mmt limits number of threads -t7z specifies type 
         return e.stderr
     for il,line in enumerate(lines):
         if "---------" in line:
-            name = lines[il+1].split('0')[-1].strip()
+            name = lines[il+1].split(' 0 ')[-1].strip()
             return name
 
 def sevenTest(archivePath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
