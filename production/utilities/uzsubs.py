@@ -196,7 +196,7 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
     # print ("Windows 7zip done.  Run on Linux for links, torrents and page work")
     print("7zip finished {}".format(action))
     if action == 'compression':
-        finalPath = archivePath - compressTemp
+        finalPath = archivePath.replace(compressTemp,'')
         renameTry(archivePath, finalPath)
     elif action == 'extraction':
         base, _ = os.path.split(folderPath)
@@ -204,7 +204,7 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
         finalPath = os.path.join(base,trueLandName)
         renameTry(folderPath, finalPath)
         upLevelDel(base,trueLandName,trueLandName)
-    print()
+    print("7zip finished {}".format(action))
     return output
         # Following implements working cpulimit but signal handline doesn't work
     # maxCPU = 80  # %
