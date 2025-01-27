@@ -110,23 +110,25 @@ for dir in zipDirs:
         dirList = sorted(os.listdir(dir), reverse=True)
     for item in dirList:
         match = re.search(r'(.*)\.v.*\.7z$',item)
-        if not match or '_C3' in item:
+        if not match or '_C3' in item or 'WestGermany3' in item:
             continue
         name_underscores = match.group(1)
         archive = os.path.join(dir,item)
         response = sevenName(archive)
-        if 'error' in response.lower():
+        if 'is not an archive' in response.lower():
+            print("Archive {} is corrupted: deleting it".format(item))
             os.remove(archive)
             continue
         else:
             trueLandName = response
-        convertedFilesPath = os.path.join(dir,name_underscores + '_to_C3')
+        convertedFilesPath = os.path.join(lowVMain,name_underscores + '_to_C3')
         destination = os.path.join('A:\\landscapes',trueLandName)
         if os.path.exists(convertedFilesPath) or os.path.exists(destination) or trueLandName in landscapesMap:
             continue
         print('Extracting {} to {}'.format(archive,destination))
         output = sevenzip("extraction", archive, destination, nThreads)
         if "Can't open as archive" in output:
+            print("Archive {} can't be extracted because it is corrupted: deleting it".format(item))
             os.remove(archive)
 
 sys.exit('Stop')
