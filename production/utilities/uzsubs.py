@@ -7,6 +7,37 @@ from time import sleep
 from datetime import datetime
 from common import dirSize, renameTry
 
+def good7zOrDel(response,archive):
+    if 'is not an archive' in response.lower() or 'cannot open the file as [7z]' in response.lower() or 'is not archive' in response.lower():
+        print("Archive {} is corrupted: deleting it".format(archive))
+        os.remove(archive)
+        return 'deleted'
+    elif 'error' in response.lower():
+        sys.exit('Stop:  Error...{}'.format(response))
+    else:
+        return 'OK'
+def extractZipsLandsNotUpdated(zipDirs,destinationDir,args):
+    for dir in zipDirs:
+        dirList = sorted(os.listdir(dir), reverse=args.reverse)
+        for item in dirList:
+            match = re.search(r'(.*)\.v.*\.7z$',item)
+            if not match or '_C3' in item or 'WestGermany3' in item:
+                continue
+            name_underscores = match.group(1)
+            archive = os.path.join(dir,item)
+            response = sevenName(archive)
+            check = good7zOrDel(response,archive)
+            if check == 'OK':
+                trueLandName = response
+            else:
+                continue
+            convertedFilesPath = os.path.join(lowVMain,name_underscores + '_to_C3')
+            destination = os.path.join(destinationDir,trueLandName)
+            if os.path.exists(convertedFilesPath) or os.path.exists(destination) or trueLandName in landscapesMap:
+                continue
+            print('Extracting {} to {}'.format(archive,destination))
+            response = sevenzip("extraction", archive, destination, nThreads)
+            good7zOrDel(response,archive)
 def modeDateAndAppend(toMatchDateTimeStamp, path, matching):
     modTimeStamp = os.path.getmtime(path)
     timeDiffAllowed = 15 #min
@@ -87,7 +118,7 @@ def sevenTest(archivePath,nThreads): # -mmt limits number of threads -t7z specif
         cmd = ['C:\\Program Files\\7-Zip\\7z.exe', 't', '-mmt={}'.format(maxThreads), archivePath]
     output = None
     try:
-        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True,shell=True)
+        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,shell=True)
         output, error = zipProc.communicate()
         if zipProc.returncode != 0:
             raise subprocess.CalledProcessError(zipProc.returncode, zipProc.args, output=output, stderr=error)
@@ -118,7 +149,7 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
     output = None
     try:
         zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True, shell=True)
-        output = zipProc.communicate()[0]
+        output, error = zipProc.communicate()
         if zipProc.returncode != 0:
             raise subprocess.CalledProcessError(zipProc.returncode, zipProc.args, output=output, stderr=error)
     except subprocess.CalledProcessError as e:

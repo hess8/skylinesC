@@ -1,22 +1,22 @@
-'''Calls landscapes.py and createTorrents.py'''
+"""
+    Calls landscapes.py and createTorrents.py if on Linux
 
-# Not used...use threads limits...Run with cpulimit -l 90 python3 production/utilities/updateZipped.py
+    loop
+    1. checks links and folder size
+    2. creates new zips for folders that are static
+    3. creates new links
+    4. runs createTorrents.py
+    5. runs landscapesPage.py
+    6. can confirm (not enabled) that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
+    link target eg C:\\Users\\Bret\\AppData\\Local\\qBittorrent\\logs\\qbittorrent.log
 
-#loop
-# 1. checks links and folder size
-# 2. creates new zips for folders that are static
-# 3. creates new links
-# 4. runs createTorrents.py
-# 5. runs landscapesPage.py
-# 6. can confirm that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
-# link target eg C:\Users\Bret\AppData\Local\qBittorrent\logs\qbittorrent.log
-#   sample line:  (N) 2022-04-03T19:07:50 - 'Falkland_Islands.v1.0.7z' added to download list.
-#
-# Add "-" to the beginning of the landscape dir name to remove all but .ini files and move to lowVini
-# xxx-legacy (kept in code, needs updating). Add "." to the beginning of the landscape dir name to move landscape to symlink directory,
+      sample line:  (N) 2022-04-03T19:07:50 - 'Falkland_Islands.v1.0.7z' added to download list.
 
-# landscapes.py writes the new page locally so we need to make this symbolic link on the skylinesC server:
+    Add "-" to the beginning of the landscape dir name to remove all but .ini files and move to lowVini
+    Add "." to the beginning of the landscape dir name to move landscape to symlink directory,
 
+    landscapes.py writes the new page locally so we need to make this symbolic link on the skylinesC server:
+"""
 import os,sys
 # import py7zr #py7zr does not follow symlinks!
 # import win32com.client
@@ -30,13 +30,13 @@ from uzsubs import *
 from common import landscapesMap
 from time import perf_counter
 import argparse
-parser = argparse.ArgumentParser(description="Description of your script")
+parser = argparse.ArgumentParser(description="Landscape compression and management")
 parser.add_argument("-r", "--reverse", help="Goes through landscapes and zip lists in reverse order", action="store_true")
+# parser.add_argument("-l", "--loop", help="Loops to check growth and for new folders", action="store_true")
 args = parser.parse_args()
-reverse = False
 
-looping = True
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
+maxZipTilTorr = 10 # then will run createTorrents if Linux
 nThreads = {'linux': 1, 'windows': 12}
 
 versions = ['C2','C3']
@@ -101,37 +101,8 @@ highVList = os.listdir(highVMain)
 landSizes = {}
 allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag)
 
-#temp
-print('extracting zips of lands not updated')
-# destination = 'A:\\landscapes'
-for dir in zipDirs:
-    dirList = sorted(os.listdir(dir))
-    if args.reverse:
-        dirList = sorted(os.listdir(dir), reverse=True)
-    for item in dirList:
-        match = re.search(r'(.*)\.v.*\.7z$',item)
-        if not match or '_C3' in item or 'WestGermany3' in item:
-            continue
-        name_underscores = match.group(1)
-        archive = os.path.join(dir,item)
-        response = sevenName(archive)
-        if 'is not an archive' in response.lower():
-            print("Archive {} is corrupted: deleting it".format(item))
-            os.remove(archive)
-            continue
-        else:
-            trueLandName = response
-        convertedFilesPath = os.path.join(lowVMain,name_underscores + '_to_C3')
-        destination = os.path.join('A:\\landscapes',trueLandName)
-        if os.path.exists(convertedFilesPath) or os.path.exists(destination) or trueLandName in landscapesMap:
-            continue
-        print('Extracting {} to {}'.format(archive,destination))
-        output = sevenzip("extraction", archive, destination, nThreads)
-        if "Can't open as archive" in output:
-            print("Archive {} can't be extracted because it is corrupted: deleting it".format(item))
-            os.remove(archive)
+# extractZipsLandsNotUpdated(zipDirs,destinationDir='A:\\landscapesC2',args)
 
-sys.exit('Stop')
 #remove unwanted folders
 # for i, landPath, in enumerate(allLandPaths):
 #     if highVMain in landPath:
@@ -198,8 +169,10 @@ for i, landPath, in enumerate(allLandPaths):
 
 print('Write code for:   Start the landscape dir name with "-" to move landscape to ini only directory')
 print('Write code for:   Start the landscape dir name with "." to move landscape to other landscapes folder')
-go = True
+
 loopCount = 0
+nZipAfterTorr = 0
+go = True
 while go:
     loopCount += 1
 
@@ -299,7 +272,7 @@ while go:
         condorVers = versionFromPath(landPath)
         zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
 
-        if zipName not in allZips:
+        if zipName not in allZips and not (linux and nZipAfterTorr >= maxZipTilTorr):
             if checkGrowth(landPath, landSizes):
                 print('Will check {} for growth'.format(os.path.basename(landPath)))
                 toTestGrowth.append({'zipName': zipName, 'landPath': landPath})
@@ -344,23 +317,23 @@ while go:
 
             if os.path.exists(zipPathTemp):
                 os.remove(zipPathTemp)
-            output = sevenzip("compression", zipPathTemp, landPath2, nThreads)
-
+            response = sevenzip("compression", zipPathTemp, landPath2, nThreads)
+            # else:
+            #     nZipAfterTorr += 1
             # except:
             #     print('Error creating {}'.format(zipPath))
     if linux:
         updateSymlinks([zipDirs])
-        createdTorr = createTrrents(zipMain,watchDir,makeAllMagnets)
+        createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
         if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
             landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
 
-    if looping:
-        waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
-        for i in range(waitTimeMins):
-            print("\r", end='')
-            print('[loop {}]  Waiting {} min '.format(loopCount, waitTimeMins - i), flush=True, end='')
-            sleep(60)
+    waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
+    for i in range(waitTimeMins):
         print("\r", end='')
+        print('[loop {}]  Waiting {} min '.format(loopCount, waitTimeMins - i), flush=True, end='')
+        sleep(60)
+    print("\r", end='')
 print('Done')
 #check that new torrents have been added to the qbittorrent servers
     # time.sleep(5)
