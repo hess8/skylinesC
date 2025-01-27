@@ -52,7 +52,7 @@ else:
     pathStart = linuxPathStart
     linux = True
 lowVMain = os.path.join(pathStart,'E','landscapes','landscapesC2-main')
-lowVExt1 = None #os.path.join(pathStart,'E','landscapes','landscapesC2-main')
+lowVExt1 = os.path.join(pathStart,'A','landscapesC2') # None #
 lowVini = os.path.join(pathStart,'E','landscapes','landscapesC2-ini')
 lowVserver = os.path.join(pathStart,'E','landscapes','landscapesC2-server')
 highVMain = os.path.join(pathStart,'E','landscapes','landscapesC3-main')
@@ -99,12 +99,15 @@ lowVList = os.listdir(lowVMain)
 highVList = os.listdir(highVMain)
 
 landSizes = {}
-allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag)
 
-# optional scripts:
-# extractZipsLandsNotUpdated(zipDirs,destinationDir='A:\\landscapesC2',args)
+landDirs = [lowVMain, lowVExt1, highVMain,highVExt1]
+allLands, allLandPaths = getLandPaths(landDirs,versionUpdateTag)
+
+#### optional scripts ###
+# extractZipsLandsNotUpdated(zipDirs,lowVMain,destinationDir,versions,versionUpdateTag,nThreads,args)
 # renameDirsWithTag(dirsList,tags,tagReplacement)
-# copyFilesFromVersionUpdate(allLandPaths,lowVMain, highVMain,versionUpdateTag)
+copyFilesFromVersionUpdate(allLandPaths,lowVMain, highVMain,versionUpdateTag)
+sys.exit('Stop')
 
 print('Write code for:   Start the landscape dir name with "-" to move landscape to ini only directory')
 print('Write code for:   Start the landscape dir name with "." to move landscape to other landscapes folder')
@@ -164,7 +167,7 @@ while go:
         updateSymlinks(landVersionsLists)
         ## now all landscapes are represented in main folders ##
 
-    allLands, allLandPaths = getLandPaths(lowVMain,highVMain,versionUpdateTag)
+    allLands, allLandPaths = getLandPaths(landDirs,versionUpdateTag)
 
     #### update symbolic links to zip files
     if linux: updateSymlinks([zipDirs])
@@ -189,8 +192,6 @@ while go:
 
     for i, landPath, in enumerate(allLandPaths):
         land = allLands[i]
-        if 'Alps' in land:
-            xx=0
         if os.path.basename(landPath)[0] == '!' or (highVMain in landPath and land in lowVLands):
             continue                      # no zips of C2 folders linked to C3
         if versionUpdateTag in landPath:

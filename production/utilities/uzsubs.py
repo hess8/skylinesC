@@ -17,12 +17,12 @@ def good7zOrDel(response,archive):
     else:
         return 'OK'
 
-def extractZipsLandsNotUpdated(zipDirs,lowVMain,destinationDir,nThreads,args):
+def extractZipsLandsNotUpdated(zipDirs,lowVMain,destinationDir,versions,versionUpdateTag,nThreads,args):
     for dir in zipDirs:
         dirList = sorted(os.listdir(dir), reverse=args.reverse)
         for item in dirList:
             match = re.search(r'(.*)\.v.*\.7z$',item)
-            if not match or '_C3' in item or 'WestGermany3' in item:
+            if not match or versions[1] in item or 'WestGermany3' in item:
                 continue
             name_underscores = match.group(1)
             archive = os.path.join(dir,item)
@@ -32,7 +32,7 @@ def extractZipsLandsNotUpdated(zipDirs,lowVMain,destinationDir,nThreads,args):
                 trueLandName = response
             else:
                 continue
-            convertedFilesPath = os.path.join(lowVMain,name_underscores + '_to_C3')
+            convertedFilesPath = os.path.join(lowVMain,name_underscores + versionUpdateTag)
             destination = os.path.join(destinationDir,trueLandName)
             if os.path.exists(convertedFilesPath) or os.path.exists(destination) or trueLandName in landscapesMap:
                 continue
@@ -52,7 +52,7 @@ def copyFilesFromVersionUpdate(allLandPaths,lowVMain, highVMain,versionUpdateTag
                         os.symlink(linkSource,linkDest)
                 continue
             landBase,name = os.path.split(landPath)
-            highVFilesDir = os.path.join(landBase, name + versionUpdateTag)#.replace(' ', '_')
+            highVFilesDir = os.path.join(landBase, name + versionUpdateTag).replace(' ', '_')
             if os.path.exists(highVFilesDir):
                 continue
             highVFiles = lowVtoHighVFiles(landPath)
@@ -334,10 +334,10 @@ def get_qbtExe(qbtorrentExeDir,slcFilesPath):
     else:
         sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")
 
-def getLandPaths(lowVMain,highVMain, versionUpdateTag):
+def getLandPaths(landDirs, versionUpdateTag):
     allLands = []
     allLandPaths = []
-    for dir in [lowVMain,highVMain]:
+    for dir in landDirs:
         items = os.listdir(dir)
         items.sort()
         for item in items:
