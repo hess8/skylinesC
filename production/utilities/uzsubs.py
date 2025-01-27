@@ -5,7 +5,7 @@ import platform
 import signal
 from time import sleep
 from datetime import datetime
-from common import dirSize, renameTry
+from common import dirSize, landscapesMap, renameTry
 
 def good7zOrDel(response,archive):
     if 'is not an archive' in response.lower() or 'cannot open the file as [7z]' in response.lower() or 'is not archive' in response.lower():
@@ -16,7 +16,8 @@ def good7zOrDel(response,archive):
         sys.exit('Stop:  Error...{}'.format(response))
     else:
         return 'OK'
-def extractZipsLandsNotUpdated(zipDirs,destinationDir,args):
+
+def extractZipsLandsNotUpdated(zipDirs,lowVMain,destinationDir,nThreads,args):
     for dir in zipDirs:
         dirList = sorted(os.listdir(dir), reverse=args.reverse)
         for item in dirList:
@@ -38,6 +39,38 @@ def extractZipsLandsNotUpdated(zipDirs,destinationDir,args):
             print('Extracting {} to {}'.format(archive,destination))
             response = sevenzip("extraction", archive, destination, nThreads)
             good7zOrDel(response,archive)
+
+def copyFilesFromVersionUpdate(allLandPaths,lowVMain, highVMain,versionUpdateTag):
+    for i, landPath, in enumerate(allLandPaths):
+        if lowVMain in landPath:
+            if versionUpdateTag in landPath: #create a link in the higher version folder
+                base,name = os.path.split(landPath)
+                linkSource = landPath.replace(versionUpdateTag,'') # the full landscape folder
+                linkDest = os.path.join(highVMain,name.replace(versionUpdateTag,''))
+                if not os.path.islink(linkDest):
+                    if platform.system() == 'Linux':
+                        os.symlink(linkSource,linkDest)
+                continue
+            landBase,name = os.path.split(landPath)
+            highVFilesDir = os.path.join(landBase, name + versionUpdateTag)#.replace(' ', '_')
+            if os.path.exists(highVFilesDir):
+                continue
+            highVFiles = lowVtoHighVFiles(landPath)
+            if not highVFiles:
+                continue
+            else:
+                print(versionUpdateTag, highVFiles)
+                os.mkdir(highVFilesDir)
+                for newFileExistingPath in highVFiles:
+                    newFileSavePath = newFileExistingPath.replace(landPath,highVFilesDir)
+                    dirsInPath = newFileSavePath.split(highVFilesDir)[1].split(os.sep)[:-1]
+                    if len(dirsInPath) > 0: #create dir structure needed for file
+                        nextDirPath = highVFilesDir
+                        for dir in dirsInPath:
+                            nextDirPath = os.path.join(nextDirPath,dir)
+                            if not os.path.exists(nextDirPath):
+                                os.mkdir(nextDirPath)
+                    shutil.copy2(newFileExistingPath, newFileSavePath)
 def modeDateAndAppend(toMatchDateTimeStamp, path, matching):
     modTimeStamp = os.path.getmtime(path)
     timeDiffAllowed = 15 #min

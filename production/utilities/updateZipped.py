@@ -101,71 +101,10 @@ highVList = os.listdir(highVMain)
 landSizes = {}
 allLands, allLandPaths = getLandPaths(lowVMain, highVMain,versionUpdateTag)
 
+# optional scripts:
 # extractZipsLandsNotUpdated(zipDirs,destinationDir='A:\\landscapesC2',args)
-
-#remove unwanted folders
-# for i, landPath, in enumerate(allLandPaths):
-#     if highVMain in landPath:
-#         if os.path.islink(landPath):
-#             os.unlink(landPath)
-
-
-# # rename some folders
-# for landPath in allLandPaths:
-#     # badTags = ['_C2toC3_C2toC3','_toC3_toC3','_toC3',]
-#     badTags = [' ']
-#     if lowVMain in landPath:
-#         for tag in badTags:
-#             if tag in landPath:
-#                 newName = landPath.replace(tag,'_')
-#                 renameTry(landPath, newName)
-#                 break
-
-# for landPath in allLandPaths:
-#     if versionUpdateTag in landPath and 'Airports' in os.listdir(landPath):
-#         airportsDir = os.path.join(landPath,'Airports')
-#         nAirports = len(os.listdir(airportsDir))
-#         print('Airports',nAirports,landPath)
-
-        # landBase,name = os.path.split(landPath)
-        # badDir = os.path.join(landBase,name + versionUpdateTag)
-        # if os.path.exists(badDir):
-        #     newName = badDir.replace(versionUpdateTag,versionUpdateTag.replace('_C2toC3','_to_C3'))
-        #     renameTry(badDir,newName)
-####
-
-# Copy files from high version update
-for i, landPath, in enumerate(allLandPaths):
-    if lowVMain in landPath:
-        if versionUpdateTag in landPath: #create a link in the higher version folder
-            base,name = os.path.split(landPath)
-            linkSource = landPath.replace(versionUpdateTag,'') # the full landscape folder
-            linkDest = os.path.join(highVMain,name.replace(versionUpdateTag,''))
-            if not os.path.islink(linkDest):
-                if platform.system() == 'Linux':
-                    os.symlink(linkSource,linkDest)
-            continue
-        landBase,name = os.path.split(landPath)
-        highVFilesDir = os.path.join(landBase, name + versionUpdateTag).replace(' ', '_')
-        if os.path.exists(highVFilesDir):
-            continue
-        highVFiles = lowVtoHighVFiles(landPath)
-        if not highVFiles:
-            continue
-        else:
-            print(versionUpdateTag, highVFiles)
-            os.mkdir(highVFilesDir)
-            for newFileExistingPath in highVFiles:
-                # newBase, newName = os.path.split(newFileExistingPath)
-                newFileSavePath = newFileExistingPath.replace(landPath,highVFilesDir)
-                dirsInPath = newFileSavePath.split(highVFilesDir)[1].split(os.sep)[:-1]
-                if len(dirsInPath) > 0: #create dir structure needed for file
-                    nextDirPath = highVFilesDir
-                    for dir in dirsInPath:
-                        nextDirPath = os.path.join(nextDirPath,dir)
-                        if not os.path.exists(nextDirPath):
-                            os.mkdir(nextDirPath)
-                shutil.copy2(newFileExistingPath, newFileSavePath)
+# renameDirsWithTag(dirsList,tags,tagReplacement)
+# copyFilesFromVersionUpdate(allLandPaths,lowVMain, highVMain,versionUpdateTag)
 
 print('Write code for:   Start the landscape dir name with "-" to move landscape to ini only directory')
 print('Write code for:   Start the landscape dir name with "." to move landscape to other landscapes folder')

@@ -31,6 +31,12 @@ landscapesMap = {
     '': '',
 }
 
+def renameDirsWithTag(dirsList,tags,tagReplacement):
+    for dir in dirsList:
+        for tag in tags:
+            if tag in dir:
+                newName = dir.replace(tag,tagReplacement)
+                renameTry(dir, newName)
 
 def readfile(filepath):
     with open(filepath) as f:
