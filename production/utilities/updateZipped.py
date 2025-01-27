@@ -32,6 +32,8 @@ from time import perf_counter
 import argparse
 parser = argparse.ArgumentParser(description="Landscape compression and management")
 parser.add_argument("-r", "--reverse", help="Goes through landscapes and zip lists in reverse order", action="store_true")
+parser.add_argument("-g", "--growth", help="Check dir growth before zipping", action="store_true")
+
 # parser.add_argument("-l", "--loop", help="Loops to check growth and for new folders", action="store_true")
 args = parser.parse_args()
 
@@ -52,7 +54,7 @@ else:
     pathStart = linuxPathStart
     linux = True
 lowVMain = os.path.join(pathStart,'E','landscapes','landscapesC2-main')
-lowVExt1 = os.path.join(pathStart,'A','landscapesC2') # None #
+lowVExt1 = os.path.join('A:','landscapesC2') # None #
 lowVini = os.path.join(pathStart,'E','landscapes','landscapesC2-ini')
 lowVserver = os.path.join(pathStart,'E','landscapes','landscapesC2-server')
 highVMain = os.path.join(pathStart,'E','landscapes','landscapesC3-main')
@@ -100,14 +102,14 @@ highVList = os.listdir(highVMain)
 
 landSizes = {}
 
-landDirs = [lowVMain, lowVExt1, highVMain,highVExt1]
-allLands, allLandPaths = getLandPaths(landDirs,versionUpdateTag)
+landDirs = [lowVMain, lowVExt1, highVMain]
+allLands, allLandPaths = getLandPaths(landDirs, versionUpdateTag)
 
 #### optional scripts ###
 # extractZipsLandsNotUpdated(zipDirs,lowVMain,destinationDir,versions,versionUpdateTag,nThreads,args)
 # renameDirsWithTag(dirsList,tags,tagReplacement)
-copyFilesFromVersionUpdate(allLandPaths,lowVMain, highVMain,versionUpdateTag)
-sys.exit('Stop')
+# copyFilesFromVersionUpdate(allLandPaths,lowVMain, highVMain,versions,versionUpdateTag)
+# sys.exit('Stop')
 
 print('Write code for:   Start the landscape dir name with "-" to move landscape to ini only directory')
 print('Write code for:   Start the landscape dir name with "." to move landscape to other landscapes folder')
@@ -176,7 +178,8 @@ while go:
     for item in items:
         if item.split('.')[-1] == '7z':
             allZips.append(item)
-    all
+    allZips.sort()
+
     ## now all zips are represented in zipMain ##
 
     # list dirs to be zipped
@@ -213,7 +216,7 @@ while go:
         zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
 
         if zipName not in allZips and not (linux and nZipAfterTorr >= maxZipTilTorr):
-            if checkGrowth(landPath, landSizes):
+            if args.growth and checkGrowth(landPath, landSizes):
                 print('Will check {} for growth'.format(os.path.basename(landPath)))
                 toTestGrowth.append({'zipName': zipName, 'landPath': landPath})
             else:

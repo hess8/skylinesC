@@ -40,38 +40,40 @@ def extractZipsLandsNotUpdated(zipDirs,lowVMain,destinationDir,versions,versionU
             response = sevenzip("extraction", archive, destination, nThreads)
             good7zOrDel(response,archive)
 
-def copyFilesFromVersionUpdate(allLandPaths,lowVMain, highVMain,versionUpdateTag):
+def copyFilesFromVersionUpdate(allLandPaths,lowVMain,highVMain,versions,versionUpdateTag):
+    print('Disabled linking')
     for i, landPath, in enumerate(allLandPaths):
-        if lowVMain in landPath:
-            if versionUpdateTag in landPath: #create a link in the higher version folder
-                base,name = os.path.split(landPath)
-                linkSource = landPath.replace(versionUpdateTag,'') # the full landscape folder
-                linkDest = os.path.join(highVMain,name.replace(versionUpdateTag,''))
-                if not os.path.islink(linkDest):
-                    if platform.system() == 'Linux':
-                        os.symlink(linkSource,linkDest)
-                continue
-            landBase,name = os.path.split(landPath)
-            highVFilesDir = os.path.join(landBase, name + versionUpdateTag).replace(' ', '_')
-            if os.path.exists(highVFilesDir):
-                continue
-            highVFiles = lowVtoHighVFiles(landPath)
-            if not highVFiles:
-                continue
-            else:
-                print(versionUpdateTag, highVFiles)
-                os.mkdir(highVFilesDir)
-                for newFileExistingPath in highVFiles:
-                    newFileSavePath = newFileExistingPath.replace(landPath,highVFilesDir)
-                    dirsInPath = newFileSavePath.split(highVFilesDir)[1].split(os.sep)[:-1]
-                    if len(dirsInPath) > 0: #create dir structure needed for file
-                        nextDirPath = highVFilesDir
-                        for dir in dirsInPath:
-                            nextDirPath = os.path.join(nextDirPath,dir)
-                            if not os.path.exists(nextDirPath):
-                                os.mkdir(nextDirPath)
-                    shutil.copy2(newFileExistingPath, newFileSavePath)
-def modeDateAndAppend(toMatchDateTimeStamp, path, matching):
+        if 'Boras' in landPath:
+            xx=0
+        if versions[1] in landPath: #create a link in the higher version folder
+            # base,name = os.path.split(landPath)
+            # linkSource = landPath.replace(versionUpdateTag,'') # the full landscape folder
+            # linkDest = os.path.join(highVMain,name.replace(versionUpdateTag,''))
+            # if not os.path.islink(linkDest):
+            #     if platform.system() == 'Linux':
+            #         os.symlink(linkSource,linkDest)
+            continue
+        landBase,name = os.path.split(landPath)
+        highVFilesDir = os.path.join(landBase, name + versionUpdateTag).replace(' ', '_')
+        if os.path.exists(highVFilesDir):
+            continue
+        highVFiles = lowVtoHighVFiles(landPath)
+        if not highVFiles:
+            continue
+        else:
+            print(versionUpdateTag, highVFiles)
+            os.mkdir(highVFilesDir)
+            for newFileExistingPath in highVFiles:
+                newFileSavePath = newFileExistingPath.replace(landPath,highVFilesDir)
+                dirsInPath = newFileSavePath.split(highVFilesDir)[1].split(os.sep)[:-1]
+                if len(dirsInPath) > 0: #create dir structure needed for file
+                    nextDirPath = highVFilesDir
+                    for dir in dirsInPath:
+                        nextDirPath = os.path.join(nextDirPath,dir)
+                        if not os.path.exists(nextDirPath):
+                            os.mkdir(nextDirPath)
+                shutil.copy2(newFileExistingPath, newFileSavePath)
+def checkModDateAndAppend(toMatchDateTimeStamp, path, matching):
     modTimeStamp = os.path.getmtime(path)
     timeDiffAllowed = 15 #min
     if abs(modTimeStamp - toMatchDateTimeStamp)/60 < timeDiffAllowed:
@@ -82,10 +84,9 @@ def getFilesByModDate(path,toMatchDateTimeStamp,matching):
     with os.scandir(path) as entries:
         for entry in entries:
             if entry.is_file():
-                entryPath = os.path.join(path,entry)
-                matching = modeDateAndAppend(toMatchDateTimeStamp, entryPath, matching)
-            elif entry.is_dir():
-                getFilesByModDate(entry.path,toMatchDateTimeStamp,matching) #recursive
+                matching = checkModDateAndAppend(toMatchDateTimeStamp, entry.path, matching)
+            elif entry.is_dir(): # recursive for dirs
+                getFilesByModDate(entry.path, toMatchDateTimeStamp,matching)
     return matching
 
 def lowVtoHighVFiles(landPath):
