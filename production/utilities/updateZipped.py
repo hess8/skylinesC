@@ -29,13 +29,8 @@ from common import dirSize, readfileNoStrip, readfile, renameTry
 from uzsubs import *
 from common import landscapesMap
 from time import perf_counter
-import argparse
-parser = argparse.ArgumentParser(description="Landscape compression and management")
-parser.add_argument("-r", "--reverse", help="Goes through landscapes and zip lists in reverse order", action="store_true")
-parser.add_argument("-g", "--growth", help="Check dir growth before zipping", action="store_true")
 
-# parser.add_argument("-l", "--loop", help="Loops to check growth and for new folders", action="store_true")
-args = parser.parse_args()
+args = getParams()
 
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
 maxZipTilTorr = 10 # then will run createTorrents if Linux
@@ -43,6 +38,7 @@ nThreads = {'linux': 1, 'windows': 12}
 
 versions = ['C2','C3']
 versionUpdateTag = '_to_{}'.format(versions[1])
+versionBothTag = versions[0] + versions[1]
 highVCheckExt = '.tm3'
 ## zipping ##
 linuxPathStart = '/mnt/'
@@ -95,10 +91,10 @@ if not os.path.exists(watchDir):
     os.mkdir(watchDir)
 
 # #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
-# if linux:
-#     checkLinksIni(lowVMain, versionUpdateTag)
-#     checkLinksIni(highVMain, versionUpdateTag)
-#     checkZipsLinks(zipMain)
+if args.links and linux:
+    checkLinksIni(lowVMain, versionUpdateTag)
+    checkLinksIni(highVMain, versionUpdateTag)
+    checkZipsLinks(zipMain)
 lowVList = os.listdir(lowVMain)
 highVList = os.listdir(highVMain)
 
@@ -163,12 +159,10 @@ while go:
 
     allZips = []
     #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
-    if linux:
+    if args.links and  linux:
         checkLinksIni(lowVMain,versionUpdateTag)
         checkLinksIni(highVMain,versionUpdateTag)
         checkZipsLinks(zipMain)
-        #### update symbolic links to landscape folders
-
         updateSymlinks(landVersionsLists)
         ## now all landscapes are represented in main folders ##
 
@@ -199,8 +193,9 @@ while go:
         land = allLands[i]
         if os.path.basename(landPath)[0] == '!' or (highVMain in landPath and land in lowVLands):
             continue                      # no zips of C2 folders linked to C3
+        base, name = os.path.split(landPath)
+
         if versionUpdateTag in landPath:
-            base,name = os.path.split(landPath)
             zipNameUpdateVers = name.replace(' ', '_') + '.7z'
             if zipNameUpdateVers not in allZips:
                 toZip.append({'zipName': zipNameUpdateVers, 'landPath': landPath})
@@ -215,20 +210,28 @@ while go:
             print ('lines', lines)
             sys.exit("Stop: .ini file can't be parsed {}".format(iniFilePath))
         condorOrigVers = origVersionFromPath(landPath)
-        if condorOrigVers == versions[0]:
-            C2OnlyzipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),landVersion,condorOrigVers) #no zips will have spaces, but landscapes folders might
+        condorVersInName = condorOrigVers
+        if args.upversion and condorOrigVers == versions[0]:
+            lowOnlyZipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),landVersion,condorOrigVers) #no zips will have spaces, but landscapes folders might
             items = os.listdir(landPath)
-            if land + highVCheckExt in items and not os.path.exists(C2OnlyzipName):
-                print('remove C2OnlyzipName conditional later')
-                condorOrigVers = versions[0] + versions[1]
-        zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),landVersion,condorOrigVers) #no zips will have spaces, but landscapes folders might
+            if land + highVCheckExt in items and not os.path.exists(lowOnlyZipName):
+                condorVersInName = versionBothTag
+        zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),landVersion,condorVersInName) #no zips will have spaces, but landscapes folders might
+        # if versionBothTag in zipName: #see if we need to and can merge
+        #     zipPathlow = os.path.join(zipMain, zipName.replace(versionBothTag, versions[0]))
+        #     zipNameUpdateVers = os.path.join(zipMain, name.replace(' ', '_') + versionUpdateTag +'.7z')
+        #     zipPathUpdateVers = os.path.join(zipMain, zipNameUpdateVers)
+        #     zipPathBothVers = os.path.join(zipMain, zipName)
+        #     if os.path.exists(zipPathlow) and os.path.exists(zipPathUpdateVers) and not os.path.exists(zipPathBothVers):
+        #         zipMergeIntoNew([zipPathlow, zipPathUpdateVers], os.path.join(zipMain,zipName))
+        #         continue
+
         if zipName not in allZips and not (linux and nZipAfterTorr >= maxZipTilTorr):
             if args.growth and checkGrowth(landPath, landSizes):
                 print('Will check {} for growth'.format(os.path.basename(landPath)))
                 toTestGrowth.append({'zipName': zipName, 'landPath': landPath})
             else:
                 toZip.append({'zipName': zipName, 'landPath': landPath})
-        # add C2_C3 folder
 
 
     #this code works, but may be too short to check for growth, so for now let loop time determine it
@@ -244,7 +247,7 @@ while go:
     if len(toZip) > 0:
         print("Will create these zips:")
         for land in toZip:
-            print(land['landPath'])
+            print('{} -> {}'.format(land['landPath'], land['zipName']))
         # create new zips
         newZipped = []
         for newZip in toZip:
@@ -252,7 +255,7 @@ while go:
             # continue
             landPath2 = newZip['landPath']
             if 'C3' in landPath2:
-                mainDir = highVMain
+                mainPath = highVMain
             else:
                 mainDir = lowVMain
 
@@ -268,7 +271,7 @@ while go:
             #     nZipAfterTorr += 1
             # except:
             #     print('Error creating {}'.format(zipPath))
-    if linux:
+    if args.links and  linux:
         updateSymlinks([zipDirs])
         createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
         if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):

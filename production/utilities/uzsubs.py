@@ -7,7 +7,47 @@ from time import sleep
 from datetime import datetime
 from common import dirSize, landscapesMap, renameTry
 
-def zipMerge():
+def getParams():
+    import argparse
+    growthHelp = "Check dir growth before zipping"
+    linksHelp = "Do links work if on linux"
+    reverseHelp = "Go through landscapes and zip lists in reverse order"
+    upversionHelp = "Make zip of combined low and high versions"
+    parser = argparse.ArgumentParser(description="Landscape compression and management")
+    parser.add_argument("-g", "--growth", help=growthHelp, action="store_true")
+    parser.add_argument("-l", "--links", help=linksHelp, action="store_true")
+    parser.add_argument("-r", "--reverse", help=reverseHelp, action="store_true")
+    parser.add_argument("-u", "--upversion", help=upversionHelp, action="store_true")
+    args = parser.parse_args()
+    if args.growth:
+        print('Will:', growthHelp)
+    if args.links:
+        print('Will:', linksHelp)
+    if args.links:
+        print('Will:', reverseHelp)
+    if args.links:
+        print('Will:', upversionHelp)
+    return args
+
+def zipMergeIntoNew(zipsList, outZip):
+    ''' DOESN'T WORK FOR 7ZIP!!
+zipmerge [-DhIiSsV] target-zip source-zip [source-zip ...]
+
+We want to have the latest files overwrite the older, so the older ones are listed first
+    '''
+    # cmd = ['zipmerge', outZip]
+    # for zip in zipsList:
+    #     cmd.append(zip)
+    # try:
+    #     zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,shell=True)
+    #     output, error = zipProc.communicate()
+    #     if zipProc.returncode != 0:
+    #         raise subprocess.CalledProcessError(zipProc.returncode, zipProc.args, output=output, stderr=error)
+    #     print('Merged {} -> {}'.format(zipsList),outZip)
+    # except subprocess.CalledProcessError as e:
+    #     print("Error output:", e.stderr)
+    #     return e.stderr
+
 def good7zOrDel(response,archive):
     if 'is not an archive' in response.lower() or 'cannot open the file as [7z]' in response.lower() or 'is not archive' in response.lower():
         print("Archive {} is corrupted: deleting it".format(archive))
