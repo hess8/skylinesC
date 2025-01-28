@@ -43,6 +43,7 @@ nThreads = {'linux': 1, 'windows': 12}
 
 versions = ['C2','C3']
 versionUpdateTag = '_to_{}'.format(versions[1])
+highVCheckExt = '.tm3'
 ## zipping ##
 linuxPathStart = '/mnt/'
 winPathStart = 'S:\\' #includes Samba windows mapped drive
@@ -65,8 +66,8 @@ lowerVersionLandDirs = [lowVMain,lowVini,lowVserver]
 higherVersionLandDirs = [highVMain,highVini,highVserver]
 landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
 versionMainDict = {'C2': lowVMain, 'C3': highVMain}
-# zipMain = os.path.join(pathStart,'P','landscapes-zip')
-zipMain = os.path.join('A:','zips')
+zipMain = os.path.join(pathStart,'P','landscapes-zip')
+# zipMain = os.path.join('A:','zips')
 zipExtras = None #[os.path.join(pathStart,'E','landscapes','zipped1']
 zipDirs = [zipMain] #+ zipExtras
 zipPathPrior = [zipMain] # [zipExtras[0],zipMain] # fill up in this order
@@ -103,13 +104,14 @@ highVList = os.listdir(highVMain)
 
 landSizes = {}
 
-landDirs = [lowVMain, lowVExt1, highVMain]
-allLands, allLandPaths = getLandPaths(landDirs, versionUpdateTag)
+# landDirs = [lowVMain, lowVExt1, highVMain]
+landDirs = [lowVMain]
+allLands, allLandPaths = getLandPaths(landDirs, versionUpdateTag, args)
 
 #### optional scripts ###
-# extractZipsLandsNotUpdated(zipDirs,lowVMain,destinationDir,versions,versionUpdateTag,nThreads,args)
+# extractZipsLandsNotUpdated(zipDirs,lowVMain,'A:\\landscapesC2',versions,versionUpdateTag,nThreads,args)
 # renameDirsWithTag(dirsList,tags,tagReplacement)
-# copyFilesFromVersionUpdate(allLandPaths,lowVMain, highVMain,versions,versionUpdateTag)
+# copyFilesFromVersionUpdate(allLandPaths,lowVMain, highVMain,versions,versionUpdateTag,highVCheckExt)
 # sys.exit('Stop')
 
 print('Write code for:   Start the landscape dir name with "-" to move landscape to ini only directory')
@@ -170,7 +172,7 @@ while go:
         updateSymlinks(landVersionsLists)
         ## now all landscapes are represented in main folders ##
 
-    allLands, allLandPaths = getLandPaths(landDirs,versionUpdateTag)
+    allLands, allLandPaths = getLandPaths(landDirs,versionUpdateTag, args)
 
     #### update symbolic links to zip files
     if linux: updateSymlinks([zipDirs])
@@ -193,29 +195,33 @@ while go:
         land = allLands[i]
         if lowVMain in landPath:
             lowVLands.append(land)
-
     for i, landPath, in enumerate(allLandPaths):
         land = allLands[i]
         if os.path.basename(landPath)[0] == '!' or (highVMain in landPath and land in lowVLands):
             continue                      # no zips of C2 folders linked to C3
         if versionUpdateTag in landPath:
             base,name = os.path.split(landPath)
-            zipName = name.replace(' ', '_') + '.7z'
-            if zipName not in allZips:
-                toZip.append({'zipName': zipName, 'landPath': landPath})
+            zipNameUpdateVers = name.replace(' ', '_') + '.7z'
+            if zipNameUpdateVers not in allZips:
+                toZip.append({'zipName': zipNameUpdateVers, 'landPath': landPath})
             continue
         files = os.listdir(landPath)
         iniFilePath = os.path.join(landPath,land+'.ini')
         lines = readfile(iniFilePath)
         if len(lines) > 1:
-            version = lines[1].split('=')[1].split('(')[0].split(',')[0].replace('00','0').replace('.10.','.1.').replace(' ','')
+            landVersion = lines[1].split('=')[1].split('(')[0].split(',')[0].replace('00','0').replace('.10.','.1.').replace(' ','')
         else:
             print('len lines',len(lines))
             print ('lines', lines)
             sys.exit("Stop: .ini file can't be parsed {}".format(iniFilePath))
-        condorVers = versionFromPath(landPath)
-        zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),version,condorVers) #no zips will have spaces, but landscapes folders might
-
+        condorOrigVers = origVersionFromPath(landPath)
+        if condorOrigVers == versions[0]:
+            C2OnlyzipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),landVersion,condorOrigVers) #no zips will have spaces, but landscapes folders might
+            items = os.listdir(landPath)
+            if land + highVCheckExt in items and not os.path.exists(C2OnlyzipName):
+                print('remove C2OnlyzipName conditional later')
+                condorOrigVers = versions[0] + versions[1]
+        zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),landVersion,condorOrigVers) #no zips will have spaces, but landscapes folders might
         if zipName not in allZips and not (linux and nZipAfterTorr >= maxZipTilTorr):
             if args.growth and checkGrowth(landPath, landSizes):
                 print('Will check {} for growth'.format(os.path.basename(landPath)))
@@ -252,16 +258,12 @@ while go:
 
             destination = zipDestDriveByPriority(zipPathPrior, landPath2)
             zipPath = os.path.join(destination, newZip['zipName'])  # no zips will have spaces, but landscapes folders might
-            zipPathTemp = os.path.join(zipPath + '.temp')
 
             count = 0
             print()
             print('----------------------------------------------------------')
             print('***Creating {} in {}***'.format(newZip['zipName'], destination))
-
-            if os.path.exists(zipPathTemp):
-                os.remove(zipPathTemp)
-            response = sevenzip("compression", zipPathTemp, landPath2, nThreads)
+            response = sevenzip("compression", zipPath, landPath2, nThreads)
             # else:
             #     nZipAfterTorr += 1
             # except:

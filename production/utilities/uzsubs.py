@@ -7,6 +7,7 @@ from time import sleep
 from datetime import datetime
 from common import dirSize, landscapesMap, renameTry
 
+def zipMerge():
 def good7zOrDel(response,archive):
     if 'is not an archive' in response.lower() or 'cannot open the file as [7z]' in response.lower() or 'is not archive' in response.lower():
         print("Archive {} is corrupted: deleting it".format(archive))
@@ -40,11 +41,10 @@ def extractZipsLandsNotUpdated(zipDirs,lowVMain,destinationDir,versions,versionU
             response = sevenzip("extraction", archive, destination, nThreads)
             good7zOrDel(response,archive)
 
-def copyFilesFromVersionUpdate(allLandPaths,lowVMain,highVMain,versions,versionUpdateTag):
+def copyFilesFromVersionUpdate(allLandPaths,lowVMain,highVMain,versions,versionUpdateTag,highVCheckExt):
     print('Disabled linking')
     for i, landPath, in enumerate(allLandPaths):
-        if 'Boras' in landPath:
-            xx=0
+
         if versions[1] in landPath: #create a link in the higher version folder
             # base,name = os.path.split(landPath)
             # linkSource = landPath.replace(versionUpdateTag,'') # the full landscape folder
@@ -57,7 +57,7 @@ def copyFilesFromVersionUpdate(allLandPaths,lowVMain,highVMain,versions,versionU
         highVFilesDir = os.path.join(landBase, name + versionUpdateTag).replace(' ', '_')
         if os.path.exists(highVFilesDir):
             continue
-        highVFiles = lowVtoHighVFiles(landPath)
+        highVFiles = lowVtoHighVFiles(landPath,highVCheckExt)
         if not highVFiles:
             continue
         else:
@@ -89,11 +89,11 @@ def getFilesByModDate(path,toMatchDateTimeStamp,matching):
                 getFilesByModDate(entry.path, toMatchDateTimeStamp,matching)
     return matching
 
-def lowVtoHighVFiles(landPath):
+def lowVtoHighVFiles(landPath,highVersionProof):
     items = os.listdir(landPath)
     condorHighVersionTimeStamp = None
     for item in items:
-        if '.tm3' in item:
+        if highVersionProof in item:
             condorHighVersionTimeStamp = os.path.getmtime(os.path.join(landPath,item))
             matching = []
             return getFilesByModDate(landPath,condorHighVersionTimeStamp,matching)
@@ -166,20 +166,24 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
     extractTemp = '_temp'
     if action == 'compression':
         command = 'a'
+        preFolder = ''
         archivePath += compressTemp
+        if os.path.exists(archivePath):
+            os.remove(archivePath)
     elif action == 'extraction':
         command = 'x' # 'e' doesn't keep dir structure
         folderPath += extractTemp
+        preFolder = '-o'
     if platform.system() == 'Linux':
         sigs = [signal.SIGTERM, signal.SIGTSTP, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP]
         for sig in sigs:
             signal.signal(sig, signal_handler)
         maxThreads = nThreads['linux']# On Soto with base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
         trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
-        cmd = ['bash', trapSigPath, '7z', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, '-o'+folderPath]
+        cmd = ['bash', trapSigPath, '7z', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, preFolder+folderPath]
     elif platform.system() == 'Windows':
         maxThreads = nThreads['windows']
-        cmd = ['C:\\Program Files\\7-Zip\\7z.exe', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, '-o'+folderPath]
+        cmd = ['C:\\Program Files\\7-Zip\\7z.exe', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, preFolder+folderPath]
     output = None
     try:
         zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True, shell=True)
@@ -190,8 +194,7 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
         print("Error output:", e.stderr)
         sys.exit('Stop. Problems with {}'.format(action))
         return e.stderr
-    lines = output.splitlines()
-    # output = zipProc.stdout
+    # lines = output.splitlines()
     print(output)
     # print ("Windows 7zip done.  Run on Linux for links, torrents and page work")
     print("7zip finished {}".format(action))
@@ -210,7 +213,7 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
     # maxCPU = 80  # %
     # cmd = ['cpulimit','-l',str(maxCPU),'--','bash',trapSigPath, '7z', 'a', '-t7z', archivePath, folderPath]
 
-def versionFromPath(path):
+def origVersionFromPath(path):
     ''''''
     '''Gets version tag from regex pattern: C[any digits] in path'''
     versTag = re.search("C[0-9]+",path)
@@ -221,7 +224,7 @@ def updateSymlinks(dirsLists):
     """"""
     '''makes symlinks in main dir (first in dirsLists) for rest of paths in dirsLists
     Works for both landscapes and zips folder.
-    If zips folder, removes .temp files'''
+    '''
 
     xx=0
     for list in dirsLists:
@@ -335,21 +338,19 @@ def get_qbtExe(qbtorrentExeDir,slcFilesPath):
     else:
         sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")
 
-def getLandPaths(landDirs, versionUpdateTag):
+def getLandPaths(landDirs, versionUpdateTag, args):
     allLands = []
     allLandPaths = []
     for dir in landDirs:
         items = os.listdir(dir)
-        items.sort()
+        items.sort(reverse=args.reverse)
         for item in items:
             itemPath = os.path.join(dir, item)
             if os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'WestGermany3' not in item and 'Slovenia' not in item)
-                                             or versionUpdateTag in item): # note: isdir is true for a link pointing to a dir
+                                             or versionUpdateTag in item ): # note: isdir is true for a link pointing to a dir
                     allLands.append(item)
                     allLandPaths.append(os.path.join(dir, item))
     return allLands, allLandPaths
-
-
 
 def checkGrowth(landPath,landSizes):
     sizeNew = dirSize(landPath)
