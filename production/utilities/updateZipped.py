@@ -29,6 +29,8 @@ from common import dirSize, readfileNoStrip, readfile, renameTry
 from uzsubs import *
 from common import landscapesMap
 from time import perf_counter
+from createTorrents import createTorrents
+from landscapesPage import landscapesPage
 
 args = getParams()
 
@@ -42,32 +44,36 @@ versionBothTag = versions[0] + versions[1]
 highVCheckExt = '.tm3'
 ## zipping ##
 linuxPathStart = '/mnt/'
-winPathStart = 'S:\\' #includes Samba windows mapped drive
+winToLinPathStart = 'S:\\' #includes Samba windows mapped drive
+winToWinPathStart = None
+
 if platform.system() == 'Windows':
     print("Running on Windows...no work on links, torrents or page")
-    pathStart = winPathStart
+    linPathStart = winToLinPathStart
+    winPathStart =  winToWinPathStart
     linux = False
 else:
-    pathStart = linuxPathStart
+    linPathStart = linuxPathStart
+    winPathStart =linuxPathStart
     linux = True
-lowVMain = os.path.join(pathStart,'E','landscapes','landscapesC2-main')
-lowVExt1 = os.path.join('A:','landscapesC2') # None #
-lowVini = os.path.join(pathStart,'E','landscapes','landscapesC2-ini')
-lowVserver = os.path.join(pathStart,'E','landscapes','landscapesC2-server')
-highVMain = os.path.join(pathStart,'E','landscapes','landscapesC3-main')
-highVExt1 = None #os.path.join(pathStart,'E','landscapes','landscapesC3-main')
-highVini = os.path.join(pathStart,'E','landscapes','landscapesC3-ini')
-highVserver = os.path.join(pathStart,'E','landscapes','landscapesC3-server')
+lowVMain = os.path.join(linPathStart,'E','landscapes','landscapesC2-main')
+lowVExt1 = winPath(os.path.join(winPathStart, 'A:','landscapesC2')) # None
+lowVini = os.path.join(linPathStart,'E','landscapes','landscapesC2-ini')
+lowVserver = os.path.join(linPathStart,'E','landscapes','landscapesC2-server')
+highVMain = os.path.join(linPathStart,'E','landscapes','landscapesC3-main')
+highVExt1 = None #os.path.join(linPathStart,'E','landscapes','landscapesC3-main')
+highVini = os.path.join(linPathStart,'E','landscapes','landscapesC3-ini')
+highVserver = os.path.join(linPathStart,'E','landscapes','landscapesC3-server')
 lowerVersionLandDirs = [lowVMain,lowVini,lowVserver]
 higherVersionLandDirs = [highVMain,highVini,highVserver]
 landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
 versionMainDict = {'C2': lowVMain, 'C3': highVMain}
-zipMain = os.path.join(pathStart,'P','landscapes-zip')
-# zipMain = os.path.join('A:','zips')
-zipExtras = None #[os.path.join(pathStart,'E','landscapes','zipped1']
+zipMain = os.path.join(linPathStart,'P','landscapes-zip')
+# zipMain = os.path.join(winPathStart,'A:','zips')
+zipExtras = None #[os.path.join(linPathStart,'E','landscapes','zipped1']
 zipDirs = [zipMain] #+ zipExtras
 zipPathPrior = [zipMain] # [zipExtras[0],zipMain] # fill up in this order
-utilitiesDir = os.path.join(pathStart,'L','condor-related','skylinesC','production','utilities')
+utilitiesDir = os.path.join(linPathStart,'L','condor-related','skylinesC','production','utilities')
 ## Landscapes page ##
 forceLandPage = False
 landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
@@ -245,37 +251,38 @@ while go:
     #             print('{} is still growing'.format(landDict['landPath']))
 
     if len(toZip) > 0:
-        print("Will create these zips:")
         for land in toZip:
             print('{} -> {}'.format(land['landPath'], land['zipName']))
-        # create new zips
-        newZipped = []
-        for newZip in toZip:
-            # print('skipping zipping')
-            # continue
-            landPath2 = newZip['landPath']
-            if 'C3' in landPath2:
-                mainPath = highVMain
-            else:
-                mainDir = lowVMain
+        if args.nozips:
+            print('\n"nozips" chosen, but the above zips need to be created\n')
+        else:
+            print("Will create the above zips \n")
+            # create new zips
+            newZipped = []
+            for newZip in toZip:
+                # print('skipping zipping')
+                # continue
+                landPath2 = newZip['landPath']
+                if 'C3' in landPath2:
+                    mainPath = highVMain
+                else:
+                    mainDir = lowVMain
 
-            destination = zipDestDriveByPriority(zipPathPrior, landPath2)
-            zipPath = os.path.join(destination, newZip['zipName'])  # no zips will have spaces, but landscapes folders might
+                destination = zipDestDriveByPriority(zipPathPrior, landPath2)
+                zipPath = os.path.join(destination, newZip['zipName'])  # no zips will have spaces, but landscapes folders might
 
-            count = 0
-            print()
-            print('----------------------------------------------------------')
-            print('***Creating {} in {}***'.format(newZip['zipName'], destination))
-            response = sevenzip("compression", zipPath, landPath2, nThreads)
-            # else:
-            #     nZipAfterTorr += 1
-            # except:
-            #     print('Error creating {}'.format(zipPath))
-    if args.links and  linux:
-        updateSymlinks([zipDirs])
+                count = 0
+                print()
+                print('----------------------------------------------------------')
+                print('***Creating {} in {}***'.format(newZip['zipName'], destination))
+                response = sevenzip("compression", zipPath, landPath2, nThreads)
+                nZipAfterTorr += 1
+    if linux:
         createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
         if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
             landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
+        if args.links:
+            updateSymlinks([zipDirs])
 
     waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
     for i in range(waitTimeMins):

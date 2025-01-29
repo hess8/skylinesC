@@ -73,8 +73,11 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
                     os.remove(magPath)
                     toMakeMagnet.append(zipPath)
         # Check for missing .7z file
-        elif extension(item) in ['.torrent', '.magnet'] and not os.path.exists(os.path.join(zipDir,item)):
-            os.remove(os.path.join(zipDir,item))
+        elif extension(item) in ['.torrent', '.magnet']:
+            if not os.path.exists(os.path.join(zipDir,item.replace(extension(item), ''))):
+                print('remove', os.path.join(zipDir,item))
+                xx=0
+                os.remove(os.path.join(zipDir,item))
 
     createdTorr = []
     #create torrents
