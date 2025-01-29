@@ -8,10 +8,14 @@ from datetime import datetime
 from common import dirSize, landscapesMap, renameTry
 
 def winPath(path):
+    list = path.split(os.sep)
     if platform.system() == 'Windows':
-        return path
-    else:
-        return path.replace(':','')
+        if  len(list[0])==1 and list[0].isupper():
+            list[0] += ':'
+            path = os.sep.join(list)
+        else:
+            sys.exit('winPath cannot parse',path)
+    return path
 
 def getParams():
     import argparse
