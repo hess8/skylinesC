@@ -73,8 +73,6 @@ forceLandPage = False
 landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
 qbtorrentExeDir = os.path.join(zipMain,'qbt_exe')
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/' #only used if can get copying by guest control working again
-# qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
-# qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
 landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
 slcVMname = 'U14 (SkylinesC server on Z) Current'
 # landHBS = '/home/bret/servers/repo-skylinesC/landscapes.test.hbs'
@@ -217,7 +215,7 @@ while go:
             if land + highVCheckExt in items and not os.path.exists(lowOnlyZipName):
                 condorVersInName = versionBothTag
         zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),landVersion,condorVersInName) #no zips will have spaces, but landscapes folders might
-        # if versionBothTag in zipName: #see if we need to and can merge
+        # if versionBothTag in zipName: #see if we need to and can merge...but zipmerge doesn't work for 7z...keep for now.
         #     zipPathlow = os.path.join(zipMain, zipName.replace(versionBothTag, versions[0]))
         #     zipNameUpdateVers = os.path.join(zipMain, name.replace(' ', '_') + versionUpdateTag +'.7z')
         #     zipPathUpdateVers = os.path.join(zipMain, zipNameUpdateVers)
@@ -275,6 +273,8 @@ while go:
         updateSymlinks([zipDirs])
         createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
         if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
+            qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
+            qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
             landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
 
     waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
