@@ -50,8 +50,6 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
     toMakeTorrent  = []
     toMakeMagnet = []
 
-    sys.exit('Stop.  Check if it deletes zips by error first')
-
     for item in zipDirList:
         if extension(item) == '.7z':
             zipPath = os.path.join(zipDir, item)
@@ -76,13 +74,13 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             elif os.path.exists(magPath):
                 magTime = os.path.getmtime(magPath)
                 if magTime < zipTime or os.stat(magPath).st_size == 0:
+                    print(magTime < zipTime ,os.stat(magPath).st_size == 0)
                     os.remove(magPath)
                     toMakeMagnet.append(zipPath)
         # Check for missing .7z file
         elif extension(item) in ['.torrent', '.magnet']:
             if not os.path.exists(os.path.join(zipDir,item.replace(extension(item), ''))):
                 print('remove', os.path.join(zipDir,item))
-                xx=0
                 os.remove(os.path.join(zipDir,item))
 
     createdTorr = []

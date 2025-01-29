@@ -275,12 +275,13 @@ while go:
                 print('***Creating {} in {}***'.format(newZip['zipName'], destination))
                 response = sevenzip("compression", zipPath, landPath2, nThreads)
                 nZipAfterTorr += 1
-    # createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
-    # if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
-    #     qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
-    #     qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
-    #     landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
-    if linux and args.links:
+    if linux:
+        createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
+        if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
+            qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
+            qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
+            landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
+         if args.links:
             updateSymlinks([zipDirs])
 
     waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
