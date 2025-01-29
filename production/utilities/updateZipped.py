@@ -100,8 +100,8 @@ highVList = os.listdir(highVMain)
 
 landSizes = {}
 
-# landDirs = [lowVMain, lowVExt1, highVMain]
-landDirs = [lowVMain]
+landDirs = [lowVMain, lowVExt1, highVMain]
+# landDirs = [lowVMain]
 allLands, allLandPaths = getLandPaths(landDirs, versionUpdateTag, args)
 
 #### optional scripts ###
