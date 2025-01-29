@@ -45,7 +45,7 @@ highVCheckExt = '.tm3'
 ## zipping ##
 linuxPathStart = '/mnt/'
 winToLinPathStart = 'S:\\' #includes Samba windows mapped drive
-winToWinPathStart = None
+winToWinPathStart = ''
 
 if platform.system() == 'Windows':
     print("Running on Windows...no work on links, torrents or page")
