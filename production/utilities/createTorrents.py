@@ -1,27 +1,31 @@
 def createTorrents(zipDir, watchDir,makeAllMagnets):
-    '''Called by updateZipped.py'''
-    #Notes on ***magnet links***, which are created in landscapes.py:
-    # npm install -g magnet-link
-    # magnet-link /home/bret/Downloads/AA2.v0.7.7z.torrent > magnet.txt
+    '''Called by updateZipped.py
+    mktorrent can be installed in PyCharm interpreter settings
 
-    # Options for mktorrent:
+    magnet-link: npm install -g magnet-link.   On Windows install nodejs first
 
-    # -a <url>[,<url>]* : specify the full announce URLs
-    #                     at least one is required
-    #                     additional -a adds backup trackers
-    # -c <comment>      : add a comment to the metainfo
-    # -d                : don't write the creation date
-    # -h                : show this help screen
-    # -l <n>            : set the piece length to 2^n bytes,
-    #                     default is 18, that is 2^18 = 256kb
-    # -n <name>         : set the name of the torrent,
-    #                     default is the basename of the target
-    # -o <filename>     : set the path and filename of the created file
-    #                     default is <name>.torrent
-    # -p                : set the private flag
-    # -s                : add source string embedded in infohash
-    # -v                : be verbose
+    Notes on ***magnet links***, which are created in landscapes.py:
+    npm install -g magnet-link
+    magnet-link /home/bret/Downloads/AA2.v0.7.7z.torrent > magnet.txt
 
+    Options for mktorrent:
+
+    -a <url>[,<url>]* : specify the full announce URLs
+                        at least one is required
+                        additional -a adds backup trackers
+    -c <comment>      : add a comment to the metainfo
+    -d                : don't write the creation date
+    -h                : show this help screen
+    -l <n>            : set the piece length to 2^n bytes,
+                        default is 18, that is 2^18 = 256kb
+    -n <name>         : set the name of the torrent,
+                        default is the basename of the target
+    -o <filename>     : set the path and filename of the created file
+                        default is <name>.torrent
+    -p                : set the private flag
+    -s                : add source string embedded in infohash
+    -v                : be verbose
+'''
     import os, sys
 
     def extension(filepath):
@@ -45,6 +49,8 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
     torrentsList = []
     toMakeTorrent  = []
     toMakeMagnet = []
+
+    sys.exit('Stop.  Check if it deletes zips by error first')
 
     for item in zipDirList:
         if extension(item) == '.7z':

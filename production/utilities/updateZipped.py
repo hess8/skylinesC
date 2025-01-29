@@ -218,7 +218,7 @@ while go:
         if args.upversion and condorOrigVers == versions[0]:
             lowOnlyZipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),landVersion,condorOrigVers) #no zips will have spaces, but landscapes folders might
             items = os.listdir(landPath)
-            if land + highVCheckExt in items and not os.path.exists(lowOnlyZipName):
+            if land not in landscapesMap and land + highVCheckExt in items and not os.path.exists(lowOnlyZipName):
                 condorVersInName = versionBothTag
         zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),landVersion,condorVersInName) #no zips will have spaces, but landscapes folders might
         # if versionBothTag in zipName: #see if we need to and can merge...but zipmerge doesn't work for 7z...keep for now.
@@ -275,13 +275,12 @@ while go:
                 print('***Creating {} in {}***'.format(newZip['zipName'], destination))
                 response = sevenzip("compression", zipPath, landPath2, nThreads)
                 nZipAfterTorr += 1
-    if linux:
-        createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
-        if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
-            qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
-            qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
-            landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
-        if args.links:
+    # createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
+    # if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
+    #     qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
+    #     qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
+    #     landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
+    if linux and args.links:
             updateSymlinks([zipDirs])
 
     waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
