@@ -49,7 +49,7 @@ def winPath(path):
             list[0] += ':'
             path = os.sep.join(list)
         else:
-            sys.exit('winPath cannot parse',path)
+            sys.exit('winPath cannot parse{}'.format(path))
     return path
 
 def skylinesC_VM():
