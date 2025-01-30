@@ -4,9 +4,9 @@ import subprocess
 import platform
 import signal
 from time import sleep
+from more_itertools import sort_together
 from datetime import datetime
 from common import dirSize, landscapesMap, renameTry
-
 def winPath(path):
     list = path.split(os.sep)
     if platform.system() == 'Windows':
@@ -23,7 +23,7 @@ def getParams():
     linksHelp = "Do links work if on linux"
     nozipsHelp = "Not zip any folders"
     reverseHelp = "Go through landscapes and zip lists in reverse order"
-    upversionHelp = "Make zip of combined low and high versions"
+    upversionHelp = "Make zips of combined low and high versions"
     parser = argparse.ArgumentParser(description="Landscape compression and management")
     parser.add_argument("-g", "--growth", help=growthHelp, action="store_true")
     parser.add_argument("-l", "--links", help=linksHelp, action="store_true")
@@ -31,6 +31,7 @@ def getParams():
     parser.add_argument("-r", "--reverse", help=reverseHelp, action="store_true")
     parser.add_argument("-u", "--upversion", help=upversionHelp, action="store_true")
     args = parser.parse_args()
+    args.upversion = True  # not keeping C2zips now
     if len(sys.argv) == 1:
         print('No parameters found in command line')
         parser.print_help(sys.stderr)
@@ -405,13 +406,14 @@ def getLandPaths(landDirs, versionUpdateTag, args):
     allLandPaths = []
     for dir in landDirs:
         items = os.listdir(dir)
-        items.sort(reverse=args.reverse)
         for item in items:
             itemPath = os.path.join(dir, item)
             if os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'WestGermany3' not in item and 'Slovenia' not in item)
                                              or versionUpdateTag in item ): # note: isdir is true for a link pointing to a dir
                     allLands.append(item)
                     allLandPaths.append(os.path.join(dir, item))
+
+    allLands, allLandPaths = sort_together([allLands, allLandPaths],reverse=args.reverse)
     return allLands, allLandPaths
 
 def checkGrowth(landPath,landSizes):
