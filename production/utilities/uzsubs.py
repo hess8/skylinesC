@@ -6,25 +6,18 @@ import signal
 from time import sleep
 from more_itertools import sort_together
 from datetime import datetime
-from common import dirSize, landscapesMap, renameTry
-def winPath(path):
-    list = path.split(os.sep)
-    if platform.system() == 'Windows':
-        if  len(list[0])==1 and list[0].isupper():
-            list[0] += ':'
-            path = os.sep.join(list)
-        else:
-            sys.exit('winPath cannot parse',path)
-    return path
+from common import dirSize, landscapesMap, listRunningVms, renameTry
 
 def getParams():
     import argparse
+    forceHelp = "Force landscapespage to run"
     growthHelp = "Check dir growth before zipping"
     linksHelp = "Do links work if on linux"
     nozipsHelp = "Not zip any folders"
     reverseHelp = "Go through landscapes and zip lists in reverse order"
     upversionHelp = "Make zips of combined low and high versions"
     parser = argparse.ArgumentParser(description="Landscape compression and management")
+    parser.add_argument("-f", "--force", help=forceHelp, action="store_true")
     parser.add_argument("-g", "--growth", help=growthHelp, action="store_true")
     parser.add_argument("-l", "--links", help=linksHelp, action="store_true")
     parser.add_argument("-n", "--nozips", help=nozipsHelp, action="store_true")
@@ -47,10 +40,27 @@ def getParams():
         if args.upversion:
             print('Will:', upversionHelp)
     sleep(2)
-
-
-
     return args
+
+def winPath(path):
+    list = path.split(os.sep)
+    if platform.system() == 'Windows':
+        if  len(list[0])==1 and list[0].isupper():
+            list[0] += ':'
+            path = os.sep.join(list)
+        else:
+            sys.exit('winPath cannot parse',path)
+    return path
+
+def skylinesC_VM():
+    """Get skylinesC VM name from listRunningVms"""
+    output = listRunningVms()
+    for line in output:
+        if 'U14' in line and 'SkylinesC' in line:
+            name = line.split('"')[1]
+            return name
+    else:
+        return None
 
 def zipMergeIntoNew(zipsList, outZip):
     ''' DOESN'T WORK FOR 7ZIP!!

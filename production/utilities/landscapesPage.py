@@ -1,7 +1,8 @@
 import shutil
 from common import landscapesMap
+from uzsubs import skylinesC_VM
 
-def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr):
+def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,trackerStr):
     '''Called by updateZipped.py'''
     import os, sys
     sys.path.append('/mnt/L/condor-related/skylinesC/skylines')
@@ -56,9 +57,6 @@ def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMna
     names = []
     sizes = []
     for item in dirList:
-        print(item)
-        if 'AA3' in item:
-            xx=0
         if item.split('.')[-1]=='torrent':
             name = item.split('.torrent')[0]
             if '_to_C3' in name: #don't add if there is a version 3 for this landscape
@@ -124,5 +122,10 @@ def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMna
     lines.append(' </div> \n')
     lines.append('</BasePage> \n')
     writefile(lines,landPageDest)
-    copy_file_to_guest(slcVMname, landPageDest, landHBS, username, passwd)
+    slcVMname = skylinesC_VM
+    if slcVMname:
+        copy_file_to_guest(slcVMname, landPageDest, landHBS, username, passwd)
+        print('Copied landscapes page to SkylinesC server')
+    else:
+        print('SkylinesC server appears not to be running')
     print('New landscapes page created for {} files'.format(len(names)))

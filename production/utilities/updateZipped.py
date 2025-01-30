@@ -45,17 +45,19 @@ highVCheckExt = '.tm3'
 ## zipping ##
 linuxPathStart = '/mnt/'
 winToLinPathStart = 'S:\\' #includes Samba windows mapped drive
+winToWinPathStart = ''
 
 if platform.system() == 'Windows':
     print("Running on Windows...no work on links, torrents or page")
     linPathStart = winToLinPathStart
+    winPathStart =  winToWinPathStart
     linux = False
 else:
     linPathStart = linuxPathStart
     winPathStart =linuxPathStart
     linux = True
 lowVMain = os.path.join(linPathStart,'E','landscapes','landscapesC2-main')
-lowVExt1 = winPath(os.path.join('A','landscapesC2')) # None
+lowVExt1 = winPath(os.path.join(winPathStart, 'A:','landscapesC2')) # None
 lowVini = os.path.join(linPathStart,'E','landscapes','landscapesC2-ini')
 lowVserver = os.path.join(linPathStart,'E','landscapes','landscapesC2-server')
 highVMain = os.path.join(linPathStart,'E','landscapes','landscapesC3-main')
