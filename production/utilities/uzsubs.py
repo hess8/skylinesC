@@ -7,43 +7,60 @@ from time import sleep
 from datetime import datetime
 from common import dirSize, landscapesMap, renameTry
 
-def winPath(path):
-    if platform.system() == 'Windows':
-        return path
-    else:
-        return path.replace(':','')
-
 def getParams():
     import argparse
+    forceHelp = "Force landscapespage to run"
     growthHelp = "Check dir growth before zipping"
     linksHelp = "Do links work if on linux"
     nozipsHelp = "Not zip any folders"
     reverseHelp = "Go through landscapes and zip lists in reverse order"
     upversionHelp = "Make zip of combined low and high versions"
     parser = argparse.ArgumentParser(description="Landscape compression and management")
+    parser.add_argument("-f", "--force", help=forceHelp, action="store_true")
     parser.add_argument("-g", "--growth", help=growthHelp, action="store_true")
     parser.add_argument("-l", "--links", help=linksHelp, action="store_true")
     parser.add_argument("-n", "--nozips", help=nozipsHelp, action="store_true")
     parser.add_argument("-r", "--reverse", help=reverseHelp, action="store_true")
     parser.add_argument("-u", "--upversion", help=upversionHelp, action="store_true")
     args = parser.parse_args()
-    if len(sys.argv) == 1:
-        print('No parameters found in command line')
-        parser.print_help(sys.stderr)
-    else:
-        if args.growth:
-            print('Will:', growthHelp)
-        if args.links:
-            print('Will:', linksHelp)
-        if args.nozips:
-            print('Will:', nozipsHelp)
-        if args.reverse:
-            print('Will:', reverseHelp)
-        if args.upversion:
-            print('Will:', upversionHelp)
+    # if len(sys.argv) == 1:
+    #     print('No parameters found in command line')
+    parser.print_help(sys.stderr)
+    sleep(1)
+    # else:
+    if args.force:
+        print('Will:', forceHelp)
+    if args.growth:
+        print('Will:', growthHelp)
+    if args.growth:
+        print('Will:', growthHelp)
+    if args.links:
+        print('Will:', linksHelp)
+    if args.nozips:
+        print('Will:', nozipsHelp)
+    if args.reverse:
+        print('Will:', reverseHelp)
+    if args.upversion:
+        print('Will:', upversionHelp)
     sleep(2)
+    return args
+
+def winPath(path):
+    if platform.system() == 'Windows':
+        return path
+    else:
+        return path.replace(':','')
 
 
+def skylinesC_VM():
+    """Get skylinesC VM name from listRunningVms"""
+    output = listRunningVms()
+    for line in output:
+        if 'U14' in line and 'SkylinesC' in line:
+            name = line.split('"')[1]
+            return name
+    else:
+        return None
 
     return args
 

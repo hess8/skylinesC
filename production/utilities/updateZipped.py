@@ -281,7 +281,7 @@ while go:
             qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
             qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
             landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
-         if args.links:
+        if args.links:
             updateSymlinks([zipDirs])
 
     waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes

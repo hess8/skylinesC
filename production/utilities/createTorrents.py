@@ -69,7 +69,7 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             else:
                 toMakeTorrent.append(zipPath)
             # check for outdated magnet
-            if makeAllMagnets:
+            if makeAllMagnets and not zipPath not in toMakeMagnet:
                 toMakeMagnet.append(zipPath)
             elif os.path.exists(magPath):
                 magTime = os.path.getmtime(magPath)
@@ -96,7 +96,6 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             os.system('mktorrent -a {} -l {} -c {} -w {} {}'.format(tracker,sizeExp,comment,webSeed,zippedPath))
             print('{}.torrent created'.format(zippedPath))
             createdTorr.append(toMakeTorrent)
-            magPath = zippedPath.replace('.7z','.magnet')
             toMakeMagnet.append(zipPath)
         except:
             sys.exit('Stop.Error in torrent {}'.format(zippedPath))
