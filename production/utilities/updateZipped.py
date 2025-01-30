@@ -75,12 +75,10 @@ zipDirs = [zipMain] #+ zipExtras
 zipPathPrior = [zipMain] # [zipExtras[0],zipMain] # fill up in this order
 utilitiesDir = os.path.join(linPathStart,'L','condor-related','skylinesC','production','utilities')
 ## Landscapes page ##
-forceLandPage = False
 landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
 qbtorrentExeDir = os.path.join(zipMain,'qbt_exe')
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/' #only used if can get copying by guest control working again
 landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
-slcVMname = 'U14 (SkylinesC server on Z) Current'
 # landHBS = '/home/bret/servers/repo-skylinesC/landscapes.test.hbs'
 ## Torrents ##
 
@@ -186,7 +184,6 @@ while go:
     # list dirs to be zipped
     toTestGrowth = []
     toZip = []
-    createdTorr = []
     #get low version list to avoid making zips of C2 folders linked to C3
     lowVLands = []
     for i, landPath, in enumerate(allLandPaths):
@@ -277,11 +274,11 @@ while go:
                 nZipAfterTorr += 1
     if linux:
         createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
-        if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
+        if args.force or len(createdTorr) > 0 or not os.path.exists(landPageDest):
             qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
             qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
-            landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
-         if args.links:
+            landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,trackerStr)
+        if args.links:
             updateSymlinks([zipDirs])
 
     waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes

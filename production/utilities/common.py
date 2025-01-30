@@ -1,4 +1,4 @@
-import os,subprocess
+import os,subprocess,sys
 import platform
 import shutil
 # import pathlib
@@ -79,6 +79,16 @@ def copy_file_to_guest(vm_name, host_file_path, guest_file_path,usernm,passwd):
         subprocess.check_output(cmd)
     except subprocess.CalledProcessError as e:
         print(e.output)
+
+def listRunningVms():
+    cmd = [
+        "vboxmanage",
+        "list",
+        "runningvms"
+    ]
+    result = subprocess.check_output(cmd)
+    outputLines = result.decode('utf-8').split('\n')
+    return outputLines
 
 def dirSize(path):
     # This suggestion is very slow: sum(f.stat().st_size for f in pathlib.Path(path).glob('**/*') if f.is_file())
