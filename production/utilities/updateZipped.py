@@ -49,35 +49,31 @@ winToWinPathStart = ''
 
 if platform.system() == 'Windows':
     print("Running on Windows...no work on links, torrents or page")
-    linPathStart = winToLinPathStart
-    winPathStart =  winToWinPathStart
     linux = False
 else:
-    linPathStart = linuxPathStart
-    winPathStart =linuxPathStart
     linux = True
-lowVMain = os.path.join(linPathStart,'E','landscapes','landscapesC2-main')
-lowVExt1 = winPath(os.path.join(winPathStart, 'A:','landscapesC2')) # None
-lowVini = os.path.join(linPathStart,'E','landscapes','landscapesC2-ini')
-lowVserver = os.path.join(linPathStart,'E','landscapes','landscapesC2-server')
-highVMain = os.path.join(linPathStart,'E','landscapes','landscapesC3-main')
-highVExt1 = None #os.path.join(linPathStart,'E','landscapes','landscapesC3-main')
-highVini = os.path.join(linPathStart,'E','landscapes','landscapesC3-ini')
-highVserver = os.path.join(linPathStart,'E','landscapes','landscapesC3-server')
+lowVMain = pathWinLin(os.path.join('E','landscapes','landscapesC2-main'))
+lowVExt1 = pathWinLin(os.path.join('A','landscapesC2')) # None
+lowVini = pathWinLin(os.path.join('E','landscapes','landscapesC2-ini'))
+lowVserver = pathWinLin(os.path.join('E','landscapes','landscapesC2-server'))
+highVMain = pathWinLin(os.path.join('E','landscapes','landscapesC3-main'))
+highVExt1 = None #pathWinLin(os.path.join('E','landscapes','landscapesC3-main')
+highVini = pathWinLin(os.path.join('E','landscapes','landscapesC3-ini'))
+highVserver = pathWinLin(os.path.join('E','landscapes','landscapesC3-server'))
 lowerVersionLandDirs = [lowVMain,lowVini,lowVserver]
 higherVersionLandDirs = [highVMain,highVini,highVserver]
 landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
 versionMainDict = {'C2': lowVMain, 'C3': highVMain}
-zipMain = os.path.join(linPathStart,'P','landscapes-zip')
-# zipMain = os.path.join(winPathStart,'A:','zips')
-zipExtras = None #[os.path.join(linPathStart,'E','landscapes','zipped1']
+zipMain = pathWinLin(os.path.join('P','landscapes-zip'))
+# zipMain = pathWinLin(os.path.join(winPathStart,'A:','zips'))
+zipExtras = None #[os.path.join('E','landscapes','zipped1']
 zipDirs = [zipMain] #+ zipExtras
 zipPathPrior = [zipMain] # [zipExtras[0],zipMain] # fill up in this order
-utilitiesDir = os.path.join(linPathStart,'L','condor-related','skylinesC','production','utilities')
+utilitiesDir = os.path.join('L','condor-related','skylinesC','production','utilities')
 ## Landscapes page ##
 forceLandPage = False
-landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
-qbtorrentExeDir = os.path.join(zipMain,'qbt_exe')
+landPageDest = pathWinLin(os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs'))
+qbtorrentExeDir = pathWinLin(os.path.join(zipMain,'qbt_exe'))
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/' #only used if can get copying by guest control working again
 landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
 slcVMname = 'U14 (SkylinesC server on Z) Current'
@@ -288,10 +284,10 @@ while go:
                 nZipAfterTorr += 1
     if linux:
         createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
-        if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
-            qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
-            qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
-            landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
+        # if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
+        #     qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
+        #     qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
+        #     landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
         if args.links:
             updateSymlinks([zipDirs])
 

@@ -42,7 +42,7 @@ def getParams():
     sleep(2)
     return args
 
-def winPath(path):
+def pathWinLin(path):
     list = path.split(os.sep)
     if platform.system() == 'Windows':
         if  len(list[0])==1 and list[0].isupper():
@@ -50,6 +50,8 @@ def winPath(path):
             path = os.sep.join(list)
         else:
             sys.exit('winPath cannot parse',path)
+    else:
+        path = '/mnt/' + path
     return path
 
 def skylinesC_VM():

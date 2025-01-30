@@ -95,7 +95,7 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             print(zippedPath)
             os.system('mktorrent -a {} -l {} -c {} -w {} {}'.format(tracker,sizeExp,comment,webSeed,zippedPath))
             print('{}.torrent created'.format(zippedPath))
-            createdTorr.append(toMakeTorrent)
+            createdTorr.append(zipPath)
             toMakeMagnet.append(zipPath)
         except:
             sys.exit('Stop.Error in torrent {}'.format(zippedPath))
