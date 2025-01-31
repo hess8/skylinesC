@@ -50,7 +50,7 @@ def pathWinLin(path):
         if driveLetter in winSharedDrives:
             list[0] += ':'
             path = os.sep.join(list)
-        else:
+        elif winSambaDrive not in path:
             path = winSambaDrive + path
     elif linuxPathStart not in path:
         path = linuxPathStart + path
