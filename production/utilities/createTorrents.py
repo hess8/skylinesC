@@ -51,6 +51,8 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
     toMakeMagnet = []
 
     for item in zipDirList:
+        if item == 'zagreb_to_C3.7z':
+            xx=0
         if extension(item) == '.7z':
             zipPath = os.path.join(zipDir, item)
             torrPath = zipPath + '.torrent'
@@ -76,7 +78,8 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
                 if magTime < zipTime or os.stat(magPath).st_size == 0:
                     print(magTime < zipTime ,os.stat(magPath).st_size == 0)
                     os.remove(magPath)
-                    toMakeMagnet.append(zipPath)
+                    if zipPath not in toMakeMagnet:
+                        toMakeMagnet.append(zipPath)
         # Check for missing .7z file
         elif extension(item) in ['.torrent', '.magnet']:
             if not os.path.exists(os.path.join(zipDir,item.replace(extension(item), ''))):

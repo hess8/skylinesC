@@ -25,20 +25,18 @@ def getParams():
     parser.add_argument("-u", "--upversion", help=upversionHelp, action="store_true")
     args = parser.parse_args()
     args.upversion = True  # not keeping C2zips now
-    if len(sys.argv) == 1:
-        print('No parameters found in command line')
-        parser.print_help(sys.stderr)
-    else:
-        if args.growth:
-            print('Will:', growthHelp)
-        if args.links:
-            print('Will:', linksHelp)
-        if args.nozips:
-            print('Will:', nozipsHelp)
-        if args.reverse:
-            print('Will:', reverseHelp)
-        if args.upversion:
-            print('Will:', upversionHelp)
+    if args.force:
+        print('Will:', forceHelp)
+    if args.growth:
+        print('Will:', growthHelp)
+    if args.links:
+        print('Will:', linksHelp)
+    if args.nozips:
+        print('Will:', nozipsHelp)
+    if args.reverse:
+        print('Will:', reverseHelp)
+    if args.upversion:
+        print('Will:', upversionHelp)
     sleep(2)
     return args
 
