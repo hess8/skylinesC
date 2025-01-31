@@ -404,14 +404,14 @@ def makeLink(linkDir, realDir):
     except:
         print('Problem creating symblolic link {} -> {}'.format(linkDir, realDir))
 
-def get_qbtExe(qbtorrentExeDir,slcFilesPath):
+def get_qbtExe(qbtorrentExeDir):
     items = os.listdir(qbtorrentExeDir)
     items.sort()
     exeDirList = qbtorrentExeDir.split(os.sep)
     for item in items:
         if re.search("qb.*exe",item.lower()):
-            u14path = os.path.join(slcFilesPath,exeDirList[-1],item)
-            return u14path
+            exePath = os.path.join(qbtorrentExeDir,item)
+            return exePath
     else:
         sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")
 

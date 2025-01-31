@@ -68,12 +68,12 @@ zipDirs = [zipMain] #+ zipExtras
 zipPathPrior = [zipMain] # [zipExtras[0],zipMain] # fill up in this order
 utilitiesDir = pathWinLin(os.path.join('L','condor-related','skylinesC','production','utilities'))
 ## Landscapes page ##
-landPageDest = pathWinLin(os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs'))
-qbtorrentExeDir = pathWinLin(os.path.join(zipMain,'qbt_exe'))
-slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/' #only used if can get copying by guest control working again
-landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
+landPageLocalDest = pathWinLin(os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs'))
+qbtExeLocalPath = get_qbtExe(pathWinLin(os.path.join(zipMain,'qbt_exe')))
+slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/'
+landPageServerDest = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
 slcVMname = 'U14 (SkylinesC server on Z) Current'
-# landHBS = '/home/bret/servers/repo-skylinesC/landscapes.test.hbs'
+# landPageServerDest = '/home/bret/servers/repo-skylinesC/landscapes.test.hbs'
 ## Torrents ##
 
 trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
@@ -280,10 +280,8 @@ while go:
                 nZipAfterTorr += 1
     if linux:
         createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
-        if (args.force or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
-            qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
-            qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
-            landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,trackerStr,versions,args)
+        if (args.force or len(createdTorr) > 0 or not os.path.exists(landPageLocalDest)):
+            landscapesPage(zipMain,landPageLocalDest,landPageServerDest,qbtExeLocalPath,slcFilesPath,trackerStr,versions,args)
         if args.links:
             updateSymlinks([zipDirs])
 
