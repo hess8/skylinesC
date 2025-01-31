@@ -48,8 +48,7 @@ def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,tracker
     # copy qbt exe to /files so it is accessible to ember
     qbtExeName = qbtExeLocal.split(os.sep)[-1]
     qbtExeDest = os.path.join(slcFilesPath,qbtExeName) #if we can get directy copy through guestcontrol to work again
-    qbtExePage = os.path.join('../../../htdocs/files',qbtExeName)
-    # copy_file_to_guest(slcVMname,qbtExeLocal,qbtExeDest,username, passwd)
+
 
     # get torrents
     dirList = os.listdir(zipMain)
@@ -123,9 +122,16 @@ def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,tracker
     lines.append('</BasePage> \n')
     writefile(lines,landPageDest)
     slcVMname = skylinesC_VM
+
+    if os.path.exists(qbtExeLocal):
+        copy_file_to_guest(slcVMname, qbtExeLocal, qbtExeDest, username, passwd)
+    else:
+        print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocal)
+
     if slcVMname:
         copy_file_to_guest(slcVMname, landPageDest, landHBS, username, passwd)
         print('Copied landscapes page to SkylinesC server')
     else:
         print('SkylinesC server appears not to be running')
+
     print('New landscapes page created for {} files'.format(len(names)))
