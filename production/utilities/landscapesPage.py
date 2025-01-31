@@ -2,7 +2,7 @@ import shutil
 from common import landscapesMap
 from uzsubs import skylinesC_VM
 
-def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,trackerStr):
+def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,trackerStr,versions,args):
     '''Called by updateZipped.py'''
     import os, sys
     sys.path.append('/mnt/L/condor-related/skylinesC/skylines')
@@ -11,7 +11,7 @@ def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,tracker
     def column_table_head(version):
         lines.append('     <div class="column"> \n')
         lines.append('       <table class="table table-striped"> \n')
-        lines.append('       <thead> <h4>Condor ' + str(version) + ' {{t "landscapes"}}</h4> </thead>\n')
+        lines.append('       <thead> <h4>Condor ' + str(version) + '</h4> </thead>\n')
         lines.append('       <tbody> \n')
         # lines.append('        <th class="column-buttons"> {{t "download-torrent"}}</th> \n')
         # lines.append('        <th class="column-buttons"></th> \n')
@@ -48,7 +48,8 @@ def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,tracker
     # copy qbt exe to /files so it is accessible to ember
     qbtExeName = qbtExeLocal.split(os.sep)[-1]
     qbtExeDest = os.path.join(slcFilesPath,qbtExeName) #if we can get directy copy through guestcontrol to work again
-
+    qbtExePage = os.path.join('files',qbtExeName)
+    # copy_file_to_guest(slcVMname,qbtExeLocal,qbtExeDest,username, passwd)
 
     # get torrents
     dirList = os.listdir(zipMain)
@@ -109,29 +110,24 @@ def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,tracker
     lines.append('   </style> \n')
 
     lines.append(' <div class="row"> \n')
-    column_table_head(version='2')
+    if args.upversion:
+        versionStr = '{}/{}'.format(versions[0].replace('C',''),versions[1].replace('C',''))
+    column_table_head(versionStr)
     for i, name in enumerate(lowVersionList):
         tableRow()
     column_table_end()
 
-    column_table_head(version='3')
+    column_table_head(versions[1].replace('C',''))
     for i, name in enumerate(highVersionList):
         tableRow()
     column_table_end()
     lines.append(' </div> \n')
     lines.append('</BasePage> \n')
     writefile(lines,landPageDest)
-    slcVMname = skylinesC_VM
-
-    if os.path.exists(qbtExeLocal):
-        copy_file_to_guest(slcVMname, qbtExeLocal, qbtExeDest, username, passwd)
-    else:
-        print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocal)
-
+    slcVMname = skylinesC_VM()
     if slcVMname:
         copy_file_to_guest(slcVMname, landPageDest, landHBS, username, passwd)
         print('Copied landscapes page to SkylinesC server')
     else:
         print('SkylinesC server appears not to be running')
-
     print('New landscapes page created for {} files'.format(len(names)))
