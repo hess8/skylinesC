@@ -15,7 +15,7 @@ def getParams():
     linksHelp = "Do links work if on linux"
     nozipsHelp = "Not zip any folders"
     reverseHelp = "Go through landscapes and zip lists in reverse order"
-    upversionHelp = "Make zips of combined low and high versions"
+    upversionHelp = "Work with low versions that have been updated to high"
     parser = argparse.ArgumentParser(description="Landscape compression and management")
     parser.add_argument("-f", "--force", help=forceHelp, action="store_true")
     parser.add_argument("-g", "--growth", help=growthHelp, action="store_true")

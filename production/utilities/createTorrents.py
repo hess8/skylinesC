@@ -51,8 +51,6 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
     toMakeMagnet = []
 
     for item in zipDirList:
-        if item == 'zagreb_to_C3.7z':
-            xx=0
         if extension(item) == '.7z':
             zipPath = os.path.join(zipDir, item)
             torrPath = zipPath + '.torrent'
@@ -76,7 +74,6 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             elif os.path.exists(magPath):
                 magTime = os.path.getmtime(magPath)
                 if magTime < zipTime or os.stat(magPath).st_size == 0:
-                    print(magTime < zipTime ,os.stat(magPath).st_size == 0)
                     os.remove(magPath)
                     if zipPath not in toMakeMagnet:
                         toMakeMagnet.append(zipPath)
@@ -96,8 +93,6 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
         webSeed = 'http://208.83.226.9:8080/{}'.format(zippedPath)
         try:
             print(zippedPath)
-            os.system('mktorrent -a {} -l {} -c {} -w {} {}'.format(tracker,sizeExp,comment,webSeed,zippedPath))
-            print('{}.torrent created'.format(zippedPath))
             createdTorr.append(zipPath)
             toMakeMagnet.append(zipPath)
         except:
