@@ -42,10 +42,11 @@ versions = ['C2','C3']
 versionUpdateTag = '_to_{}'.format(versions[1])
 versionBothTag = versions[0] + versions[1]
 highVCheckExt = '.tm3'
+
 ## zipping ##
 linuxPathStart = '/mnt/'
-winToLinPathStart = 'S:\\' #includes Samba windows mapped drive
-winToWinPathStart = ''
+winSharedDrives = ['A']
+winSambaDrive = 'S' #includes Samba windows mapped drive
 
 if platform.system() == 'Windows':
     print("Running on Windows...no work on links, torrents or page")
@@ -64,16 +65,16 @@ lowerVersionLandDirs = [lowVMain,lowVini,lowVserver]
 higherVersionLandDirs = [highVMain,highVini,highVserver]
 landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
 versionMainDict = {'C2': lowVMain, 'C3': highVMain}
-zipMain = pathWinLin(os.path.join('P','landscapes-zip'))
-# zipMain = pathWinLin(os.path.join(winPathStart,'A:','zips'))
-zipExtras = None #[os.path.join('E','landscapes','zipped1']
+zipMain = os.path.join(linPathStart,'P','landscapes-zip')
+# zipMain = os.path.join(winPathStart,'A:','zips')
+zipExtras = None #[os.path.join(linPathStart,'E','landscapes','zipped1']
 zipDirs = [zipMain] #+ zipExtras
 zipPathPrior = [zipMain] # [zipExtras[0],zipMain] # fill up in this order
-utilitiesDir = os.path.join('L','condor-related','skylinesC','production','utilities')
+utilitiesDir = os.path.join(linPathStart,'L','condor-related','skylinesC','production','utilities')
 ## Landscapes page ##
 forceLandPage = False
-landPageDest = pathWinLin(os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs'))
-qbtorrentExeDir = pathWinLin(os.path.join(zipMain,'qbt_exe'))
+landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
+qbtorrentExeDir = os.path.join(zipMain,'qbt_exe')
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/' #only used if can get copying by guest control working again
 landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
 slcVMname = 'U14 (SkylinesC server on Z) Current'
@@ -284,10 +285,10 @@ while go:
                 nZipAfterTorr += 1
     if linux:
         createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
-        # if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
-        #     qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
-        #     qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
-        #     landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
+        if (forceLandPage or len(createdTorr) > 0 or not os.path.exists(landPageDest)):
+            qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
+            qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
+            landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,slcVMname,trackerStr)
         if args.links:
             updateSymlinks([zipDirs])
 

@@ -49,7 +49,7 @@ def pathWinLin(path):
             list[0] += ':'
             path = os.sep.join(list)
         else:
-            sys.exit('winPath cannot parse',path)
+            sys.exit('winPath cannot parse{}'.format(path))
     else:
         path = '/mnt/' + path
     return path
