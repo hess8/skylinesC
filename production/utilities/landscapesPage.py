@@ -48,8 +48,7 @@ def landscapesPage(zipMain,landPageLocalDest,landPageServerDest,qbtExeLocalPath,
     # copy qbt exe to /files so it is accessible to ember
     qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
     qbtExeDest = os.path.join(slcFilesPath,qbtExeName) #if we can get directy copy through guestcontrol to work again
-    qbtExePage = os.path.join('files',qbtExeName)
-    # copy_file_to_guest(slcVMname,qbtExeLocalPath,qbtExeDest,username, passwd)
+    qbtWebPath = os.path.join('/files',qbtExeName)
 
     # get torrents
     dirList = os.listdir(zipMain)
@@ -82,9 +81,7 @@ def landscapesPage(zipMain,landPageLocalDest,landPageServerDest,qbtExeLocalPath,
     lines.append('  </div> \n')
 
     lines.append('  <p>  <b> {{t "landscapesPage.before"}}  {{t "install"}} qBittorrent</b> {{t "landscapesPage.other"}} </p> \n')
-    # lines.append('  <p> <a href="/files/qbittorrent_x64_setup.exe" class="btn btn-default" download>{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n')
-    exeStr = '  <p> <a href="' + qbtExePage + '" class="btn btn-default">{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n'
-    lines.append(exeStr)
+    lines.append('  <p> <a href="' + qbtWebPath + '" class="btn btn-default" download>{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n')
     lines.append('  <p> {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
     lines.append('  <p> {{t "landscapesPage.makeSure"}} <b> {{t "not"}} {{t "your"}} {{t "browser"}}. </b>  {{t "landscapesPage.limits"}}  </p> \n')
     lines.append('  <p> {{t "landscapesPage.extract-with"}}  <a href="https://www.7-zip.org/download.html"> 7-zip </a>. {{t "landscapesPage.extract-here"}} {{t "landscapesPage.paste"}} </p> \n')
