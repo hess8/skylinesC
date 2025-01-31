@@ -2,7 +2,7 @@ import shutil
 from common import landscapesMap
 from uzsubs import skylinesC_VM
 
-def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,trackerStr,versions,args):
+def landscapesPage(zipMain,landPageLocalDest,landPageServerDest,qbtExeLocalPath,slcFilesPath,trackerStr,versions,args):
     '''Called by updateZipped.py'''
     import os, sys
     sys.path.append('/mnt/L/condor-related/skylinesC/skylines')
@@ -46,10 +46,10 @@ def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,tracker
     colPad = 18
     [username,passwd] = readfile('/home/bret/.local/secure/userU')
     # copy qbt exe to /files so it is accessible to ember
-    qbtExeName = qbtExeLocal.split(os.sep)[-1]
+    qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
     qbtExeDest = os.path.join(slcFilesPath,qbtExeName) #if we can get directy copy through guestcontrol to work again
     qbtExePage = os.path.join('files',qbtExeName)
-    # copy_file_to_guest(slcVMname,qbtExeLocal,qbtExeDest,username, passwd)
+    # copy_file_to_guest(slcVMname,qbtExeLocalPath,qbtExeDest,username, passwd)
 
     # get torrents
     dirList = os.listdir(zipMain)
@@ -123,15 +123,16 @@ def landscapesPage(zipMain,landPageDest,landHBS,qbtExeLocal,slcFilesPath,tracker
     column_table_end()
     lines.append(' </div> \n')
     lines.append('</BasePage> \n')
-    writefile(lines,landPageDest)
+    writefile(lines,landPageLocalDest)
 
     slcVMname = skylinesC_VM()
-    if os.path.exists(qbtExeLocal):
-        copy_file_to_guest(slcVMname, qbtExeLocal, qbtExeDest, username, passwd)
+    if os.path.exists(qbtExeLocalPath):
+        copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
+        print('Copied {} to SlylinesC server'.format(qbtExeLocalPath))
     else:
-        print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocal)
+        print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
     if slcVMname:
-        copy_file_to_guest(slcVMname, landPageDest, landHBS, username, passwd)
+        copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
         print('Copied landscapes page to SkylinesC server')
     else:
         print('SkylinesC server appears not to be running')
