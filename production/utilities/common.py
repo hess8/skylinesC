@@ -31,18 +31,20 @@ landscapesMap = {
     '': '',
 }
 
-def winLinkAllDir(sourceDir,targetDir):
+def linkAllDir(sourceDir,targetDir):
     '''puts links to every item in sourceDir in a windows targetDir
     Windows can follow these links more frequently than when sourceDir is linked'''
-    print('Must run as Administrator to use winLinkAllDir')
+    if platform.system() == 'Windows': print('Must run as Administrator to use linkAllDir')
     if not os.path.exists(targetDir):
        os.mkdir(targetDir)
     items = os.listdir(sourceDir)
     for item in items:
         if not os.path.exists(os.path.join(targetDir,item)):
-            cmd = ['mklink', '/d', os.path.join(targetDir, item), os.path.join(sourceDir, item) ]
-            # cmd = 'mklink /d C:\Condor2\Landscapes\Florida2 s:\E\landscapes\landscapesC2-main\Florida2'
-            # os.system(cmd)
+
+            if platform.system() == 'Windows':
+                cmd = ['mklink', '/d', os.path.join(targetDir, item), os.path.join(sourceDir, item) ]
+            else:
+                cmd = ['ln', '-s', os.path.join(sourceDir, item), os.path.join(targetDir, item)]
             print(cmd)
             try:
                 proc = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,shell=True)

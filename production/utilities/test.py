@@ -1,3 +1,9 @@
+from common import linkAllDir
+dir1 = '/mnt/E/landscapesC2/'
+dir2 = '/mnt/E/landscapesC3/'
+
+linkAllDir(dir1,dir2)
+
 import os,sys,time
 
 # # print(os.path(os.curdir))
