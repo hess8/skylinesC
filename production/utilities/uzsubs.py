@@ -407,7 +407,6 @@ def makeLink(linkDir, realDir):
 def get_qbtExe(qbtorrentExeDir):
     items = os.listdir(qbtorrentExeDir)
     items.sort()
-    exeDirList = qbtorrentExeDir.split(os.sep)
     for item in items:
         if re.search("qb.*exe",item.lower()):
             exePath = os.path.join(qbtorrentExeDir,item)
