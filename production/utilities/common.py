@@ -1,4 +1,4 @@
-import os,subprocess,sys
+import os,subprocess
 import platform
 import shutil
 # import pathlib
@@ -84,6 +84,14 @@ def renameTry(oldname, newname):
     #     sys.exit("Stop: can't rename {} to {}".format(oldname, newname))
     shutil.move(oldname, newname)
     print('Renamed {} to {}'.format(oldname, newname))
+
+def rmLinksDir(path):
+    '''Removes all links in a directory'''
+    for item in os.listdir(path):
+        itemPath = os.path.join(path,item)
+        if os.path.islink(itemPath):
+            os.remove(itemPath)
+            print('Removed symlink',itemPath)
 
 def copy_file_to_guest(vm_name, host_file_path, guest_file_path,usernm,passwd):
     """Copies a file from host to guest using VBoxManage."""
