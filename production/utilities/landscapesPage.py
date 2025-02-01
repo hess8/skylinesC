@@ -121,16 +121,4 @@ def landscapesPage(zipMain,landPageLocalDest,landPageServerDest,qbtExeLocalPath,
     lines.append(' </div> \n')
     lines.append('</BasePage> \n')
     writefile(lines,landPageLocalDest)
-
-    slcVMname = skylinesC_VM()
-    if os.path.exists(qbtExeLocalPath):
-        copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
-        print('Copied {} to SlylinesC server'.format(qbtExeLocalPath))
-    else:
-        print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
-    if slcVMname:
-        copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
-        print('Copied landscapes page to SkylinesC server')
-    else:
-        print('SkylinesC server appears not to be running')
     print('New landscapes page created for {} files'.format(len(names)))

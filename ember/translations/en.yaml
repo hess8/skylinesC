@@ -282,7 +282,7 @@ circling-direction:
   total: Total
 landscapesPage:
   download: All landscapes download as a single file.
-  paste: Put the landscape folder in Condor2/Landscapes.
+  paste: Put the landscape folder in the appropriate Landscapes folder.
 #  qbittorent: Click on "qBittorrent Windows x64" or "qBittorrent Windows" links, not the page's ad. qBittorrent (or similar torrent manager) works well for these large files.
   makeSure: Make sure your torrent manager is downloading the big torrent files,
   limits: Browsers have download size limits.
@@ -303,6 +303,9 @@ landscapesPage:
   see: See this
   map: world map
   locations: for the location of all landscapes.
+  convert: You can use a Condor2 landscape in Condor3 if it's been converted. The "C2C3" downloads contain converted landscapes. The "_to_C3" downloads have the few files needed to convert a landscape you already have.
+  link: You must make a symbolic link from the C2 landscape to the C3 Landscapes folder. If you if you already have the Condor2 landscape, just download the small "_to_C3" file, extract and paste into the file.  Then m
+  converter: is a tool that creates the symbolic links needed between all converted C2 landscapes and the C3 Landscapes folder. It also quickly extracts the "_to_C3" downloads and a the C2 landscape you already have.
 errors:
   description: This field
   inclusion: '{description} is not included in the list'

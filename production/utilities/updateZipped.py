@@ -70,12 +70,11 @@ utilitiesDir = pathWinLin(os.path.join('L','condor-related','skylinesC','product
 ## Landscapes page ##
 landPageLocalDest = pathWinLin(os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs'))
 qbtExeLocalPath = get_qbtExe(pathWinLin(os.path.join(zipMain,'qbt_exe')))
+convert-landscapesPath = pathWinLin(os.path.join(zipMain,'convert-landscapes'))
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/'
 landPageServerDest = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
-slcVMname = 'U14 (SkylinesC server on Z) Current'
-# landPageServerDest = '/home/bret/servers/repo-skylinesC/landscapes.test.hbs'
-## Torrents ##
 
+## Torrents ##
 trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
 watchDir = pathWinLin(os.path.join(zipMain + '/qbtWatch'))
 makeAllMagnets = False  # needed only occasionally
@@ -282,6 +281,23 @@ while go:
         createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
         if (args.force or len(createdTorr) > 0 or not os.path.exists(landPageLocalDest)):
             landscapesPage(zipMain,landPageLocalDest,landPageServerDest,qbtExeLocalPath,slcFilesPath,trackerStr,versions,args)
+        slcVMname = skylinesC_VM()
+        if slcVMname:
+            if os.path.exists(convert):
+                copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
+                print('Copied {} to SlylinesC server'.format(qbtExeLocalPath))
+            else:
+                print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
+            if os.path.exists(qbtExeLocalPath):
+                copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
+                print('Copied {} to SlylinesC server'.format(qbtExeLocalPath))
+            else:
+                print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
+
+            copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
+            print('Copied landscapes page to SkylinesC server')
+        else:
+            print('SkylinesC server appears not to be running')
         if args.links:
             updateSymlinks([zipDirs])
 
