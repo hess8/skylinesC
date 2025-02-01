@@ -1,15 +1,16 @@
 import shutil
 import os, sys
 
-from uzsubs import *
+from uzsubs import getParams
 from landscapesPage import landscapesPage
 from createTorrents import createTorrents
 
-
-zipMain = '/mnt/P/landscapes-zip'
+args = getParams()
+# zipMain = '/mnt/P/landscapes-zip'
+zipMain = '/media/sf_landscapes-zip'
 ## Landscapes page ##
-landPageDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
-qbtorrentExeDir = os.path.join(zipMain,'qbt_exe')
+landPageLocalDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs')
+
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/' #only used if can get copying by guest control working again
 qbtExeLocal = get_qbtExe(qbtorrentExeDir,slcFilesPath)
 qbtExePath = get_qbtExe(qbtorrentExeDir,slcFilesPath)
@@ -21,4 +22,4 @@ trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
 watchDir = os.path.join(zipMain + '/qbtWatch')
 makeAllMagnets = False  # needed only occasionally
 createdTorr = createTorrents(zipMain, watchDir, makeAllMagnets)
-landscapesPage(zipMain, landPageDest, landHBS, qbtExeLocal, slcFilesPath, slcVMname, trackerStr)
+landscapesPagelandscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)

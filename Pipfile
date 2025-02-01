@@ -47,6 +47,7 @@ requests-oauthlib = "*"
 blinker = "*"
 gitflask = "*"
 pipfile = "*"
+more-itertools = "*"
 
 [dev-packages]
 fabric = "==1.14.0"

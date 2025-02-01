@@ -1,6 +1,6 @@
 import shutil
 from common import landscapesMap
-from uzsubs import skylinesC_VM
+
 
 def landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args):
     '''Called by updateZipped.py'''
