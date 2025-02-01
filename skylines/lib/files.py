@@ -22,7 +22,7 @@ def sanitise_filename(name):
     if is_bytes(name):
         name = re.sub(br"[^-_.a-zA-Z0-9]", "_", name)
 
-        # convert to unicode string
+        # landscapes to unicode string
         name = name.decode("ascii")
     else:
         name = re.sub(r"[^-_.a-zA-Z0-9]", "_", name)

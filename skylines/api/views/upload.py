@@ -582,7 +582,7 @@ def airspace_image(cache_key, airspace_id):
         extent_epsg4326[1] = center_y - 0.15
         extent_epsg4326[3] = center_y + 0.15
 
-    # convert extent from EPSG4326 to EPSG3857
+    # landscapes extent from EPSG4326 to EPSG3857
     epsg4326 = pyproj.Proj(init="epsg:4326")
     epsg3857 = pyproj.Proj(init="epsg:3857")
 

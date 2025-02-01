@@ -4,7 +4,6 @@ import subprocess
 import platform
 import signal
 from time import sleep
-from more_itertools import sort_together
 from datetime import datetime
 from common import dirSize, landscapesMap, listRunningVms, renameTry
 
@@ -407,7 +406,6 @@ def makeLink(linkDir, realDir):
 def get_qbtExe(qbtorrentExeDir):
     items = os.listdir(qbtorrentExeDir)
     items.sort()
-    exeDirList = qbtorrentExeDir.split(os.sep)
     for item in items:
         if re.search("qb.*exe",item.lower()):
             exePath = os.path.join(qbtorrentExeDir,item)
@@ -416,6 +414,7 @@ def get_qbtExe(qbtorrentExeDir):
         sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")
 
 def getLandPaths(landDirs, versionUpdateTag, args):
+    from more_itertools import sort_together
     allLands = []
     allLandPaths = []
     for dir in landDirs:

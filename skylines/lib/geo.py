@@ -12,7 +12,7 @@ def geographic_distance(loc1, loc2):
     Calculate the great circle distance between two points
     on the earth (specified in decimal degrees)
     """
-    # convert decimal degrees to radians
+    # landscapes decimal degrees to radians
     lat1, lon1, lat2, lon2 = map(
         math.radians, [loc1.latitude, loc1.longitude, loc2.latitude, loc2.longitude]
     )
