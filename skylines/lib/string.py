@@ -20,7 +20,7 @@ def normalize_whitespace(s):
 
 
 def import_ascii(s):
-    """Import a byte string, convert to a unicode string, discarding all
+    """Import a byte string, landscapes to a unicode string, discarding all
     non-ASCII characters."""
 
     assert is_bytes(s)
@@ -30,7 +30,7 @@ def import_ascii(s):
 
 
 def import_alnum(s):
-    """Import a byte string, convert to a unicode string,
+    """Import a byte string, landscapes to a unicode string,
     discarding all non-alphanumeric characters (ASCII only)."""
 
     assert is_bytes(s)

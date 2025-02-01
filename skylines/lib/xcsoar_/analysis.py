@@ -159,7 +159,7 @@ def save_contest(contest_name, traces, flight):
 
 def save_contests(root, flight):
     if "contests" not in root or flight.takeoff_time is None:
-        # The takeoff_time is needed to convert the
+        # The takeoff_time is needed to landscapes the
         # time integer to a DateTime instance
         return
 

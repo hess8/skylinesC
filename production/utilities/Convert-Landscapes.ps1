@@ -53,8 +53,11 @@ else
 		{
 			Write-Host -ForegroundColor Yellow "Converting $($name)..."
 			# Extract conversion files
+      Write-Host "test0"
 			& "$env:ProgramFiles\7-Zip\7z.exe" x -t7z ('-o' + $landscapes2) $conv.FullName
+			Write-Host "test1"
 			$c2t = [IO.DirectoryInfo][IO.Path]::Combine($landscapes2, $name + '_to_C3')
+			Write-Host $c2t,"test2"
 			try
 			{
 				if ($c2t.Exists)

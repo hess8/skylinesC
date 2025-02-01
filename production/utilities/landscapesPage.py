@@ -2,7 +2,7 @@ import shutil
 from common import landscapesMap
 from uzsubs import skylinesC_VM
 
-def landscapesPage(zipMain,landPageLocalDest,landPageServerDest,qbtExeLocalPath,slcFilesPath,trackerStr,versions,args):
+def landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args):
     '''Called by updateZipped.py'''
     import os, sys
     sys.path.append('/mnt/L/condor-related/skylinesC/skylines')
@@ -44,11 +44,6 @@ def landscapesPage(zipMain,landPageLocalDest,landPageServerDest,qbtExeLocalPath,
     ##############  script  ##############
     colWidth = 330
     colPad = 18
-    [username,passwd] = readfile('/home/bret/.local/secure/userU')
-    # copy qbt exe to /files so it is accessible to ember
-    qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
-    qbtExeDest = os.path.join(slcFilesPath,qbtExeName) #if we can get directy copy through guestcontrol to work again
-    qbtWebPath = os.path.join('/files',qbtExeName)
 
     # get torrents
     dirList = os.listdir(zipMain)

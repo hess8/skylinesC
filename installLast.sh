@@ -102,6 +102,7 @@ sudo pipenv install --verbose  faker
 sudo pipenv install --verbose  flake8
 sudo pipenv install --verbose  immobilus
 sudo pipenv install --verbose  blinker
+sudo pipenv install --verbose more-itertools
 
 
 # sudo pipenv install --verbose --verbose --dev  --skip-lock #this doesn't work with skip-lock...seems to work without it, but can't lock anyway due to oauth dependency problems
