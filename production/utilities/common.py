@@ -40,20 +40,11 @@ def linkAllDir(sourceDir,targetDir):
     items = os.listdir(sourceDir)
     for item in items:
         if not os.path.exists(os.path.join(targetDir,item)):
-
             if platform.system() == 'Windows':
                 cmd = ['mklink', '/d', os.path.join(targetDir, item), os.path.join(sourceDir, item) ]
             else:
                 cmd = ['ln', '-s', os.path.join(sourceDir, item), os.path.join(targetDir, item)]
-            print(cmd)
-            try:
-                proc = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,shell=True)
-                output, error = proc.communicate()
-                if proc.returncode != 0:
-                    raise subprocess.CalledProcessError(proc.returncode, proc.args, output=output, stderr=error)
-                lines = output.splitlines()
-            except subprocess.CalledProcessError as e:
-                print("Error output:", e.stderr)
+            subprocess.run(cmd)
 
 def renameDirsWithTag(dirsList,tags,tagReplacement):
     for dir in dirsList:
