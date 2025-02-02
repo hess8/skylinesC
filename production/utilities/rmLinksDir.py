@@ -6,4 +6,3 @@ removeStrs = ['_to_C3']
 keepStrs = []
 controlStrs = ['remove',['_to_C3']]
 rmLinksDir(path,controlStrs)
-)
