@@ -306,6 +306,10 @@ landscapesPage:
   using: Using a Condor2 landscape in Condor3
   convert: The "C2C3" downloads contain converted landscapes. The "_to_C3" downloads have the few files needed add to a landscape you already have.
   converter: can help you convert landscapes quickly. It creates the symbolic links needed between all converted C2 landscapes and the C3 Landscapes folder. It also quickly extracts the "_to_C3" downloads and places them in a C2 landscape you already have.
+  copy: Copy the file into your Condor2 Landscapes folder.
+  seven: You need to have 7-zip installed
+
+
 errors:
   description: This field
   inclusion: '{description} is not included in the list'
