@@ -72,7 +72,9 @@ Router.map(function() {
     this.route('list', { path: '/list/:list' });
   });
 
-  this.route('landscapes');
+  this.route('landscapes', function() {
+    this.route('convert');
+  });
   this.route('utsoar-dist');
   this.route('utsoar-totals');
   this.route('utsoar-speed');
