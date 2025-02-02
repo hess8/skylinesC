@@ -58,19 +58,20 @@ def renameTry(oldname, newname):
     print('Renamed {} to {}'.format(oldname, newname))
 
 
-def linkAllDir(sourceDir,targetDir):
-    '''puts links to every item in sourceDir in a windows targetDir
-    Windows can follow these links more frequently than when sourceDir is linked'''
+def linkAllDir(realDir,linksDir):
+    '''puts links to every item in realDir in a windows linksDir
+    Windows can follow these links more frequently than when realDir is linked'''
     if platform.system() == 'Windows': print('Must run as Administrator to use linkAllDir')
-    if not os.path.exists(targetDir):
-       os.mkdir(targetDir)
-    items = os.listdir(sourceDir)
+    if not os.path.exists(linksDir):
+       os.mkdir(linksDir)
+    items = os.listdir(realDir)
     for item in items:
-        if not os.path.exists(os.path.join(targetDir,item)):
+        if not os.path.exists(os.path.join(linksDir,item)):
             if platform.system() == 'Windows':
-                cmd = ['mklink', '/d', os.path.join(targetDir, item), os.path.join(sourceDir, item) ]
+                cmd = ['mklink', '/d', os.path.join(linksDir, item), os.path.join(realDir, item) ]
             else:
-                cmd = ['ln', '-s', os.path.join(sourceDir, item), os.path.join(targetDir, item)]
+                cmd = ['ln', '-s', os.path.join(realDir, item), os.path.join(linksDir, item)]
+                print(cmd)
             subprocess.run(cmd)
 
 def rmLinksDir(path,controlStrs):
