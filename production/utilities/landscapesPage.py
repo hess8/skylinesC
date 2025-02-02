@@ -84,8 +84,10 @@ def landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args
     lines.append('  <div class ="col-md-4" > \n')
     lines.append('  <p> {{fa-icon "envelope"}} <a href = "mailto:{{' + "'skylinescondor@gmail.com'}}" + '"> {{t "contact-admin"}} </a> {{" "}} {{t "landscapesPage.contact"}} </p>   \n')
     lines.append('  </div> \n')
+    lines.append('  <div> \n')
     lines.append('  <hr> \n')
     lines.append('  <p> <b> {{t "landscapesPage.host"}} </b> {{t "landscapesPage.seed"}} <b> {{t "landscapesPage.easy"}} </b> {{t "landscapesPage.run"}}</p> \n')
+    lines.append('  </div> \n')
 
     lines.append('  <p> <b> {{ t "landscapesPage.using"}} </b> </p> \n')
     lines.append('  <p> {{ t "landscapesPage.convert"}} </p> \n')
