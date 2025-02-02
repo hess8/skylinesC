@@ -87,10 +87,14 @@ def landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args
     lines.append('  <hr> \n')
     lines.append('  <p> <b> {{t "landscapesPage.host"}} </b> {{t "landscapesPage.seed"}} <b> {{t "landscapesPage.easy"}} </b> {{t "landscapesPage.run"}}</p> \n')
 
+    lines.append('  <p> <b> {{ t "landscapesPage.using"}} </b> </p> \n')
+    lines.append('  <p> {{ t "landscapesPage.convert"}} </p> \n')
+    lines.append('  <p> <LinkTo @route="landscapes.convert"> Convert-Landscapes </LinkTo>  {{ t "landscapesPage.converter"}} </p> \n')
+
+# <div class="col-xs-6"><LinkTo @route="settings.club" class="btn btn-default"> {{t "group-choose-new"}}</LinkTo></div>
+
     lines.append('  <hr> \n')
     lines.append('  <p> {{t "landscapesPage.see"}}  <a href="https://www.condor.club/sceneriesmap/241/"> {{t "landscapesPage.map"}} </a>  {{t "landscapesPage.locations"}} </p> \n')
-
-    lines.append('  <p> <hr> </p> \n')
 
     lines.append('  <style> \n')
     lines.append('  * {box-sizing: border-box;} \n')
