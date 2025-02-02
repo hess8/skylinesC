@@ -37,6 +37,12 @@ Router.map(function() {
     this.route('pilot', { path: '/pilot/:pilot_id' });
   });
 
+  this.route('test', { path: '/statistics' }, function() {
+
+    this.route('club', { path: '/club' });
+
+  });
+
   this.route('flight-upload', { path: '/flights/upload' });
 //note: the route (template, other files are named 'flight, but the path of the route is flights.
   this.route('flight', { path: '/flights/:flight_ids' }, function() {
