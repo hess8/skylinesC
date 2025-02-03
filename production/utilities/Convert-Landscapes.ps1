@@ -1,4 +1,7 @@
 <#
+
+# Convert-Landscapes version 1.0 2025-02-01
+
     .SYNOPSIS
     Converts Condor 2 landscapes to Condor 3 compatibilty when the conversion archive download is available
 
@@ -53,11 +56,8 @@ else
 		{
 			Write-Host -ForegroundColor Yellow "Converting $($name)..."
 			# Extract conversion files
-      Write-Host "test0"
 			& "$env:ProgramFiles\7-Zip\7z.exe" x -t7z ('-o' + $landscapes2) $conv.FullName
-			Write-Host "test1"
 			$c2t = [IO.DirectoryInfo][IO.Path]::Combine($landscapes2, $name + '_to_C3')
-			Write-Host $c2t,"test2"
 			try
 			{
 				if ($c2t.Exists)
@@ -82,7 +82,7 @@ else
 
 # Create directory links
 $landscapes3 = [IO.DirectoryInfo][IO.Path]::Combine($Condor3, 'Landscapes')
-Get-ChildItem -Path $landscapes2 -Directory | ?{ $_.GetFiles('*.tm3') } | %{
+Get-ChildItem -Path $landscapes2 -Directory | ?{-not($_.Name -like '*_to_C3') -and $_.GetFiles('*.tm3') } | %{
 	$c3l = [IO.DirectoryInfo][IO.Path]::Combine($landscapes3, $_.Name)
 	if (-not $c3l.Exists)
 	{
