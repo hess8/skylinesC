@@ -281,30 +281,27 @@ while go:
         qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
         qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
         qbtWebPath = os.path.join('/files',qbtExeName)
-        if (args.force or len(createdTorr) > 0 or not os.path.exists(landPageLocalDest)):
+        slcVMname = skylinesC_VM()
+        [username, passwd] = readfile('/home/bret/.local/secure/userU')
+        if args.force or len(createdTorr) > 0 or not os.path.exists(landPageLocalDest):
             landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)
-
-            [username,passwd] = readfile('/home/bret/.local/secure/userU')
             # copy qbt exe to /files so it is accessible to ember
-            slcVMname = skylinesC_VM()
             if slcVMname:
-                if os.path.exists(convert_landscapesPath):
-                    copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath,'Convert-Landscapes.ps1'), username, passwd)
-                    print('Copied {} to SKylinesC server'.format(convert_landscapesPath))
-                else:
-                    print('Cannot copy convert-landscapes to SkylinesC server: not found at', qbtExeLocalPath)
-                if os.path.exists(qbtExeLocalPath):
-                    copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
-                    print('Copied {} to SKylinesC server'.format(qbtExeLocalPath))
-                else:
-                    print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
-
                 copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
                 print('Copied landscapes page to SkylinesC server')
             else:
                 print('SkylinesC server appears not to be running')
-        if args.links:
-            updateSymlinks([zipDirs])
+        if os.path.exists(convert_landscapesPath) and slcVMname:
+            copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath, 'Convert-Landscapes.ps1'),
+                               username, passwd)
+            print('Copied {} to SKylinesC server'.format(convert_landscapesPath))
+        else:
+            print('Cannot copy Convert-Landscapes to SkylinesC server')
+        if os.path.exists(qbtExeLocalPath):
+            copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
+            print('Copied {} to SkylinesC server'.format(qbtExeLocalPath))
+        else:
+            print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
 
     waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
     for i in range(waitTimeMins):
