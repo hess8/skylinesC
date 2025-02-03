@@ -302,14 +302,15 @@ while go:
             print('Copied {} to SkylinesC server'.format(qbtExeLocalPath))
         else:
             print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
-
+    if not args.loop:
+        print('Done')
+        break
     waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
     for i in range(waitTimeMins):
         print("\r", end='')
         print('[loop {}]  Waiting {} min '.format(loopCount, waitTimeMins - i), flush=True, end='')
         sleep(60)
     print("\r", end='')
-print('Done')
 #check that new torrents have been added to the qbittorrent servers
     # time.sleep(5)
     # shell = win32com.client.Dispatch("WScript.Shell")
