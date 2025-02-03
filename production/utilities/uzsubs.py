@@ -4,7 +4,6 @@ import subprocess
 import platform
 import signal
 from time import sleep
-from more_itertools import sort_together
 from datetime import datetime
 from common import dirSize, landscapesMap, listRunningVms, renameTry
 
@@ -13,16 +12,19 @@ def getParams():
     forceHelp = "Force landscapespage to run"
     growthHelp = "Check dir growth before zipping"
     linksHelp = "Do links work if on linux"
+    loopHelp = "Loop"
     nozipsHelp = "Not zip any folders"
     reverseHelp = "Go through landscapes and zip lists in reverse order"
     upversionHelp = "Work with low versions that have been updated to high"
     parser = argparse.ArgumentParser(description="Landscape compression and management")
     parser.add_argument("-f", "--force", help=forceHelp, action="store_true")
     parser.add_argument("-g", "--growth", help=growthHelp, action="store_true")
-    parser.add_argument("-l", "--links", help=linksHelp, action="store_true")
+    parser.add_argument("-k", "--links", help=linksHelp, action="store_true")
+    parser.add_argument("-l", "--loop", help=loopHelp, action="store_true")
     parser.add_argument("-n", "--nozips", help=nozipsHelp, action="store_true")
     parser.add_argument("-r", "--reverse", help=reverseHelp, action="store_true")
     parser.add_argument("-u", "--upversion", help=upversionHelp, action="store_true")
+
     args = parser.parse_args()
     args.upversion = True  # not keeping C2zips now
     if args.force:
@@ -31,6 +33,8 @@ def getParams():
         print('Will:', growthHelp)
     if args.links:
         print('Will:', linksHelp)
+    if args.loop:
+        print('Will:', loopHelp)
     if args.nozips:
         print('Will:', nozipsHelp)
     if args.reverse:
@@ -415,6 +419,7 @@ def get_qbtExe(qbtorrentExeDir):
         sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")
 
 def getLandPaths(landDirs, versionUpdateTag, args):
+    from more_itertools import sort_together
     allLands = []
     allLandPaths = []
     for dir in landDirs:

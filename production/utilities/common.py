@@ -30,22 +30,6 @@ landscapesMap = {
     'West-UK2': 'United Kingdom3',
     '': '',
 }
-
-def linkAllDir(sourceDir,targetDir):
-    '''puts links to every item in sourceDir in a windows targetDir
-    Windows can follow these links more frequently than when sourceDir is linked'''
-    if platform.system() == 'Windows': print('Must run as Administrator to use linkAllDir')
-    if not os.path.exists(targetDir):
-       os.mkdir(targetDir)
-    items = os.listdir(sourceDir)
-    for item in items:
-        if not os.path.exists(os.path.join(targetDir,item)):
-            if platform.system() == 'Windows':
-                cmd = ['mklink', '/d', os.path.join(targetDir, item), os.path.join(sourceDir, item) ]
-            else:
-                cmd = ['ln', '-s', os.path.join(sourceDir, item), os.path.join(targetDir, item)]
-            subprocess.run(cmd)
-
 def renameDirsWithTag(dirsList,tags,tagReplacement):
     for dir in dirsList:
         for tag in tags:
@@ -70,21 +54,49 @@ def writefile(lines,filepath): #need to have \n's inserted already
     return
 
 def renameTry(oldname, newname):
-    # try:
-    #     os.rename(oldname, newname)
-    #     print('Renamed {} to {}'.format(oldname, newname))
-    # except:
-    #     sys.exit("Stop: can't rename {} to {}".format(oldname, newname))
     shutil.move(oldname, newname)
     print('Renamed {} to {}'.format(oldname, newname))
 
-def rmLinksDir(path):
-    '''Removes all links in a directory'''
+
+def linkAllDir(realDir,linksDir):
+    '''puts links to every item in realDir in a windows linksDir
+    Windows can follow these links more frequently than when realDir is linked'''
+    if platform.system() == 'Windows': print('Must run as Administrator to use linkAllDir')
+    if not os.path.exists(linksDir):
+       os.mkdir(linksDir)
+    items = os.listdir(realDir)
+    for item in items:
+        if not os.path.exists(os.path.join(linksDir,item)):
+            if platform.system() == 'Windows':
+                cmd = ['mklink', '/d', os.path.join(linksDir, item), os.path.join(realDir, item) ]
+            else:
+                cmd = ['ln', '-s', os.path.join(realDir, item), os.path.join(linksDir, item)]
+                print(cmd)
+            subprocess.run(cmd)
+
+def rmLinksDir(path,controlStrs):
+    '''If mode is 'keep', removes all links that don't contain on the selected strings.
+    Mode 'remove' Removes all links that do contain oneof the selected strings'''
+    mode =  controlStrs[0] # 'keep' or 'remove'
+    strs = controlStrs[1]
     for item in os.listdir(path):
         itemPath = os.path.join(path,item)
-        if os.path.islink(itemPath):
-            os.remove(itemPath)
-            print('Removed symlink',itemPath)
+        if not os.path.islink(itemPath):
+            continue
+        for str in strs:
+            if mode == 'keep' and str in strs:
+                break
+            elif mode == 'remove' and str in item:
+                os.remove(itemPath)
+                print('Removed symlink', itemPath)
+                break
+        else:
+            if mode == 'keep':
+                os.remove(itemPath)
+
+
+
+
 
 def copy_file_to_guest(vm_name, host_file_path, guest_file_path,usernm,passwd):
     """Copies a file from host to guest using VBoxManage."""

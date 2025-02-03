@@ -3,6 +3,7 @@
 # Convert-Landscapes version 1.0 2025-02-01
 
     .SYNOPSIS
+    Links converted Condor 2 landscapes to Condor 3
     Converts Condor 2 landscapes to Condor 3 compatibilty when the conversion archive download is available
 
     .DESCRIPTION

@@ -69,7 +69,7 @@ utilitiesDir = pathWinLin(os.path.join('L','condor-related','skylinesC','product
 ## Landscapes page ##
 landPageLocalDest = pathWinLin(os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs'))
 qbtExeLocalPath = get_qbtExe(pathWinLin(os.path.join(zipMain,'qbt_exe')))
-convert_landscapesPath = pathWinLin(os.path.join(zipMain,'landscapes-landscapes','Convert-Landscapes.ps1'))
+convert_landscapesPath = pathWinLin(os.path.join('/mnt/L/condor-related/skylinesC/production/utilities/','Convert-Landscapes.ps1'))
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/'
 landPageServerDest = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
 
@@ -281,38 +281,36 @@ while go:
         qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
         qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
         qbtWebPath = os.path.join('/files',qbtExeName)
-        if (args.force or len(createdTorr) > 0 or not os.path.exists(landPageLocalDest)):
+        slcVMname = skylinesC_VM()
+        [username, passwd] = readfile('/home/bret/.local/secure/userU')
+        if args.force or len(createdTorr) > 0 or not os.path.exists(landPageLocalDest):
             landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)
-
-            [username,passwd] = readfile('/home/bret/.local/secure/userU')
             # copy qbt exe to /files so it is accessible to ember
-            slcVMname = skylinesC_VM()
             if slcVMname:
-                if os.path.exists(convert_landscapesPath):
-                    copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath,'Convert-Landscapes.ps1'), username, passwd)
-                    print('Copied {} to SlylinesC server'.format(qbtExeLocalPath))
-                else:
-                    print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
-                if os.path.exists(qbtExeLocalPath):
-                    copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
-                    print('Copied {} to SlylinesC server'.format(qbtExeLocalPath))
-                else:
-                    print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
-
                 copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
                 print('Copied landscapes page to SkylinesC server')
             else:
                 print('SkylinesC server appears not to be running')
-        if args.links:
-            updateSymlinks([zipDirs])
-
+        if os.path.exists(convert_landscapesPath) and slcVMname:
+            copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath, 'Convert-Landscapes.ps1'),
+                               username, passwd)
+            print('Copied {} to SKylinesC server'.format(convert_landscapesPath))
+        else:
+            print('Cannot copy Convert-Landscapes to SkylinesC server')
+        if os.path.exists(qbtExeLocalPath):
+            copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
+            print('Copied {} to SkylinesC server'.format(qbtExeLocalPath))
+        else:
+            print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
+    if not args.loop:
+        print('Done')
+        break
     waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
     for i in range(waitTimeMins):
         print("\r", end='')
         print('[loop {}]  Waiting {} min '.format(loopCount, waitTimeMins - i), flush=True, end='')
         sleep(60)
     print("\r", end='')
-print('Done')
 #check that new torrents have been added to the qbittorrent servers
     # time.sleep(5)
     # shell = win32com.client.Dispatch("WScript.Shell")
