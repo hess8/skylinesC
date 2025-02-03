@@ -79,7 +79,7 @@ def extract_fpl_file(igc_filename):
     for il,line in enumerate(fplLines):
         if 'plane' in line.lower():
             planeStart = il
-        if planeStart and '[' in line:
+        if planeStart and il > planeStart and '[' in line:
             nextSection = il
             break
     keep = fplLines[:planeStart] + fplLines[nextSection:]
