@@ -69,7 +69,7 @@ utilitiesDir = pathWinLin(os.path.join('L','condor-related','skylinesC','product
 ## Landscapes page ##
 landPageLocalDest = pathWinLin(os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs'))
 qbtExeLocalPath = get_qbtExe(pathWinLin(os.path.join(zipMain,'qbt_exe')))
-convert_landscapesPath = pathWinLin(os.path.join(zipMain,'landscapes-landscapes','Convert-Landscapes.ps1'))
+convert_landscapesPath = pathWinLin(os.path.join('/mnt/L/condor-related/skylinesC/production/utilities/','Convert-Landscapes.ps1'))
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/'
 landPageServerDest = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
 
@@ -290,12 +290,12 @@ while go:
             if slcVMname:
                 if os.path.exists(convert_landscapesPath):
                     copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath,'Convert-Landscapes.ps1'), username, passwd)
-                    print('Copied {} to SlylinesC server'.format(qbtExeLocalPath))
+                    print('Copied {} to SKylinesC server'.format(convert_landscapesPath))
                 else:
-                    print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
+                    print('Cannot copy convert-landscapes to SkylinesC server: not found at', qbtExeLocalPath)
                 if os.path.exists(qbtExeLocalPath):
                     copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
-                    print('Copied {} to SlylinesC server'.format(qbtExeLocalPath))
+                    print('Copied {} to SKylinesC server'.format(qbtExeLocalPath))
                 else:
                     print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
 

@@ -74,7 +74,6 @@ def landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args
     lines.append('  <div class="page-header"> \n')
     lines.append('    <h1>{{t "landscapes"}}</h1> \n')
     lines.append('  </div> \n')
-en
     lines.append('  <p>  <b> {{t "landscapesPage.before"}}  {{t "install"}} qBittorrent</b> {{t "landscapesPage.other"}} </p> \n')
     lines.append('  <p> <a href="' + qbtWebPath + '" class="btn btn-default" download>{{fa-icon "download" size="lg"}} {{t "download"}} qBittorrent</a> </p> \n')
     lines.append('  <p> {{t "landscapesPage.many"}} {{t "landscapesPage.magnet"}} </p> \n')
