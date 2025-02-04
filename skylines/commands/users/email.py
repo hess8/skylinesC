@@ -20,8 +20,10 @@ class Email(Command):
     """ Send email to admins, a test site, or all users """
 
     option_list = (
-        Option("path", help="path to a text file with the content of the email"),
-        Option("to", help="can be 'admin' (goes to ) or 'all'")
+        Option("path_plain", help="path to a text file with the first part of the email"),
+        Option("path_html", help="path to an html file with the last part of the email"),
+        Option("audience", help="can be 'admin', 'all', or 'test'"),
+        Option("test_address", help="one email address'")
     )
 
     def sendEmail(self, user, sender, recipient, subject, text, html):
@@ -39,7 +41,7 @@ class Email(Command):
             if html:
                 html = MIMEText(html, 'html') #any html should be last
                 msg.attach(html)
-            s = smtplib.SMTP('localhost')
+            s = smtplib.SMTP('skylinescondor.com')
             s.sendmail(sender, recipient.encode("ascii"), msg.as_string())
             s.quit()
         except BaseException as e:
@@ -48,9 +50,9 @@ class Email(Command):
             sys.exit('Stop')
 
     def run(self, path_plain, path_html, audience, test_address=None):
-        '''test option it to send one email to a site like www.mail-tester.com'''
+        '''test option is to send one email to a site like www.mail-tester.com'''
         if audience not in ['admin','all','test']:
-            sys.exit('Stop: last option must be "admin", "all" or "test"')
+            sys.exit('Stop: audience must be "admin", "all" or "test"')
         sender = 'mail@skylinscondor.com'
         os.chdir('/home/bret/servers/repo-skylinesC/skylinesC')
         lines_plain = readfileNoStrip(path_plain)
@@ -62,18 +64,18 @@ class Email(Command):
         html = ''
         for line in lines_html:
             html += line
-        html += "<br><p>For help contact skylinescondor@gmail.com.  Don't reply to this message.</p>"
-        html += '<br><p>--Bret at SkylinesCondor</p>'
+        html += "<br><p>For help contact skylinescondor@gmail.com.  Don't reply to this message.</p>\n"
+        html += '<br><p>--Bret at SkylinesCondor</p>\n'
         if audience == 'test':
-            user = db.session.query(User).filter(User.id == 6)
+            users = (db.session.query(User).filter(User.id == 6))
             recipient = test_address
-            self.sendEmail(user, sender, recipient, subject, text, html)
+            self.sendEmail(users[0], sender, recipient, subject, text, html)
         else:
             users_query = (db.session.query(User).filter(User.email_address != None).order_by(User.id))
             for user in users_query:
                 recipient = user.email_address
                 if audience == 'admin' and user.admin:
                     self.sendEmail(user,sender,recipient,subject,text,html)
-                    # break
                 elif audience == 'all':
-        self.sendEmail(user,sender,recipient,subject,text, html)
+                    self.sendEmail(user, sender, recipient, subject, text)
+
