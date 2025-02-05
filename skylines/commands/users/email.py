@@ -35,8 +35,7 @@ class Email(Command):
             os.mkdir(queue_dir)
         print("Queueing email to {} (ID: {})...".format(user.name.encode("utf-8"),user.id))
         print(format(user.email_address))
-        #try:
-        if True:
+        try:
             msg = MIMEMultipart('alternative')
             msg["Subject"] = subject
             msg["From"] = sender
@@ -49,20 +48,20 @@ class Email(Command):
                 html = MIMEText(html, 'html') #any html should be last
                 msg.attach(html)
 
-            file_name = datetime.now().strftime(timeFormat) + '_skylinesC'
+            file_name = datetime.now().strftime(timeFormat) + '_skylinesC.str'
             f = open(os.path.join(queue_dir,file_name),'w')
             f.write(msg.as_string())
             f.close()
             f = open(log_file,'a')
             f.write(msg.as_string())
             f.close()
-            # s = smtplib.SMTP('skylinescondor.com')
-            # s.sendmail(sender, recipient.encode("ascii"), msg.as_string())
-            # s.quit()
-        #except BaseException as e:
-         #   print(recipient)
-          #  print("Queueing email failed: {}".format(e))
-           # sys.exit('Stop')
+            s = smtplib.SMTP('skylinescondor.com')
+            s.sendmail(sender, recipient.encode("ascii"), msg.as_string())
+            s.quit()
+        except BaseException as e:
+            print(recipient)
+            print("Queueing email failed: {}".format(e))
+            sys.exit('Stop')
 
     def run(self, path_plain, path_html, audience, test_address=None):
         '''test option is to send one email to a site like www.mail-tester.com'''
