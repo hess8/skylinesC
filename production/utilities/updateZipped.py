@@ -32,6 +32,8 @@ from createTorrents import createTorrents
 from landscapesPage import landscapesPage
 
 args = getParams()
+if args.loop == -1:
+    forever = True
 
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
 maxZipTilTorr = 10 # then will run createTorrents if Linux
@@ -302,7 +304,7 @@ while go:
             print('Copied {} to SkylinesC server'.format(qbtExeLocalPath))
         else:
             print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
-    if not args.loop:
+    if not forever and (not args.loop or loopCount == args.loop):
         print('Done')
         break
     waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes
