@@ -48,16 +48,18 @@ class Email(Command):
                 html = MIMEText(html, 'html') #any html should be last
                 msg.attach(html)
 
-            file_name = datetime.now().strftime(timeFormat) + '_skylinesC.str'
+            file_name = datetime.now().strftime(timeFormat) + '_skylinesC.msg'
             f = open(os.path.join(queue_dir,file_name),'w')
+            f.write(sender + '\n')
+            f.write(recipient + '\n')
             f.write(msg.as_string())
             f.close()
             f = open(log_file,'a')
             f.write(msg.as_string())
             f.close()
-            s = smtplib.SMTP('skylinescondor.com')
-            s.sendmail(sender, recipient.encode("ascii"), msg.as_string())
-            s.quit()
+            #s = smtplib.SMTP('skylinescondor.com')
+            #s.sendmail(sender, recipient.encode("ascii"), msg.as_string())
+            #s.quit()
         except BaseException as e:
             print(recipient)
             print("Queueing email failed: {}".format(e))
@@ -67,7 +69,7 @@ class Email(Command):
         '''test option is to send one email to a site like www.mail-tester.com'''
         if audience not in ['admin','all','test']:
             sys.exit('Stop: audience must be "admin", "all" or "test"')
-        sender = 'mail@skylinscondor.com'
+        sender = 'mail@skylinescondor.com' #overwritten in mail-server
         os.chdir('/home/bret/servers/repo-skylinesC/skylinesC')
         lines_plain = readfileNoStrip(path_plain)
         lines_html = readfileNoStrip(path_html)
