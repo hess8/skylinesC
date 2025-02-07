@@ -30,6 +30,23 @@ landscapesMap = {
     'West-UK2': 'United Kingdom3',
     '': '',
 }
+
+def winLink(truePath, linkPath):
+    cmd = 'mklink /d {} {}'.format(linkPath, truePath)
+    print('true {} <-> link {}'.format(truePath, linkPath))
+    os.system(cmd)
+
+def buildDirs(finalPath):
+    list = finalPath.split(os.sep)
+    path = list[0] + os.sep
+    for segment in list[1:]:
+        path = os.path.join(path,segment)
+        if not os.path.exists(path):
+            os.mkdir(path)
+    if path != finalPath:
+        sys.exit('Stop...buildDirs failed ')
+
+
 def renameDirsWithTag(dirsList,tags,tagReplacement):
     for dir in dirsList:
         for tag in tags:
