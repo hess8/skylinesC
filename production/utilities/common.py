@@ -1,4 +1,4 @@
-import os,subprocess
+import os,subprocess,sys
 import platform
 import shutil
 # import pathlib
@@ -88,7 +88,7 @@ def linkAllDir(realDir,linksDir):
                 cmd = ['mklink', '/d', os.path.join(linksDir, item), os.path.join(realDir, item) ]
             else:
                 cmd = ['ln', '-s', os.path.join(realDir, item), os.path.join(linksDir, item)]
-                print(cmd)
+            print(cmd)
             subprocess.run(cmd)
 
 def rmLinksDir(path,controlStrs):
