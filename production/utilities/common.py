@@ -31,6 +31,23 @@ landscapesMap = {
     '': '',
 }
 
+def pathWinLin(path):
+    linuxPathStart = '/mnt/'
+    winDrives = ['A','C']
+    # winSambaDrive = 'S:\\'  # includes Samba windows mapped drive
+    winSambaDrive = '\\\\192.168.1.161\\S'  # includes Samba windows mapped drive
+    list = path.split(os.sep)
+    driveLetter = list[0]
+    if platform.system() == 'Windows':
+        if driveLetter in winDrives:
+            list[0] += ':'
+            path = os.sep.join(list)
+        elif winSambaDrive not in path:
+            path = winSambaDrive + path
+    elif linuxPathStart not in path:
+        path = linuxPathStart + path
+    return path
+
 def winLink(truePath, linkPath):
     cmd = 'mklink /d {} {}'.format(linkPath, truePath)
     print('true {} <-> link {}'.format(truePath, linkPath))

@@ -46,22 +46,6 @@ def getParams():
     sleep(2)
     return args
 
-def pathWinLin(path):
-    linuxPathStart = '/mnt/'
-    winSharedDrives = ['A']
-    winSambaDrive = 'S:\\'  # includes Samba windows mapped drive
-    list = path.split(os.sep)
-    driveLetter = list[0]
-    if platform.system() == 'Windows':
-        if driveLetter in winSharedDrives:
-            list[0] += ':'
-            path = os.sep.join(list)
-        elif winSambaDrive not in path:
-            path = winSambaDrive + path
-    elif linuxPathStart not in path:
-        path = linuxPathStart + path
-    return path
-
 def skylinesC_VM():
     """Get skylinesC VM name from listRunningVms"""
     output = listRunningVms()
