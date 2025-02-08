@@ -25,7 +25,7 @@ import os,sys
 # print(os.path.abspath(os.curdir))
 from time import sleep
 import platform
-from common import copy_file_to_guest,dirSize, readfileNoStrip, readfile, renameTry
+from common import copy_file_to_guest,dirSize, readfileNoStrip, readfile, renameTry, pathWinLin
 from uzsubs import *
 from time import perf_counter
 from createTorrents import createTorrents

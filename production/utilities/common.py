@@ -1,4 +1,4 @@
-import os,subprocess,sys
+import os,subprocess
 import platform
 import shutil
 # import pathlib
