@@ -49,7 +49,7 @@ def getParams():
 def pathWinLin(path):
     linuxPathStart = '/mnt/'
     winSharedDrives = ['A']
-    winSambaDrive = 'S:\\'  # includes Samba windows mapped drive
+    winSambaDrive = '\\\\192.168.1.161\\S' # 'S:\\'  # Samba windows mapped drive...not reliable
     list = path.split(os.sep)
     driveLetter = list[0]
     if platform.system() == 'Windows':
