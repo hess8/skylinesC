@@ -27,7 +27,13 @@ class Email(Command):
     )
 
     def sendEmail(self, user, sender, recipient, subject, text, html):
-        print("Sending email to {} (ID: {})...".format(user.name.encode("utf-8"),user.id))
+        from datetime import datetime
+        timeFormat = '%Y-%m-%d.%H.%M.%S.%f'
+        queue_dir = '/media/sf_landscapes-zip/mail'
+        log_file = os.path.join(queue_dir,'emails.log')
+        if not os.path.exists(queue_dir):
+            os.mkdir(queue_dir)
+        print("Queueing email to {} (ID: {})...".format(user.name.encode("utf-8"),user.id))
         print(format(user.email_address))
         try:
             msg = MIMEMultipart('alternative')
@@ -41,19 +47,29 @@ class Email(Command):
             if html:
                 html = MIMEText(html, 'html') #any html should be last
                 msg.attach(html)
-            s = smtplib.SMTP('skylinescondor.com')
-            s.sendmail(sender, recipient.encode("ascii"), msg.as_string())
-            s.quit()
+
+            file_name = datetime.now().strftime(timeFormat) + '_skylinesC.msg'
+            f = open(os.path.join(queue_dir,file_name),'w')
+            f.write(sender + '\n')
+            f.write(recipient + '\n')
+            f.write(msg.as_string())
+            f.close()
+            f = open(log_file,'a')
+            f.write(msg.as_string())
+            f.close()
+            #s = smtplib.SMTP('skylinescondor.com')
+            #s.sendmail(sender, recipient.encode("ascii"), msg.as_string())
+            #s.quit()
         except BaseException as e:
             print(recipient)
-            print("Sending email failed: {}".format(e))
+            print("Queueing email failed: {}".format(e))
             sys.exit('Stop')
 
     def run(self, path_plain, path_html, audience, test_address=None):
         '''test option is to send one email to a site like www.mail-tester.com'''
         if audience not in ['admin','all','test']:
             sys.exit('Stop: audience must be "admin", "all" or "test"')
-        sender = 'mail@skylinscondor.com'
+        sender = 'mail@skylinescondor.com' #overwritten in mail-server
         os.chdir('/home/bret/servers/repo-skylinesC/skylinesC')
         lines_plain = readfileNoStrip(path_plain)
         lines_html = readfileNoStrip(path_html)

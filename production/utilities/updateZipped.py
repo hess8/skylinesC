@@ -32,6 +32,7 @@ from createTorrents import createTorrents
 from landscapesPage import landscapesPage
 
 args = getParams()
+forever = False
 if args.loop == -1:
     forever = True
 
