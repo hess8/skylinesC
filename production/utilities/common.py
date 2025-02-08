@@ -28,6 +28,7 @@ landscapesMap = {
     'West_Patgonia': 'West_Patagonia3',
     'West-UK': 'United Kingdom3',
     'West-UK2': 'United Kingdom3',
+    'France Champagne': 'Fr_ChampagneC3',
     '': '',
 }
 def renameDirsWithTag(dirsList,tags,tagReplacement):
