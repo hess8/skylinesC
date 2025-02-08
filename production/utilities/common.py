@@ -2,6 +2,7 @@ import os,subprocess,sys
 import platform
 import shutil
 # import pathlib
+sambaServer = '\\\\192.168.1.161\\'
 
 landscapesMap = {
     'AA2': 'AA3',
@@ -28,8 +29,25 @@ landscapesMap = {
     'West_Patgonia': 'West_Patagonia3',
     'West-UK': 'United Kingdom3',
     'West-UK2': 'United Kingdom3',
+    'France Champagne': 'Fr_ChampagneC3',
     '': '',
 }
+
+def pathWinLin(path):
+    linuxPathStart = '/mnt/'
+    winDrives = ['A','C']
+    winSambaDrive = sambaServer  # includes Samba windows mapped drive
+    list = path.split(os.sep)
+    driveLetter = list[0]
+    if platform.system() == 'Windows':
+        if driveLetter in winDrives:
+            list[0] += ':'
+            path = os.sep.join(list)
+        elif winSambaDrive not in path:
+            path = winSambaDrive + path
+    elif linuxPathStart not in path:
+        path = linuxPathStart + path
+    return path
 
 def winLink(truePath, linkPath):
     cmd = 'mklink /d {} {}'.format(linkPath, truePath)
