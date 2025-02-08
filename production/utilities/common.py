@@ -40,7 +40,7 @@ def pathWinLin(path):
     list = path.split(os.sep)
     driveLetter = list[0]
     if platform.system() == 'Windows':
-        if driveLetter in winDrives:
+        if driveLetter.upper() in winDrives:
             list[0] += ':'
             path = os.sep.join(list)
         elif winSambaDrive not in path:
