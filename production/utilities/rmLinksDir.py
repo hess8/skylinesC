@@ -1,8 +1,9 @@
-import os
-from common import rmLinksDir
+import os,sys
+from common import pathWinLin, rmLinksDir
 
-path = '/mnt/E/landscapes/landscapesC2-main'
+#dirToRmLinks = pathWinLin(os.path.join('E','landscapes','landscapesC2-main'))
+dirToRmLinks = pathWinLin(os.path.join('C','condor2','landscapes'))
 removeStrs = ['_to_C3']
 keepStrs = []
 controlStrs = ['remove',['_to_C3']]
-rmLinksDir(path,controlStrs)
+rmLinksDir(dirToRmLinks,controlStrs)

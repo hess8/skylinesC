@@ -2,7 +2,7 @@ import os,subprocess,sys
 import platform
 import shutil
 # import pathlib
-sambaServer = '\\\\192.168.1.161\\'
+sambaServer = '\\\\192.168.1.161\\S\\'
 
 landscapesMap = {
     'AA2': 'AA3',
@@ -49,9 +49,19 @@ def pathWinLin(path):
         path = linuxPathStart + path
     return path
 
-def winLink(truePath, linkPath):
-    cmd = 'mklink /d {} {}'.format(linkPath, truePath)
-    print('true {} <-> link {}'.format(truePath, linkPath))
+def rmSlash(path):
+    return path.replace('\\\\','\\')
+
+#def linkWinLin(truePath, linkPath):
+ #   cmd = 'mklink /d {} {}'.format(rmSlash(linkPath), rmSlash(truePath))
+  #  print('true {} <-> link {}'.format(truePath, linkPath))
+   # if not os.path.exists(linkPath):
+    #    if platform.system() == 'Windows':
+     #       cmd = ['mklink', '/d', os.path.join(linksDir, item), os.path.join(trueDir, item) ]
+      #  else:
+       #     cmd = ['ln', '-s', os.path.join(trueDir, item), os.path.join(linksDir, item)]
+
+
     os.system(cmd)
 
 def buildDirs(finalPath):
@@ -93,21 +103,15 @@ def renameTry(oldname, newname):
     print('Renamed {} to {}'.format(oldname, newname))
 
 
-def linkAllDir(realDir,linksDir):
-    '''puts links to every item in realDir in a windows linksDir
-    Windows can follow these links more frequently than when realDir is linked'''
+def linkAllDir(trueDir,linksDir):
+    '''puts links to every item in trueDir in a windows linksDir
+    Windows can follow these links more frequently than when trueDir is linked'''
     if platform.system() == 'Windows': print('Must run as Administrator to use linkAllDir')
     if not os.path.exists(linksDir):
        os.mkdir(linksDir)
-    items = os.listdir(realDir)
+    items = os.listdir(trueDir)
     for item in items:
-        if not os.path.exists(os.path.join(linksDir,item)):
-            if platform.system() == 'Windows':
-                cmd = ['mklink', '/d', os.path.join(linksDir, item), os.path.join(realDir, item) ]
-            else:
-                cmd = ['ln', '-s', os.path.join(realDir, item), os.path.join(linksDir, item)]
-            print(cmd)
-            subprocess.run(cmd)
+         makeLink(truePath=os.path.join(trueDir,item),linkPath=os.path.join(linksDir,item))
 
 def rmLinksDir(path,controlStrs):
     '''If mode is 'keep', removes all links that don't contain on the selected strings.
@@ -129,7 +133,14 @@ def rmLinksDir(path,controlStrs):
             if mode == 'keep':
                 os.remove(itemPath)
 
-
+def makeLink(truePath,linkPath):
+    if not os.path.exists(linkPath):
+        try:
+            os.symlink(truePath, linkPath)
+            # os.system('mklink /d "{}" "{}"'.format(, truePath))
+            print('Created true {} <-> link {}'.format(truePath,linkPath))
+        except:
+            print('Problem creating true {} <-> link {}'.format(truePath,linkPath))
 
 
 

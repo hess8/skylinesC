@@ -5,7 +5,7 @@ import platform
 import signal
 from time import sleep
 from datetime import datetime
-from common import dirSize, landscapesMap, listRunningVms, renameTry
+from common import dirSize, landscapesMap, listRunningVms, makeLink, renameTry
 
 def getParams():
     import argparse
@@ -322,9 +322,9 @@ def updateSymlinks(dirsLists):
                         print('Duplication:  No symlink created between {} and {}.'.format(mainPath,otherPath))
                 elif 'zip' in mainDir.lower():
                     if item.split('.')[-1] == '7z':
-                        makeLink(mainPath, otherPath)
+                        makeLink(truePath=otherPath,linkPath=mainPath)
                 elif not os.path.islink(otherPath):
-                    makeLink(mainPath, otherPath)
+                   makeLink(truePath=otherPath,linkPath=mainPath)
 
 def get_free_space_gb(drive):
     """Gets the free space on the specified drive in GB."""
@@ -402,13 +402,6 @@ def checkLinksIni(mainDir,versionUpdateTag):
         else:
                 print('no .ini file found in full dir {}; adding "!no_ini_" to name'.format(landscapeDir))
                 renameTry(landscapeDir,os.path.join(mainDir, "!no_ini_" + mainItem))
-
-def makeLink(linkDir, realDir):
-    try:
-        os.symlink(realDir, linkDir)
-        # os.system('mklink "{}" "{}"'.format(, realDir))
-    except:
-        print('Problem creating symblolic link {} -> {}'.format(linkDir, realDir))
 
 def get_qbtExe(qbtorrentExeDir):
     items = os.listdir(qbtorrentExeDir)
