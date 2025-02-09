@@ -12,7 +12,7 @@ landscapesMap = {
     'Centro_Italia': 'Centro_Italia3',
     'Coquimbo_SanJuan': 'CoquimboSanJuan3',
     'Cuzco_Peru': 'Cuzco_Peru3',
-    'Husacaran': 'Huascaran_Peru3',
+    'Husacaran_Peru': 'Huascaran_Peru3',
     'Lima_Peru': 'Lima_Peru3',
     'North-UK2': 'United Kingdom3',
     'Pumalin_Park': 'Pumalin_Park3',
@@ -32,6 +32,35 @@ landscapesMap = {
     'France Champagne': 'Fr_ChampagneC3',
     '': '',
 }
+
+keepC2 = [
+    'AlleghenyRidges',
+    'Arizona2',
+    'Baja_California',
+    'BigPyrenees2',
+    'CA',
+    'Cascade Range',
+    'Christchurch',
+    'Colorado_C2',
+    'Guatemala',
+    'Invermere',
+    'Logan2',
+    'NW_Montana',
+    'Nephi',
+    'New_Zealand',
+    'Oahu',
+    'Ridge-NSW-2',
+    'RockyMountains-2',
+    'Sierra_Nevada',
+    'SoCal2',
+    'South_Nevada2',
+    'Southern-Alberta',
+    'SouthernNorway4',
+    'Truckee',
+    'West_Patagonia',
+    'Wurtsboro',
+    'Yellowstone_Park'
+]
 
 def pathWinLin(path):
     linuxPathStart = '/mnt/'
