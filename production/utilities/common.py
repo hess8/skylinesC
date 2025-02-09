@@ -26,7 +26,7 @@ landscapesMap = {
     'United Kingdom': 'United Kingdom3',
     'West_Balkans': 'West_Balkans3',
     'West_Balkans2': 'West_Balkans3',
-    'West_Patgonia': 'West_Patagonia3',
+    'West_Patagonia': 'West_Patagonia3',
     'West-UK': 'United Kingdom3',
     'West-UK2': 'United Kingdom3',
     'France Champagne': 'Fr_ChampagneC3',
@@ -60,9 +60,7 @@ def rmSlash(path):
      #       cmd = ['mklink', '/d', os.path.join(linksDir, item), os.path.join(trueDir, item) ]
       #  else:
        #     cmd = ['ln', '-s', os.path.join(trueDir, item), os.path.join(linksDir, item)]
-
-
-    os.system(cmd)
+        #os.system(cmd)
 
 def buildDirs(finalPath):
     list = finalPath.split(os.sep)
