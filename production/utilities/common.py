@@ -100,29 +100,6 @@ def renameTry(oldname, newname):
     shutil.move(oldname, newname)
     print('Renamed {} to {}'.format(oldname, newname))
 
-
-
-
-def rmLinksDir(path,controlStrs):
-    '''If mode is 'keep', removes all links that don't contain on the selected strings.
-    Mode 'remove' Removes all links that do contain oneof the selected strings'''
-    mode =  controlStrs[0] # 'keep' or 'remove'
-    strs = controlStrs[1]
-    for item in os.listdir(path):
-        itemPath = os.path.join(path,item)
-        if not os.path.islink(itemPath):
-            continue
-        for str in strs:
-            if mode == 'keep' and str in strs:
-                break
-            elif mode == 'remove' and str in item:
-                os.remove(itemPath)
-                print('Removed symlink', itemPath)
-                break
-        else:
-            if mode == 'keep':
-                os.remove(itemPath)
-
 def makeLink(truePath,linkPath):
     if os.path.islink(linkPath):
         os.remove(linkPath)
