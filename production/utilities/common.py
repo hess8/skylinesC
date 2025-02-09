@@ -132,6 +132,8 @@ def rmLinksDir(path,controlStrs):
                 os.remove(itemPath)
 
 def makeLink(truePath,linkPath):
+    if os.path.islink(linkPath):
+        os.remove(linkPath)
     if not os.path.exists(linkPath):
         try:
             os.symlink(truePath, linkPath)
