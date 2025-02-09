@@ -103,15 +103,7 @@ def renameTry(oldname, newname):
     print('Renamed {} to {}'.format(oldname, newname))
 
 
-def linkAllDir(trueDir,linksDir):
-    '''puts links to every item in trueDir in a windows linksDir
-    Windows can follow these links more frequently than when trueDir is linked'''
-    if platform.system() == 'Windows': print('Must run as Administrator to use linkAllDir')
-    if not os.path.exists(linksDir):
-       os.mkdir(linksDir)
-    items = os.listdir(trueDir)
-    for item in items:
-         makeLink(truePath=os.path.join(trueDir,item),linkPath=os.path.join(linksDir,item))
+
 
 def rmLinksDir(path,controlStrs):
     '''If mode is 'keep', removes all links that don't contain on the selected strings.
@@ -135,12 +127,12 @@ def rmLinksDir(path,controlStrs):
 
 def makeLink(truePath,linkPath):
     if not os.path.exists(linkPath):
-        try:
+        # try:
             os.symlink(truePath, linkPath)
             # os.system('mklink /d "{}" "{}"'.format(, truePath))
             print('Created true {} <-> link {}'.format(truePath,linkPath))
-        except:
-            print('Problem creating true {} <-> link {}'.format(truePath,linkPath))
+        # except:
+        #     print('Problem creating true {} <-> link {}'.format(truePath,linkPath))
 
 
 
