@@ -5,14 +5,14 @@ import platform
 import signal
 from time import sleep
 from datetime import datetime
-from common import dirSize, landscapesMap, listRunningVms, renameTry
+from common import dirSize, landscapesMap, listRunningVms, makeLink, renameTry
 
 def getParams():
     import argparse
     forceHelp = "Force landscapespage to run"
     growthHelp = "Check dir growth before zipping"
     linksHelp = "Do links work if on linux"
-    loopHelp = "Loop"
+    loopHelp = "Loop N times.  If N == -1, loop forever"
     nozipsHelp = "Not zip any folders"
     reverseHelp = "Go through landscapes and zip lists in reverse order"
     upversionHelp = "Work with low versions that have been updated to high"
@@ -20,7 +20,7 @@ def getParams():
     parser.add_argument("-f", "--force", help=forceHelp, action="store_true")
     parser.add_argument("-g", "--growth", help=growthHelp, action="store_true")
     parser.add_argument("-k", "--links", help=linksHelp, action="store_true")
-    parser.add_argument("-l", "--loop", help=loopHelp, action="store_true")
+    parser.add_argument("-l", "--loop", help=loopHelp, type=int)
     parser.add_argument("-n", "--nozips", help=nozipsHelp, action="store_true")
     parser.add_argument("-r", "--reverse", help=reverseHelp, action="store_true")
     parser.add_argument("-u", "--upversion", help=upversionHelp, action="store_true")
@@ -34,7 +34,9 @@ def getParams():
     if args.links:
         print('Will:', linksHelp)
     if args.loop:
-        print('Will:', loopHelp)
+        if args.loop == -1:
+            print('Will: loop forever')
+        else: print('Will: loop {} times'.format(args.loop))
     if args.nozips:
         print('Will:', nozipsHelp)
     if args.reverse:
@@ -47,7 +49,7 @@ def getParams():
 def pathWinLin(path):
     linuxPathStart = '/mnt/'
     winSharedDrives = ['A']
-    winSambaDrive = 'S:\\'  # includes Samba windows mapped drive
+    winSambaDrive = '\\\\192.168.1.161\\S' # 'S:\\'  # Samba windows mapped drive...not reliable
     list = path.split(os.sep)
     driveLetter = list[0]
     if platform.system() == 'Windows':
@@ -320,9 +322,9 @@ def updateSymlinks(dirsLists):
                         print('Duplication:  No symlink created between {} and {}.'.format(mainPath,otherPath))
                 elif 'zip' in mainDir.lower():
                     if item.split('.')[-1] == '7z':
-                        makeLink(mainPath, otherPath)
+                        makeLink(truePath=otherPath,linkPath=mainPath)
                 elif not os.path.islink(otherPath):
-                    makeLink(mainPath, otherPath)
+                   makeLink(truePath=otherPath,linkPath=mainPath)
 
 def get_free_space_gb(drive):
     """Gets the free space on the specified drive in GB."""
@@ -400,13 +402,6 @@ def checkLinksIni(mainDir,versionUpdateTag):
         else:
                 print('no .ini file found in full dir {}; adding "!no_ini_" to name'.format(landscapeDir))
                 renameTry(landscapeDir,os.path.join(mainDir, "!no_ini_" + mainItem))
-
-def makeLink(linkDir, realDir):
-    try:
-        os.symlink(realDir, linkDir)
-        # os.system('mklink "{}" "{}"'.format(, realDir))
-    except:
-        print('Problem creating symblolic link {} -> {}'.format(linkDir, realDir))
 
 def get_qbtExe(qbtorrentExeDir):
     items = os.listdir(qbtorrentExeDir)

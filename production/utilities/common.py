@@ -1,7 +1,8 @@
-import os,subprocess
+import os,subprocess,sys
 import platform
 import shutil
 # import pathlib
+sambaServer = '\\\\192.168.1.161\\S\\'
 
 landscapesMap = {
     'AA2': 'AA3',
@@ -11,7 +12,7 @@ landscapesMap = {
     'Centro_Italia': 'Centro_Italia3',
     'Coquimbo_SanJuan': 'CoquimboSanJuan3',
     'Cuzco_Peru': 'Cuzco_Peru3',
-    'Husacaran': 'Huascaran_Peru3',
+    'Husacaran_Peru': 'Huascaran_Peru3',
     'Lima_Peru': 'Lima_Peru3',
     'North-UK2': 'United Kingdom3',
     'Pumalin_Park': 'Pumalin_Park3',
@@ -25,11 +26,82 @@ landscapesMap = {
     'United Kingdom': 'United Kingdom3',
     'West_Balkans': 'West_Balkans3',
     'West_Balkans2': 'West_Balkans3',
-    'West_Patgonia': 'West_Patagonia3',
+    'West_Patagonia': 'West_Patagonia3',
     'West-UK': 'United Kingdom3',
     'West-UK2': 'United Kingdom3',
+    'France Champagne': 'Fr_ChampagneC3',
     '': '',
 }
+
+keepC2 = [
+    'AlleghenyRidges',
+    'Arizona2',
+    'Baja_California',
+    'BigPyrenees2',
+    'CA',
+    'Cascade Range',
+    'Christchurch',
+    'Colorado_C2',
+    'Guatemala',
+    'Invermere',
+    'Logan2',
+    'NW_Montana',
+    'Nephi',
+    'New_Zealand',
+    'Oahu',
+    'Ridge-NSW-2',
+    'RockyMountains-2',
+    'Sierra_Nevada',
+    'SoCal2',
+    'South_Nevada2',
+    'Southern-Alberta',
+    'SouthernNorway4',
+    'Truckee',
+    'West_Patagonia',
+    'Wurtsboro',
+    'Yellowstone_Park'
+]
+
+def pathWinLin(path):
+    linuxPathStart = '/mnt/'
+    winDrives = ['A','C']
+    winSambaDrive = sambaServer  # includes Samba windows mapped drive
+    list = path.split(os.sep)
+    driveLetter = list[0]
+    if platform.system() == 'Windows':
+        if driveLetter.upper() in winDrives:
+            list[0] += ':'
+            path = os.sep.join(list)
+        elif winSambaDrive not in path:
+            path = winSambaDrive + path
+    elif linuxPathStart not in path:
+        path = linuxPathStart + path
+    return path
+
+def rmSlash(path):
+    return path.replace('\\\\','\\')
+
+#def linkWinLin(truePath, linkPath):
+ #   cmd = 'mklink /d {} {}'.format(rmSlash(linkPath), rmSlash(truePath))
+  #  print('true {} <-> link {}'.format(truePath, linkPath))
+   # if not os.path.exists(linkPath):
+    #    if platform.system() == 'Windows':
+     #       cmd = ['mklink', '/d', os.path.join(linksDir, item), os.path.join(trueDir, item) ]
+      #  else:
+       #     cmd = ['ln', '-s', os.path.join(trueDir, item), os.path.join(linksDir, item)]
+        #os.system(cmd)
+
+def buildDirs(finalPath):
+    list = finalPath.split(os.sep)
+    path = list[0] + os.sep
+    for segment in list[1:]:
+        path = os.path.join(path,segment)
+        if not os.path.exists(path):
+            os.mkdir(path)
+    if path != finalPath:
+        sys.exit('Stop...buildDirs failed ')
+
+
 def renameDirsWithTag(dirsList,tags,tagReplacement):
     for dir in dirsList:
         for tag in tags:
@@ -57,44 +129,16 @@ def renameTry(oldname, newname):
     shutil.move(oldname, newname)
     print('Renamed {} to {}'.format(oldname, newname))
 
-
-def linkAllDir(realDir,linksDir):
-    '''puts links to every item in realDir in a windows linksDir
-    Windows can follow these links more frequently than when realDir is linked'''
-    if platform.system() == 'Windows': print('Must run as Administrator to use linkAllDir')
-    if not os.path.exists(linksDir):
-       os.mkdir(linksDir)
-    items = os.listdir(realDir)
-    for item in items:
-        if not os.path.exists(os.path.join(linksDir,item)):
-            if platform.system() == 'Windows':
-                cmd = ['mklink', '/d', os.path.join(linksDir, item), os.path.join(realDir, item) ]
-            else:
-                cmd = ['ln', '-s', os.path.join(realDir, item), os.path.join(linksDir, item)]
-                print(cmd)
-            subprocess.run(cmd)
-
-def rmLinksDir(path,controlStrs):
-    '''If mode is 'keep', removes all links that don't contain on the selected strings.
-    Mode 'remove' Removes all links that do contain oneof the selected strings'''
-    mode =  controlStrs[0] # 'keep' or 'remove'
-    strs = controlStrs[1]
-    for item in os.listdir(path):
-        itemPath = os.path.join(path,item)
-        if not os.path.islink(itemPath):
-            continue
-        for str in strs:
-            if mode == 'keep' and str in strs:
-                break
-            elif mode == 'remove' and str in item:
-                os.remove(itemPath)
-                print('Removed symlink', itemPath)
-                break
-        else:
-            if mode == 'keep':
-                os.remove(itemPath)
-
-
+def makeLink(truePath,linkPath):
+    if os.path.islink(linkPath):
+        os.remove(linkPath)
+    if not os.path.exists(linkPath):
+        # try:
+            os.symlink(truePath, linkPath)
+            # os.system('mklink /d "{}" "{}"'.format(, truePath))
+            print('Created link {} -> true {}'.format(linkPath,truePath))
+        # except:
+        #     print('Problem creating true {} <-> link {}'.format(truePath,linkPath))
 
 
 

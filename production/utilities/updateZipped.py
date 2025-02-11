@@ -25,13 +25,16 @@ import os,sys
 # print(os.path.abspath(os.curdir))
 from time import sleep
 import platform
-from common import copy_file_to_guest,dirSize, readfileNoStrip, readfile, renameTry
+from common import copy_file_to_guest,dirSize, readfileNoStrip, readfile, renameTry, pathWinLin
 from uzsubs import *
 from time import perf_counter
 from createTorrents import createTorrents
 from landscapesPage import landscapesPage
 
 args = getParams()
+forever = False
+if args.loop == -1:
+    forever = True
 
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
 maxZipTilTorr = 10 # then will run createTorrents if Linux
@@ -101,9 +104,9 @@ allLands, allLandPaths = getLandPaths(landDirs, versionUpdateTag, args)
 # extractZipsLandsNotUpdated(zipDirs,lowVMain,'A:\\landscapesC2',versions,versionUpdateTag,nThreads,args)
 # renameDirsWithTag(dirsList,tags,tagReplacement)
 # copyFilesFromVersionUpdate(allLandPaths,lowVMain, highVMain,versions,versionUpdateTag,highVCheckExt)
-# winLinkAllDir('\\192.168.1.161\\E\\landscapes\\landscapesC2-main','C:\\Condor2\\Landscapes')
-# winLinkAllDir('s:\\E\\landscapes\\landscapesC2-main','C:\\Condor2\\Landscapes')
-# winLinkAllDir('s:\\E\\landscapes\\landscapesC3-main','C:\\Condor3\\Landscapes')
+# linkWinLinAllDir('\\192.168.1.161\\E\\landscapes\\landscapesC2-main','C:\\Condor2\\Landscapes')
+# linkWinLinAllDir('s:\\E\\landscapes\\landscapesC2-main','C:\\Condor2\\Landscapes')
+# linkWinLinAllDir('s:\\E\\landscapes\\landscapesC3-main','C:\\Condor3\\Landscapes')
 # sys.exit('Stop')
 
 print('Write code for:   Start the landscape dir name with "-" to move landscape to ini only directory')
@@ -302,7 +305,7 @@ while go:
             print('Copied {} to SkylinesC server'.format(qbtExeLocalPath))
         else:
             print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
-    if not args.loop:
+    if not forever and (not args.loop or loopCount == args.loop):
         print('Done')
         break
     waitTimeMins = int(max(0,loopWaitTime - (perf_counter() - startTime)/60)) #minutes

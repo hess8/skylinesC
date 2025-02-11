@@ -93,6 +93,8 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
         webSeed = 'http://208.83.226.9:8080/{}'.format(zippedPath)
         try:
             print(zippedPath)
+            os.system('mktorrent -a {} -l {} -c {} -w {} {}'.format(tracker,sizeExp,comment,webSeed,zippedPath))
+            print('{}.torrent created'.format(zippedPath))
             createdTorr.append(zipPath)
             toMakeMagnet.append(zipPath)
         except:
