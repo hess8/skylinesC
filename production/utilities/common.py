@@ -136,7 +136,7 @@ def makeLink(truePath,linkPath):
         # try:
             os.symlink(truePath, linkPath)
             # os.system('mklink /d "{}" "{}"'.format(, truePath))
-            print('Created true {} <-> link {}'.format(truePath,linkPath))
+            print('Created link {} -> true {}'.format(linkPath,truePath))
         # except:
         #     print('Problem creating true {} <-> link {}'.format(truePath,linkPath))
 
