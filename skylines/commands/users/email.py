@@ -17,7 +17,10 @@ from skylines.common import readfileNoStrip
 
 
 class Email(Command):
-    """ Send email to admins, a test site, or all users """
+    """ Queue email to admins, a test site, or all users
+        creates a text file for each email that email server
+        on another machine will read
+    """
 
     option_list = (
         Option("path_plain", help="path to a text file with the first part of the email"),
@@ -26,7 +29,7 @@ class Email(Command):
         Option("test_address", help="one email address'")
     )
 
-    def sendEmail(self, user, sender, recipient, subject, text, html):
+    def queueEmail(self, user, sender, recipient, subject, text, html):
         from datetime import datetime
         timeFormat = '%Y-%m-%d.%H.%M.%S.%f'
         queue_dir = '/media/sf_landscapes-zip/mail'
@@ -52,6 +55,7 @@ class Email(Command):
             f = open(os.path.join(queue_dir,file_name),'w')
             f.write(sender + '\n')
             f.write(recipient + '\n')
+            f.write(subject + '\n')
             f.write(msg.as_string())
             f.close()
             f = open(log_file,'a')
@@ -85,13 +89,13 @@ class Email(Command):
         if audience == 'test':
             users = (db.session.query(User).filter(User.id == 6))
             recipient = test_address
-            self.sendEmail(users[0], sender, recipient, subject, text, html)
+            self.queueEmail(users[0], sender, recipient, subject, text, html)
         else:
             users_query = (db.session.query(User).filter(User.email_address != None).order_by(User.id))
             for user in users_query:
                 recipient = user.email_address
                 if audience == 'admin' and user.admin:
-                    self.sendEmail(user,sender,recipient,subject,text,html)
+                    self.queueEmail(user,sender,recipient,subject,text,html)
                 elif audience == 'all':
-                    self.sendEmail(user, sender, recipient, subject, text)
+                    self.queueEmail(user, sender, recipient, subject, text)
 
