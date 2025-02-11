@@ -17,7 +17,9 @@ from skylines.common import readfileNoStrip
 
 
 class Email(Command):
-    """ Send email to admins, a test site, or all users """
+    """ Send email to admins, a test site, or all users
+
+    """
 
     option_list = (
         Option("path_plain", help="path to a text file with the first part of the email"),
@@ -27,13 +29,13 @@ class Email(Command):
     )
 
     def sendEmail(self, user, sender, recipient, subject, text, html):
-        print("Sending email to {} (ID: {})...".format(user.name.encode("utf-8"),user.id))
-        print(format(user.email_address))
+        print("Sending email ")
+        #print(format(user.email_address))
         try:
             msg = MIMEMultipart('alternative')
             msg["Subject"] = subject
             msg["From"] = sender
-            plain_part = 'Hi {},\n'.format(user.name.encode("utf-8").split(' ')[0])
+            plain_part = 'Hi {},\n'.format("Joe".encode("utf-8").split(' ')[0])
             if text:
                 plain_part += text
             plain = MIMEText(plain_part, 'plain')
@@ -67,9 +69,9 @@ class Email(Command):
         html += "<br><p>For help contact skylinescondor@gmail.com.  Don't reply to this message.</p>\n"
         html += '<br><p>--Bret at SkylinesCondor</p>\n'
         if audience == 'test':
-            users = (db.session.query(User).filter(User.id == 6))
+            #users = (db.session.query(User).filter(User.id == 6))
             recipient = test_address
-            self.sendEmail(users[0], sender, recipient, subject, text, html)
+            self.sendEmail(None, sender, recipient, subject, text, html)
         else:
             users_query = (db.session.query(User).filter(User.email_address != None).order_by(User.id))
             for user in users_query:
