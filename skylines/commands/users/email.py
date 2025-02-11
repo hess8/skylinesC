@@ -29,7 +29,7 @@ class Email(Command):
         Option("test_address", help="one email address'")
     )
 
-    def queueEmail(self, user, sender, recipient, subject, text, html):
+    def queueEmail(self, user, sender, recipient, subject, plain, html):
         from datetime import datetime
         timeFormat = '%Y-%m-%d.%H.%M.%S.%f'
         queue_dir = '/media/sf_landscapes-zip/mail'
@@ -39,24 +39,14 @@ class Email(Command):
         print("Queueing email to {} (ID: {})...".format(user.name.encode("utf-8"),user.id))
         print(format(user.email_address))
         try:
-            msg = MIMEMultipart('alternative')
-            msg["Subject"] = subject
-            msg["From"] = sender
-            plain_part = 'Hi {},\n'.format(user.name.encode("utf-8").split(' ')[0])
-            if text:
-                plain_part += text
-            plain = MIMEText(plain_part, 'plain')
-            msg.attach(plain)
-            if html:
-                html = MIMEText(html, 'html') #any html should be last
-                msg.attach(html)
 
             file_name = datetime.now().strftime(timeFormat) + '_skylinesC.msg'
             f = open(os.path.join(queue_dir,file_name),'w')
             f.write(sender + '\n')
             f.write(recipient + '\n')
             f.write(subject + '\n')
-            f.write(msg.as_string())
+            f.write(plain)
+            f.write(html)
             f.close()
             f = open(log_file,'a')
             f.write(msg.as_string())
@@ -78,9 +68,9 @@ class Email(Command):
         lines_plain = readfileNoStrip(path_plain)
         lines_html = readfileNoStrip(path_html)
         subject = lines_plain[0].strip()
-        text = ''
+        plain = ''
         for line in lines_plain[1:]:
-            text += line
+            plain += line
         html = ''
         for line in lines_html:
             html += line
@@ -89,13 +79,13 @@ class Email(Command):
         if audience == 'test':
             users = (db.session.query(User).filter(User.id == 6))
             recipient = test_address
-            self.queueEmail(users[0], sender, recipient, subject, text, html)
+            self.queueEmail(users[0], sender, recipient, subject, plain, html)
         else:
             users_query = (db.session.query(User).filter(User.email_address != None).order_by(User.id))
             for user in users_query:
                 recipient = user.email_address
                 if audience == 'admin' and user.admin:
-                    self.queueEmail(user,sender,recipient,subject,text,html)
+                    self.queueEmail(user,sender,recipient,subject,plain,html)
                 elif audience == 'all':
-                    self.queueEmail(user, sender, recipient, subject, text)
+                    self.queueEmail(user, sender, recipient, subject, plain)
 
