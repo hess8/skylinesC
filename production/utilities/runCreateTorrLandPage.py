@@ -7,7 +7,7 @@ from createTorrents import createTorrents
 '''Runs on linux'''
 
 args = getParams()
-# zipMain = '/mnt/P/landscapes-zip' #for Debian
+# zipMain = '/mnt/P/shared_VMs/landscapes-zip' #for Debian
 zipMain = '/media/sf_landscapes-zip' #for U14
 ## Landscapes page ##
 qbtExeLocalPath = os.path.join(zipMain,'qbt_exe')

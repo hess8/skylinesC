@@ -1,2 +1,2 @@
-SkylinesCondor has Condor2 landscapes updated to Condor3
+SkylinesCondor: landscapes convert to V3,
 All the landscapes on skylinescondor.com can be flown in Condor3

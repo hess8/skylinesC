@@ -140,8 +140,6 @@ def makeLink(truePath,linkPath):
         # except:
         #     print('Problem creating true {} <-> link {}'.format(truePath,linkPath))
 
-
-
 def copy_file_to_guest(vm_name, host_file_path, guest_file_path,usernm,passwd):
     """Copies a file from host to guest using VBoxManage."""
     cmd = [
