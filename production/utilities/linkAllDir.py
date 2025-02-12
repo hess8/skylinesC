@@ -1,5 +1,7 @@
 import os,sys
 import platform
+sys.path.append('/mnt/P/shared_VMs/common_py')
+sys.path.append('/media/sf_shared_VMs/common_py')
 from common import makeLink,pathWinLin
 '''puts links to every item in truePath in linksPath'''
 

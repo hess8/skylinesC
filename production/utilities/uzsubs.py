@@ -5,6 +5,8 @@ import platform
 import signal
 from time import sleep
 from datetime import datetime
+sys.path.append('/mnt/P/shared_VMs/common_py')
+sys.path.append('/media/sf_shared_VMs/common_py')
 from common import dirSize, landscapesMap, listRunningVms, makeLink, renameTry
 
 def getParams():
