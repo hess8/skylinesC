@@ -1,2 +1,8 @@
-SkylinesCondor: landscapes convert to V3,
-All the landscapes on skylinescondor.com can be flown in Condor3
+SkylinesCondor: convert landscapes to V3, TeamXC servers, groupflights fixed
+Hi, here are some updates for skylinescondor.com.
+
+All the C2 landscapes on skylinescondor can be flown in Condor3.  See the details below.
+
+TeamXC servers host rotating flights on all the serverslists host.  They focus on tasks in a large variety of mountainous landscapes including converted C2 landscapes.
+
+The groupflight feature in skylinesCondor is fully working now.  A couple of weeks ago I fixed a version-change related bug that only grouped pilots with the same plane
