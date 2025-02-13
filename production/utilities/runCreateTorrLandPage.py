@@ -7,16 +7,16 @@ from createTorrents import createTorrents
 '''Runs on linux'''
 
 args = getParams()
-# zipMain = '/mnt/P/shared_VMs/landscapes-zip' #for Debian
-zipMain = '/media/sf_landscapes-zip' #for U14
+zipMain = '/mnt/P/shared_VMs/landscapes-zip' #for Debian
+# zipMain = '/media/sf_landscapes-zip' #for U14
 ## Landscapes page ##
 qbtExeLocalPath = os.path.join(zipMain,'qbt_exe')
 qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
 qbtWebPath = os.path.join('/files',qbtExeName)
 versions = ['C2','C3']
 slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/' #only used if can get copying by guest control working again
-# landPageLocalDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs') # Debian
-landPageLocalDest =  '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs' # U14
+landPageLocalDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs') # Debian
+# landPageLocalDest =  '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs' # U14
 landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
 slcVMname = 'U14 (SkylinesC server) Current'
 ## Torrents ##

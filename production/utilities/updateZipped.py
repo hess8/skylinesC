@@ -40,7 +40,7 @@ if args.loop == -1:
 
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
 maxZipTilTorr = 10 # then will run createTorrents if Linux
-nThreads = {'linux': 1, 'windows': 12}
+nThreads = {'linux': 3, 'windows': 12}
 
 versions = ['C2','C3']
 versionUpdateTag = '_to_{}'.format(versions[1])
@@ -65,7 +65,7 @@ lowerVersionLandDirs = [lowVMain,lowVini,lowVserver]
 higherVersionLandDirs = [highVMain,highVini,highVserver]
 landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
 versionMainDict = {'C2': lowVMain, 'C3': highVMain}
-zipMain = pathWinLin(os.path.join('P','shared_Vms','landscapes-zip'))
+zipMain = pathWinLin(os.path.join('P','shared_VMs','landscapes-zip'))
 # zipMain = pathWinLin(os.path.join(winPathStart,'A:','zips')
 zipExtras = None #[pathWinLin(os.path.join('E','landscapes','zipped1']
 zipDirs = [zipMain] #+ zipExtras
