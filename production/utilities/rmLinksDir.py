@@ -1,4 +1,6 @@
 import os,sys
+sys.path.append('/mnt/P/shared_VMs/common_py')
+sys.path.append('/media/sf_shared_VMs/common_py')
 from common import pathWinLin
 '''If mode is 'keep', removes all links that don't contain on the selected strings.
 Mode 'remove' Removes all links that do contain oneof the selected strings'''

@@ -1,12 +1,11 @@
+import os, sys
 import shutil
-from common import landscapesMap
-
+sys.path.append('/mnt/P/shared_VMs/common_py')
+sys.path.append('/media/sf_shared_VMs/common_py')
+from common import landscapesMap,copy_file_to_guest, readfile, readfileNoStrip, writefile
 
 def landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args):
     '''Called by updateZipped.py'''
-    import os, sys
-    sys.path.append('/mnt/L/condor-related/skylinesC/skylines')
-    from common import copy_file_to_guest, readfile, readfileNoStrip, writefile
 
     def column_table_head(version):
         lines.append('     <div class="column"> \n')

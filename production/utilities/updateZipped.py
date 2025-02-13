@@ -25,6 +25,8 @@ import os,sys
 # print(os.path.abspath(os.curdir))
 from time import sleep
 import platform
+sys.path.append('/mnt/P/shared_VMs/common_py')
+sys.path.append('/media/sf_shared_VMs/common_py')
 from common import copy_file_to_guest,dirSize, readfileNoStrip, readfile, renameTry, pathWinLin
 from uzsubs import *
 from time import perf_counter
