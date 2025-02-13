@@ -5,9 +5,11 @@ import platform
 import signal
 from time import sleep
 from datetime import datetime
+sys.path.append('d:\common_py')
 sys.path.append('/mnt/P/shared_VMs/common_py')
 sys.path.append('/media/sf_shared_VMs/common_py')
-from common import dirSize, landscapesMap, listRunningVms, makeLink, renameTry
+from common import dirSize, landscapesMap, listRunningVms, makeLink, renameTry,copy_file_to_guest,dirSize, \
+    readfileNoStrip, readfile, renameTry, pathWinLin
 
 def getParams():
     import argparse
@@ -51,7 +53,7 @@ def getParams():
 def pathWinLin(path):
     linuxPathStart = '/mnt/'
     winSharedDrives = ['A']
-    winSambaDrive = '\\\\192.168.1.161\\S' # 'S:\\'  # Samba windows mapped drive...not reliable
+    winSambaDrive = '\\\\192.168.1.161\\S\\' # 'S:\\'  # Samba windows mapped drive...not reliable
     list = path.split(os.sep)
     driveLetter = list[0]
     if platform.system() == 'Windows':
