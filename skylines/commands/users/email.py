@@ -55,7 +55,7 @@ class Email(Command):
             #s.quit()
         except BaseException as e:
             print(recipient)
-            print("Queueing email failed: {}".format(e))
+            print("Queueing email failed: {}".format(e), recipient, subject)
             sys.exit('Stop')
 
     def run(self, path_plain, path_html, audience, test_address=None):

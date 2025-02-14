@@ -10,6 +10,7 @@ from sqlalchemy import func, and_
 from sqlalchemy.orm import joinedload, contains_eager, subqueryload
 
 from skylines.api.json import jsonify
+from skylines.common import queueEmail
 from skylines.database import db
 from skylines.api.oauth import oauth
 from skylines.lib.dbutil import get_requested_record
@@ -114,7 +115,7 @@ You have asked to recover your password.  To enter a new
 password, click on the following link:
 
  http://skylinescondor.com/users/recover?key=%x
- 
+
 For help contact skylinescondor@gmail.com.  Don't reply to this message.
 
 --Bret at SkylinesCondor
@@ -124,23 +125,6 @@ For help contact skylinescondor@gmail.com.  Don't reply to this message.
     )
     sender = 'skylinescondor@soardata.org'
 
-    try:
-        smtp = smtplib.SMTP('localhost')
-        message = MIMEText(text.encode("utf-8"), "plain", "utf-8")
-        message["Subject"] = "SkylinesCondor password recovery"
-        message["From"] = sender
-        message["To"] = user.email_address.encode("ascii")
-        smtp.sendmail(
-            sender, user.email_address.encode("ascii"), message.as_string())
-        smtp.quit()
-
-    except:
-        raise ServiceUnavailable(
-            description=(
-                "The mail server is currently not reachable. "
-                "Please try again later or contact the developers."
-            )
-        )
 
 
 def recover_step2_post(json):
