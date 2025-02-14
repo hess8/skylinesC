@@ -6,5 +6,3 @@ Hi, here is the latest:
 2. TeamXC servers are hosting rotating flights that can be found on all the serverslists.  They focus on tasks on a large variety of mountainous landscapes including converted C2 landscapes.
 
 3. The groupflight feature in skylinesCondor is fully working now.  A couple of weeks ago I fixed a version-change related bug that only grouped pilots with the same plane
-
-4. Password reset emails working now.

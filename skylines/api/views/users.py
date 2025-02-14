@@ -115,7 +115,7 @@ password, click on the following link:
 
 For help contact skylinescondor@gmail.com.  Don't reply to this message.
 
---Bret at SkylinesCondor
+-- SkylinesCondor
 """ % (
         user.recover_key,
     )
