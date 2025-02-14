@@ -117,12 +117,12 @@ For help contact skylinescondor@gmail.com.  Don't reply to this message.
 
 --Bret at SkylinesCondor
 """ % (
-        user.name,
         user.recover_key,
     )
     sender = 'skylinescondor@soardata.org'
     html = []
-    Email.queueEmail(user, sender, user.email_address, "SkylinesCondor password reset", plain, html)
+    email = Email()
+    email.queueEmail(user, sender, user.email_address, "SkylinesCondor password reset", plain, html)
 
 
 def recover_step2_post(json):
