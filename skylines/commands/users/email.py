@@ -70,7 +70,7 @@ class Email(Command):
         subject = lines_plain[0]
         plain = lines_plain[1:]
         html = readfileNoStrip(path_html)
-        html.append("<br><p>For help contact skylinescondor@gmail.com.  Don't reply to this message.</p>\n")
+        html.append("<br><hr><p>For help contact skylinescondor@gmail.com.  Don't reply to this message.</p>\n")
         html.append('<br><p>--Bret at SkylinesCondor</p>\n')
         if audience == 'test':
             users = (db.session.query(User).filter(User.id == 6))
