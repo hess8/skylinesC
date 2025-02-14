@@ -10,7 +10,6 @@ from sqlalchemy import func, and_
 from sqlalchemy.orm import joinedload, contains_eager, subqueryload
 
 from skylines.api.json import jsonify
-from skylines.common import queueEmail
 from skylines.database import db
 from skylines.api.oauth import oauth
 from skylines.lib.dbutil import get_requested_record
@@ -28,8 +27,6 @@ from skylines.schemas import (
     ValidationError,
 )
 
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 users_blueprint = Blueprint("users", "skylines")
 
 @users_blueprint.route("/users", strict_slashes=False)
@@ -109,8 +106,8 @@ def recover_step1_post(json):
     return jsonify()
 
 def send_recover_mail(user):
-    text = u"""Hi %s,
-
+    from skylines.commands.users import Email
+    plain = u"""
 You have asked to recover your password.  To enter a new
 password, click on the following link:
 
@@ -124,7 +121,8 @@ For help contact skylinescondor@gmail.com.  Don't reply to this message.
         user.recover_key,
     )
     sender = 'skylinescondor@soardata.org'
-
+    html = []
+    Email.queueEmail(user, sender, user.email_address, "SkylinesCondor password reset", plain, html)
 
 
 def recover_step2_post(json):

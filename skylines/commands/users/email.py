@@ -82,5 +82,5 @@ class Email(Command):
                 if audience == 'admin' and user.admin:
                     self.queueEmail(user,sender,recipient,subject,plain,html)
                 elif audience == 'all':
-                    self.queueEmail(user, sender, recipient, subject, plain)
+                    self.queueEmail(user, sender, recipient, subject, plain,html)
 
