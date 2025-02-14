@@ -107,7 +107,7 @@ def recover_step1_post(json):
 
 def send_recover_mail(user):
     from skylines.commands.users import Email
-    plain = u"""
+    text = u"""
 You have asked to recover your password.  To enter a new
 password, click on the following link:
 
@@ -120,9 +120,8 @@ For help contact skylinescondor@gmail.com.  Don't reply to this message.
         user.recover_key,
     )
     sender = 'skylinescondor@soardata.org'
-    html = []
     email = Email()
-    email.queueEmail(user, sender, user.email_address, "SkylinesCondor password reset", plain, html)
+    email.queueEmail(user, sender, user.email_address, "SkylinesCondor password reset", text)
 
 
 def recover_step2_post(json):
