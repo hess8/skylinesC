@@ -71,9 +71,8 @@ Router.map(function() {
     this.route('pinned');
     this.route('list', { path: '/list/:list' });
   });
-//  I don't see why it doesn't work to make /convert a child page of /landscapes like I did /flights/info
   this.route('landscapes')
-  this.route('convert', { path: '/landscapes/convert' })
+  this.route('convert')
 
   this.route('utsoar-dist');
   this.route('utsoar-totals');
