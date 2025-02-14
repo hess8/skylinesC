@@ -40,6 +40,7 @@ class Email(Command):
         print(format(user.email_address))
         try:
             file_name = datetime.now().strftime(timeFormat) + '_skylinesC.msg'
+            timeTag = datetime.now().strftime("%y/%m/%d %H:%M:%S")
             f = open(os.path.join(queue_dir,file_name),'w')
             f.write(sender + '\n')
             f.write(recipient + '\n')
@@ -48,7 +49,7 @@ class Email(Command):
             f.writelines(html)
             f.close()
             f = open(log_file,'a')
-            f.write('{} {} skylinesC'.format(recipient, subject))
+            f.write('{} queu {} {} {}'.format(timeTag, recipient, sender, subject))
             f.close()
             #s = smtplib.SMTP('skylinescondor.com')
             #s.sendmail(sender, recipient.encode("ascii"), msg.as_string())
