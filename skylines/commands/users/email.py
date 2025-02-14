@@ -44,6 +44,7 @@ class Email(Command):
             f = open(os.path.join(queue_dir,file_name),'w')
             f.write(sender + '\n')
             f.write(recipient + '\n')
+            f.write(user.first_name + '\n')
             f.write(subject + '\n')
             f.writelines(plain)
             f.writelines(html)
