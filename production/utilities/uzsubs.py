@@ -5,9 +5,11 @@ import platform
 import signal
 from time import sleep
 from datetime import datetime
+sys.path.append('d:\common_py')
 sys.path.append('/mnt/P/shared_VMs/common_py')
 sys.path.append('/media/sf_shared_VMs/common_py')
-from common import dirSize, landscapesMap, listRunningVms, makeLink, renameTry, subPopenTry
+from common import dirSize, landscapesMap, listRunningVms, makeLink, renameTry,copy_file_to_guest,dirSize, \
+    readfileNoStrip, readfile, renameTry, pathWinLin
 
 def getParams():
     import argparse
@@ -73,13 +75,6 @@ def skylinesC_VM():
             return name
     else:
         return None
-
-def zipMergeIntoNew(zipsList, outZip):
-    ''' DOESN'T WORK FOR 7ZIP!!
-zipmerge [-DhIiSsV] target-zip source-zip [source-zip ...]
-
-We want to have the latest files overwrite the older, so the older ones are listed first
-    '''
 
 def good7zOrDel(response,archive):
     if 'is not an archive' in response.lower() or 'cannot open the file as [7z]' in response.lower() or 'is not archive' in response.lower():
@@ -197,11 +192,19 @@ def sevenName(archivePath): # -mmt limits number of threads -t7z specifies type 
         cmd = ['7z', 'l', archivePath]
     elif platform.system() == 'Windows':
         cmd = ['C:\\Program Files\\7-Zip\\7z.exe', 'l', archivePath]
-    outputLines = subPopenTry(cmd)
-
-    for il,line in enumerate(outputLines):
+    output = None
+    try:
+        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,shell=True)
+        output, error = zipProc.communicate()
+        if zipProc.returncode != 0:
+            raise subprocess.CalledProcessError(zipProc.returncode, zipProc.args, output=output, stderr=error)
+        lines = output.splitlines()
+    except subprocess.CalledProcessError as e:
+        print("Error output:", e.stderr)
+        return e.stderr
+    for il,line in enumerate(lines):
         if "---------" in line:
-            name = outputLines[il+1].split(' 0 ')[-1].strip()
+            name = lines[il+1].split(' 0 ')[-1].strip()
             return name
 
 def sevenTest(archivePath,nThreads): # -mmt limits number of threads -t7z specifies type of archive

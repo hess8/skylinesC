@@ -32,21 +32,20 @@ class Email(Command):
     def queueEmail(self, user, sender, recipient, subject, plain, html):
         from datetime import datetime
         timeFormat = '%Y-%m-%d.%H.%M.%S.%f'
-        queue_dir = '/media/sf_landscapes-zip/mail'
+        queue_dir = '/media/sf_shared_VMs/mail'
         log_file = os.path.join(queue_dir,'emails.log')
         if not os.path.exists(queue_dir):
             os.mkdir(queue_dir)
         print("Queueing email to {} (ID: {})...".format(user.name.encode("utf-8"),user.id))
         print(format(user.email_address))
         try:
-
             file_name = datetime.now().strftime(timeFormat) + '_skylinesC.msg'
             f = open(os.path.join(queue_dir,file_name),'w')
             f.write(sender + '\n')
             f.write(recipient + '\n')
             f.write(subject + '\n')
-            f.write(plain)
-            f.write(html)
+            f.writelines(plain)
+            f.writelines(html)
             f.close()
             f = open(log_file,'a')
             f.write("queued", recipient, sender, subject)
@@ -66,16 +65,11 @@ class Email(Command):
         sender = 'mail@skylinescondor.com' #overwritten in mail-server
         os.chdir('/home/bret/servers/repo-skylinesC/skylinesC')
         lines_plain = readfileNoStrip(path_plain)
-        lines_html = readfileNoStrip(path_html)
-        subject = lines_plain[0].strip()
-        plain = ''
-        for line in lines_plain[1:]:
-            plain += line
-        html = ''
-        for line in lines_html:
-            html += line
-        html += "<br><p>For help contact skylinescondor@gmail.com.  Don't reply to this message.</p>\n"
-        html += '<br><p>--Bret at SkylinesCondor</p>\n'
+        subject = lines_plain[0]
+        plain = lines_plain[1:]
+        html = readfileNoStrip(path_html)
+        html.append("<br><p>For help contact skylinescondor@gmail.com.  Don't reply to this message.</p>\n")
+        html.append('<br><p>--Bret at SkylinesCondor</p>\n')
         if audience == 'test':
             users = (db.session.query(User).filter(User.id == 6))
             recipient = test_address
