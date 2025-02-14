@@ -49,7 +49,7 @@ class Email(Command):
             f.write(html)
             f.close()
             f = open(log_file,'a')
-            f.write(msg.as_string())
+            f.write("queued", recipient, sender, subject)
             f.close()
             #s = smtplib.SMTP('skylinescondor.com')
             #s.sendmail(sender, recipient.encode("ascii"), msg.as_string())
