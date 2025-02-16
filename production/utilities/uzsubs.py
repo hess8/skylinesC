@@ -5,7 +5,7 @@ import platform
 import signal
 from time import sleep
 from datetime import datetime
-sys.path.append('d:\common_py')
+sys.path.append('d:\\common_py')
 sys.path.append('/mnt/P/shared_VMs/common_py')
 sys.path.append('/media/sf_shared_VMs/common_py')
 from common import dirSize, landscapesMap, listRunningVms, makeLink, renameTry,copy_file_to_guest,dirSize, \
