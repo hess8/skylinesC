@@ -27,8 +27,6 @@ from skylines.schemas import (
     ValidationError,
 )
 
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 users_blueprint = Blueprint("users", "skylines")
 
 @users_blueprint.route("/users", strict_slashes=False)
@@ -108,39 +106,22 @@ def recover_step1_post(json):
     return jsonify()
 
 def send_recover_mail(user):
-    text = u"""Hi %s,
-
+    from skylines.commands.users import Email
+    text = u"""
 You have asked to recover your password.  To enter a new
 password, click on the following link:
 
  http://skylinescondor.com/users/recover?key=%x
- 
+
 For help contact skylinescondor@gmail.com.  Don't reply to this message.
 
---Bret at SkylinesCondor
+-- SkylinesCondor
 """ % (
-        user.name,
         user.recover_key,
     )
     sender = 'skylinescondor@soardata.org'
-
-    try:
-        smtp = smtplib.SMTP('localhost')
-        message = MIMEText(text.encode("utf-8"), "plain", "utf-8")
-        message["Subject"] = "SkylinesCondor password recovery"
-        message["From"] = sender
-        message["To"] = user.email_address.encode("ascii")
-        smtp.sendmail(
-            sender, user.email_address.encode("ascii"), message.as_string())
-        smtp.quit()
-
-    except:
-        raise ServiceUnavailable(
-            description=(
-                "The mail server is currently not reachable. "
-                "Please try again later or contact the developers."
-            )
-        )
+    email = Email()
+    email.queueEmail(user, sender, user.email_address, "SkylinesCondor password reset", text)
 
 
 def recover_step2_post(json):

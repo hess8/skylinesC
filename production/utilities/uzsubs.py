@@ -53,7 +53,7 @@ def getParams():
 def pathWinLin(path):
     linuxPathStart = '/mnt/'
     winSharedDrives = ['A']
-    winSambaDrive = '\\\\192.168.1.161\\S\\' # 'S:\\'  # Samba windows mapped drive...not reliable
+    winSambaDrive = '\\\\192.168.1.161\\S' # 'S:\\'  # Samba windows mapped drive...not reliable
     list = path.split(os.sep)
     driveLetter = list[0]
     if platform.system() == 'Windows':
@@ -75,25 +75,6 @@ def skylinesC_VM():
             return name
     else:
         return None
-
-def zipMergeIntoNew(zipsList, outZip):
-    ''' DOESN'T WORK FOR 7ZIP!!
-zipmerge [-DhIiSsV] target-zip source-zip [source-zip ...]
-
-We want to have the latest files overwrite the older, so the older ones are listed first
-    '''
-    # cmd = ['zipmerge', outZip]
-    # for zip in zipsList:
-    #     cmd.append(zip)
-    # try:
-    #     zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,shell=True)
-    #     output, error = zipProc.communicate()
-    #     if zipProc.returncode != 0:
-    #         raise subprocess.CalledProcessError(zipProc.returncode, zipProc.args, output=output, stderr=error)
-    #     print('Merged {} -> {}'.format(zipsList),outZip)
-    # except subprocess.CalledProcessError as e:
-    #     print("Error output:", e.stderr)
-    #     return e.stderr
 
 def good7zOrDel(response,archive):
     if 'is not an archive' in response.lower() or 'cannot open the file as [7z]' in response.lower() or 'is not archive' in response.lower():
@@ -237,16 +218,8 @@ def sevenTest(archivePath,nThreads): # -mmt limits number of threads -t7z specif
     elif platform.system() == 'Windows':
         maxThreads = nThreads['windows']
         cmd = ['C:\\Program Files\\7-Zip\\7z.exe', 't', '-mmt={}'.format(maxThreads), archivePath]
-    output = None
-    try:
-        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,shell=True)
-        output, error = zipProc.communicate()
-        if zipProc.returncode != 0:
-            raise subprocess.CalledProcessError(zipProc.returncode, zipProc.args, output=output, stderr=error)
-    except subprocess.CalledProcessError as e:
-        print("Error output:", e.stderr)
-        sys.exit('Stop. Problems with testing')
-    return output
+    outputLines = subPopenTry(cmd)
+    return outputLines
 
 def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
     compressTemp  = '.temp'

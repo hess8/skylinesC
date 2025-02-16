@@ -194,7 +194,7 @@ publish-flight-confirmation-text: Confirm to publish this flight...
 publish-flights: '{num, plural, =1 {Publish Flight} other {Publish Flights}}'
 publishing: Publishing
 ranking: Ranking
-recover-password: Recover Password
+recover-password: Reset Password
 recovering: Recovering...
 recovery-mail-sent: Check your email! We have sent you a link to recover your password.
 refresh: Please refresh this page.
