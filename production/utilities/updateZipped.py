@@ -38,7 +38,7 @@ if args.loop == -1:
 
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
 maxZipTilTorr = 10 # then will run createTorrents if Linux
-nThreads = {'linux': 3, 'windows': 12}
+nThreads = {'linux': 5, 'windows': 12}
 
 versions = ['C2','C3']
 versionUpdateTag = '_to_{}'.format(versions[1])

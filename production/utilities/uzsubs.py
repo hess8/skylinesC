@@ -188,6 +188,7 @@ def upLevelDel(highestDir,upperName,lowerName):
     print('removed',renamedUpper)
 
 def sevenName(archivePath): # -mmt limits number of threads -t7z specifies type of archive
+    '''gets exact landscape name from the archive, regardless of characters added to avoid spaces'''
     if platform.system() == 'Linux':
         cmd = ['7z', 'l', archivePath]
     elif platform.system() == 'Windows':
@@ -269,7 +270,7 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
         upLevelDel(base,trueLandName,trueLandName)
     print("7zip finished {}".format(action))
     return output
-        # Following implements working cpulimit but signal handline doesn't work
+        # Following implements working cpulimit but signal handle doesn't work
     # maxCPU = 80  # %
     # cmd = ['cpulimit','-l',str(maxCPU),'--','bash',trapSigPath, '7z', 'a', '-t7z', archivePath, folderPath]
 
