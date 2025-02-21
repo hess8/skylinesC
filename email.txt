@@ -1,5 +1,5 @@
-#Instructions:  html format except for paragraph markings (added later)
-SkylinesCondor: convert  C2 landscapes to C3, groupflights fixed, password reset fixed
+#Instructions:  html format except for paragraph markings (added later).  Don't remove this line
+Convert C2 landscapes to C3, groupflights fixed, password reset fixed, TeamXC servers
 Hi $first_name,
 
 Here is the latest:

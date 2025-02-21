@@ -23,18 +23,19 @@ class Email(Command):
     """
 
     option_list = (
-        Option("path_plain", help="path to a text file with the first part of the email"),
-        Option("path_html", help="path to an html file with the last part of the email"),
+        Option("path_text", help="path file with the body in html except for p tags"),
         Option("audience", help="can be 'admin', 'all', or 'test'"),
         Option("test_address", help="one email address'")
     )
 
     def toHTML(self,line,user):
+        if user.email_address == 'lubosf@centrum.cz':
+            xx=0
         if line.strip()[:3] not in ['<p>','<br', '<hr']:
             newline =  '<p>{}</p>\n'.format(line.rstrip('\n'))
         else:
             newline =  line
-        return newline.replace('$first_name', user.first_name)
+        return newline.replace('$first_name', user.first_name).encode("utf-8")
 
     def queueEmail(self, user, sender, recipient, subject, text):
         from datetime import datetime
@@ -45,11 +46,10 @@ class Email(Command):
             os.mkdir(queue_dir)
         html = []
         for line in text:
-            html.append(self.toHTML(line))
+            html.append(self.toHTML(line,user))
         html.append("<br><hr><p>For help contact skylinescondor@gmail.com.  Don't reply to this message.</p>\n")
         html.append('<br><p>--Bret at SkylinesCondor</p>\n')
-        print("Queueing email to {} (ID: {})...".format(user.name.encode("utf-8"),user.id))
-        print(format(user.email_address))
+        print("Queueing email to {} (ID: {}) {}".format(user.name.encode("utf-8"),user.id,user.email_address))
         try:
             file_name = datetime.now().strftime(timeFormat) + '_skylinesC.msg'
             timeTag = datetime.now().strftime("%y/%m/%d %H:%M:%S")
