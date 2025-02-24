@@ -171,7 +171,7 @@ def lowVtoHighVFiles(landPath,highVersionProof):
 
 def signal_handler(sig, frame):
     sleep(0.1)
-    zipProc.terminate()
+    #zipProc.terminate() #no longer works...can't be found.
     sleep(0.1)
     sys.exit('Stopped by user')
 
@@ -247,7 +247,7 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
         cmd = ['C:\\Program Files\\7-Zip\\7z.exe', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, preFolder+folderPath]
     output = None
     try:
-        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True, shell=True)
+        zipProc = subprocess.Popen(cmd,stdout=subprocess.PIPE,text=True) # Exits on linux if shell = True
         output, error = zipProc.communicate()
         if zipProc.returncode != 0:
             raise subprocess.CalledProcessError(zipProc.returncode, zipProc.args, output=output, stderr=error)

@@ -1,28 +1,37 @@
 import shutil
 import os, sys
 
-from uzsubs import getParams, get_qbtExe
+from uzsubs import copy_file_to_guest, getParams, get_qbtExe, readfile, pathWinLin, skylinesC_VM
 from landscapesPage import landscapesPage
 from createTorrents import createTorrents
 '''Runs on linux'''
 
 args = getParams()
-zipMain = '/mnt/P/shared_VMs/landscapes-zip' #for Debian
-# zipMain = '/media/sf_landscapes-zip' #for U14
+zipMain = pathWinLin(os.path.join('P','shared_VMs','landscapes-zip'))
 ## Landscapes page ##
-qbtExeLocalPath = os.path.join(zipMain,'qbt_exe')
+## Landscapes page ##
+landPageLocalDest = pathWinLin(os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs'))
+qbtExeLocalPath = get_qbtExe(pathWinLin(os.path.join(zipMain,'qbt_exe')))
+convert_landscapesPath = pathWinLin(os.path.join('/mnt/L/condor-related/skylinesC/production/utilities/','Convert-Landscapes.ps1'))
+convert_landscapesPath = pathWinLin(os.path.join('/mnt/L/condor-related/skylinesC/production/utilities/','Convert-Landscapes.ps1'))
+slcPath = '/home/bret/servers/repo-skylinesC/skylinesC/'
+slcFilesPath = os.path.join(slcPath, 'htdocs/files/')
+landPageServerDest = os.path.join(slcPath,'ember/app/templates/landscapes.hbs')
 qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
+qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
 qbtWebPath = os.path.join('/files',qbtExeName)
+slcVMname = skylinesC_VM()
+[username, passwd] = readfile('/home/bret/.local/secure/userU')
 versions = ['C2','C3']
-slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/' #only used if can get copying by guest control working again
-landPageLocalDest = os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs') # Debian
-# landPageLocalDest =  '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs' # U14
-landHBS = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
-slcVMname = 'U14 (SkylinesC server) Current'
-## Torrents ##
 
+## Torrents ##
 trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
 watchDir = os.path.join(zipMain + '/qbtWatch')
 makeAllMagnets = False  # needed only occasionally
 createdTorr = createTorrents(zipMain, watchDir, makeAllMagnets)
 landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)
+if slcVMname:
+    copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
+    print('Copied landscapes page to SkylinesC server')
+else:
+    print('SkylinesC server appears not to be running')

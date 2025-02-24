@@ -38,7 +38,7 @@ if args.loop == -1:
 
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
 maxZipTilTorr = 10 # then will run createTorrents if Linux
-nThreads = {'linux': 5, 'windows': 12}
+nThreads = {'linux': 7, 'windows': 12}
 
 versions = ['C2','C3']
 versionUpdateTag = '_to_{}'.format(versions[1])
@@ -73,8 +73,9 @@ utilitiesDir = pathWinLin(os.path.join('L','condor-related','skylinesC','product
 landPageLocalDest = pathWinLin(os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs'))
 qbtExeLocalPath = get_qbtExe(pathWinLin(os.path.join(zipMain,'qbt_exe')))
 convert_landscapesPath = pathWinLin(os.path.join('/mnt/L/condor-related/skylinesC/production/utilities/','Convert-Landscapes.ps1'))
-slcFilesPath = '/home/bret/servers/repo-skylinesC/skylinesC/htdocs/files/'
-landPageServerDest = '/home/bret/servers/repo-skylinesC/skylinesC/ember/app/templates/landscapes.hbs'
+slcPath = '/home/bret/servers/repo-skylinesC/skylinesC/'
+slcFilesPath = os.path.join(slcPath, 'htdocs/files/')
+landPageServerDest = os.path.join(slcPath,'ember/app/templates/landscapes.hbs')
 
 ## Torrents ##
 trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
@@ -288,7 +289,6 @@ while go:
         [username, passwd] = readfile('/home/bret/.local/secure/userU')
         if args.force or len(createdTorr) > 0 or not os.path.exists(landPageLocalDest):
             landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)
-            # copy qbt exe to /files so it is accessible to ember
             if slcVMname:
                 copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
                 print('Copied landscapes page to SkylinesC server')
