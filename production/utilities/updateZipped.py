@@ -196,6 +196,7 @@ while go:
         if os.path.basename(landPath)[0] == '!' or (highVMain in landPath and land in lowVLands):
             continue                      # no zips of C2 folders linked to C3
         base, name = os.path.split(landPath)
+        #Archive containing only files to update from low to high version
         if versionUpdateTag in landPath:
             zipNameUpdateVers = name.replace(' ', '_') + '.7z'
             if zipNameUpdateVers not in allZips:
@@ -240,7 +241,16 @@ while go:
                 print('Will check {} for growth'.format(os.path.basename(landPath)))
                 toTestGrowth.append({'zipName': zipName, 'landPath': landPath})
             else:
+                #add full landscape
                 toZip.append({'zipName': zipName, 'landPath': landPath})
+                #remove old versions of same name
+                if '.v' in landPath:
+                    land = os.path.split(landPath.split('.')[0])[-1]
+                    for iz, item in enumerate(allZips):
+                        if item.split('.')[0] == land and land!='WestGermany3':
+                            getOKorStop('Do you want to remove old version {}')
+                            os.remove(allZips[iz])
+                            print('removed',allZips[iz])
 
 
     #this code works, but may be too short to check for growth, so for now let loop time determine it
@@ -279,7 +289,7 @@ while go:
                 print('----------------------------------------------------------')
                 print('***Creating {} in {}***'.format(newZip['zipName'], destination))
                 response = sevenzip("compression", zipPath, landPath2, nThreads)
-                nZipAfterTorr += 1
+
     if linux:
         createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
         qbtExeName = qbtExeLocalPath.split(os.sep)[-1]

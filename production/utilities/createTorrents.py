@@ -51,6 +51,8 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
     toMakeMagnet = []
 
     for item in zipDirList:
+        if 'Hillrace' in item:
+            xx=0
         if extension(item) == '.7z':
             zipPath = os.path.join(zipDir, item)
             torrPath = zipPath + '.torrent'
@@ -104,21 +106,6 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             print('Copied {}.torrent to {}'.format(zippedPath,watchDir))
         except:
             sys.exit('Error copying {}.torrent to {}'.format(zippedPath,watchDir))
-        # remove old version files for same landscape
-        land = zippedPath.split('.')[0]
-        for item in zipDirList:
-            if item.split('.')[0] == land and land!='WestGermany3':
-                zipVersion = '{}/{}'.format(zipDir,item)
-                os.remove(zipVersion)
-                print('removed',zipVersion)
-                torrentVersion = '{}/{}.torrent'.format(zipDir,item)
-                if os.path.exists(torrentVersion):
-                    os.remove(torrentVersion)
-                    print('removed',torrentVersion)
-                magnetVersion = '{}/{}.magnet'.format(zipDir,item)
-                if os.path.exists(magnetVersion):
-                    os.remove(magnetVersion)
-                    print('removed',magnetVersion)
     # make new magnets
     for magPath in toMakeMagnet:
         createMagnet(magPath)
