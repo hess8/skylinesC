@@ -9,7 +9,7 @@ sys.path.append('d:\\common_py')
 sys.path.append('/mnt/P/shared_VMs/common_py')
 sys.path.append('/media/sf_shared_VMs/common_py')
 from common import dirSize, landscapesMap, listRunningVms, makeLink, renameTry,copy_file_to_guest,dirSize, \
-    readfileNoStrip, readfile, renameTry, pathWinLin, getOKorStop
+    readfileNoStrip, readfile, renameTry, pathWinLin, getOKor
 
 def getParams():
     import argparse
