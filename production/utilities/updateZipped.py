@@ -248,7 +248,7 @@ while go:
                     land = os.path.split(landPath.split('.')[0])[-1]
                     for iz, item in enumerate(allZips):
                         if item.split('.')[0] == land and land!='WestGermany3':
-                            getOKorStop('Do you want to remove old version {}')
+                            getOKor('break', 'Do you want to remove old version {}').format(allZips[iz],)
                             os.remove(allZips[iz])
                             print('removed',allZips[iz])
 
