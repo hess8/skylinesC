@@ -159,6 +159,7 @@ while go:
                         os.remove(os.path.join(dir1,landscape,item))
 
     allZips = []
+    allZipsPaths = []
     #remove broken symbolic links and flag landscapes without .ini file or .ini name not matching landscape
     if args.links and  linux:
         checkLinksIni(lowVMain,versionUpdateTag)
@@ -176,6 +177,7 @@ while go:
     for item in items:
         if item.split('.')[-1] == '7z':
             allZips.append(item)
+            allZipsPaths.append(os.path.join(zipMain, item))
     allZips.sort()
 
     ## now all zips are represented in zipMain ##
@@ -236,21 +238,24 @@ while go:
         #         zipMergeIntoNew([zipPathlow, zipPathUpdateVers], os.path.join(zipMain,zipName))
         #         continue
 
-        if zipName not in allZips and not (linux and nZipAfterTorr >= maxZipTilTorr):
+        if zipName not in allZips and not nZipAfterTorr >= maxZipTilTorr:
             if args.growth and checkGrowth(landPath, landSizes):
                 print('Will check {} for growth'.format(os.path.basename(landPath)))
                 toTestGrowth.append({'zipName': zipName, 'landPath': landPath})
             else:
                 #add full landscape
                 toZip.append({'zipName': zipName, 'landPath': landPath})
+                print('added',zipName)
                 #remove old versions of same name
-                if '.v' in landPath:
+                if '.v' in zipName:
                     land = os.path.split(landPath.split('.')[0])[-1]
-                    for iz, item in enumerate(allZips):
-                        if item.split('.')[0] == land and land!='WestGermany3':
-                            getOKor('break', 'Do you want to remove old version {}').format(allZips[iz],)
-                            os.remove(allZips[iz])
-                            print('removed',allZips[iz])
+                    for path in allZipsPaths:
+                        zipLand = os.path.split(path.split('.')[0])[-1]
+                        if zipLand == land and land!='WestGermany3':
+                            getOKor('break', 'Do you want to remove old version {}'.format(path))
+                            os.remove(path)
+                            print('removed',path)
+                            break
 
 
     #this code works, but may be too short to check for growth, so for now let loop time determine it

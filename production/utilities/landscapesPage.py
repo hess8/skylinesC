@@ -111,8 +111,6 @@ def landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args
 
     column_table_head(versions[1].replace('C',''))
     for i, name in enumerate(highVersionList):
-        if "Ice" in name:
-            xx=0
         tableRow()
     column_table_end()
     lines.append(' </div> \n')

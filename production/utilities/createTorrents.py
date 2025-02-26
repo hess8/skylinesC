@@ -51,12 +51,12 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
     toMakeMagnet = []
 
     for item in zipDirList:
-        if 'Hillrace' in item:
-            xx=0
-        if extension(item) == '.7z':
+        if extension(item) == '.magnet': #create new magnets each time
+            os.remove(os.path.join(zipDir, item))
+        elif extension(item) == '.7z':
             zipPath = os.path.join(zipDir, item)
+            toMakeMagnet.append(zipPath)
             torrPath = zipPath + '.torrent'
-            magPath = zipPath + '.magnet'
             zipTime = os.path.getmtime(zipPath)
             # Check for outdated torrent
             if os.path.exists(torrPath):
@@ -66,25 +66,14 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
                     toMakeTorrent.append(zipPath)
                 else:
                     torrentsList.append(torrPath)
-                    if not os.path.exists(magPath):
-                        toMakeMagnet.append(zipPath)
             else:
                 toMakeTorrent.append(zipPath)
-            # check for outdated magnet
-            if makeAllMagnets and not zipPath not in toMakeMagnet:
-                toMakeMagnet.append(zipPath)
-            elif os.path.exists(magPath):
-                magTime = os.path.getmtime(magPath)
-                if magTime < zipTime or os.stat(magPath).st_size == 0:
-                    os.remove(magPath)
-                    if zipPath not in toMakeMagnet:
-                        toMakeMagnet.append(zipPath)
+
         # Check for missing .7z file
-        elif extension(item) in ['.torrent', '.magnet']:
-            if not os.path.exists(os.path.join(zipDir,item.replace(extension(item), ''))):
+        elif extension(item) == '.torrent':
+            if not os.path.exists(os.path.join(zipDir,item.replace(extension(item), '.7z'))):
                 print('remove', os.path.join(zipDir,item))
                 os.remove(os.path.join(zipDir,item))
-
     createdTorr = []
     #create torrents
     tracker = 'http://tracker.opentrackr.org:1337/announcefile'
@@ -98,7 +87,6 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             os.system('mktorrent -a {} -l {} -c {} -w {} {}'.format(tracker,sizeExp,comment,webSeed,zippedPath))
             print('{}.torrent created'.format(zippedPath))
             createdTorr.append(zipPath)
-            toMakeMagnet.append(zipPath)
         except:
             sys.exit('Stop.Error in torrent {}'.format(zippedPath))
         try:

@@ -399,10 +399,10 @@ def getLandPaths(landDirs, versionUpdateTag, args):
         items = os.listdir(dir)
         for item in items:
             itemPath = os.path.join(dir, item)
-            if os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'WestGermany3' not in item and 'Slovenia' not in item)
-                                             or versionUpdateTag in item ): # note: isdir is true for a link pointing to a dir
-                    allLands.append(item)
-                    allLandPaths.append(os.path.join(dir, item))
+            if not item in allLands and os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'WestGermany3' not in item and 'Slovenia' not in item)
+                        or versionUpdateTag in item ): # note: isdir is true for a link pointing to a dir
+                allLands.append(item)
+                allLandPaths.append(os.path.join(dir, item))
 
     allLands, allLandPaths = sort_together([allLands, allLandPaths],reverse=args.reverse)
     return allLands, allLandPaths
