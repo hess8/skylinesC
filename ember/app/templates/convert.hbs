@@ -1,0 +1,41 @@
+<BasePage>
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Convert Landscapes</h2>
+          <br>
+        <p> <a href="/files/Convert-Landscapes.ps1" class="btn btn-default" download>{{fa-icon "download" size="lg"}} {{t "download"}} Convert-Landscapes</a> </p>
+            <br>
+        <p><u>Convert-Landscapes</u> is PowerShell script that  </p>
+        <div>
+          <p>&emsp;- <b>creates the symbolic links </b> needed between converted C2 landscapes (of any source) and the C3 Landscapes folder</p>
+          <p>&emsp;- <b>quickly extracts</b> the "_to_C3.7z" files you downloaded and <b>moves them</b> to the matching unconverted C2 landscape you already have</p>
+        </div>
+        <br>
+        <p><b>Preparation</b>: </p>
+        <p>&emsp; Download Convert-Landscapes from the link above </p>
+        <p>&emsp; You need to have 7-zip installed </p>
+        <p>&emsp; Open Command Prompt as Administrator and type <code>pwsh</code>.  Getting to PowerShell this way avoids using an outdated version) </p>
+        <p>&emsp; Enter <code>Set-ExecutionPolicy Unrestricted</code> and respond <code>yes</code> </p>
+        <p><b>Run Convert-Landscapes</b>: </p>
+        <p> &emsp; Enter <code>& C:\Condor2\Landscapes\Convert-Landscapes.ps1</code> </p>
+        <p> &emsp; If you have "_to_C3.7z" downloads, you will see “Converting &lt;landscape&gt;...". </p>
+        <br>
+        <p><u> You're done!</u> Check the Condor3 Landscapes folder. If there are links there to the C2 landscapes you converted, you can fly them in Condor 3!</p>
+
+    <hr style="height:10px;color:#333">
+
+    <p> <b> If you see errors </b> </p>
+    <p>Convert-Landscapes assumes</p>
+    <p>&emsp;- your install folders are C:\Condor2 and C:\Condor3 </p>
+    <p>&emsp;- you put any “...to_C3.7z” archives in your Downloads folder </p>
+
+     <p>If you don’t use these default locations, run it with <b> your paths included: </b> </p>
+
+<p> <code>&lt;path to Condor2\Landscapes\Convert-Landscapes.ps1 -Condor2 &lt;path to Condor2&gt;  -Condor3 &lt;path to Condor 3&gt;  -Downloads &lt;path to downloaded conversion .7z archives&gt;</code></p>
+
+<p>Credit:  Convert-Landscapes by Duane Beck.</p>
+   </div>
+ </div>
+
+</BasePage>
+

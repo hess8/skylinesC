@@ -1,0 +1,7 @@
+<FormPage @title={{t "choose-pilot"}}>
+  <ChangePilotForm
+    @flightId={{model.id}}
+    @flight={{model.flight}}
+    @clubMembers={{model.clubMembers}}
+    @onDidSave={{action "transitionToFlight"}} />
+</FormPage>

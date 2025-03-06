@@ -1,0 +1,2 @@
+sans /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+serif /usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf

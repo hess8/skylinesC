@@ -1,0 +1,51 @@
+<BasePage>
+  <div class="page-header">
+    <h1>
+      {{t "timeline"}}
+
+      {{#if loading}}
+        <small>{{t "loading"}}</small>
+      {{/if}}
+    </h1>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row">
+        <div class="col-xs-6">
+          {{#if prevPage}}
+            <LinkTo @query={{hash page=prevPage}} class="btn btn-default">&larr; {{t "newer"}}</LinkTo>
+          {{/if}}
+        </div>
+
+        <div class="col-xs-6" style="text-align:right">
+          {{#if nextPage}}
+            <LinkTo @query={{hash page=nextPage}} class="btn btn-default">{{t "older"}} &rarr;</LinkTo>
+          {{/if}}
+        </div>
+      </div>
+
+      <table class="table table-events">
+        <tbody>
+        {{#each events as |event|}}
+          <TimelineEvent @event={{event}} />
+        {{/each}}
+        </tbody>
+      </table>
+
+      <div class="row">
+        <div class="col-xs-6">
+          {{#if prevPage}}
+            <LinkTo @query={{hash page=prevPage}} class="btn btn-default">&larr; {{t "newer"}}</LinkTo>
+          {{/if}}
+        </div>
+
+        <div class="col-xs-6" style="text-align:right">
+          {{#if nextPage}}
+            <LinkTo @query={{hash page=nextPage}} class="btn btn-default">{{t "older"}} &rarr;</LinkTo>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </div>
+</BasePage>

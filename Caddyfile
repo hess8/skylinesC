@@ -1,0 +1,72 @@
+# https://caddyserver.com configuration for the production server
+
+skylinescondor.com {
+    log /home/skylines/log/caddy
+
+    root /home/skylines/src/skylines/frontend/static
+    gzip
+
+    header / Strict-Transport-Security "max-age=31536000;"
+
+    rewrite {
+        if {path} not_starts_with /api
+        if {path} not_starts_with /files
+        if {path} not_starts_with /client.php
+        if {path} not_starts_with /track.php
+        if {path} not_starts_with /widgets
+        if {path} not_starts_with /mapproxy
+        to {path} /
+
+        # if {path} not_starts_with /svg
+        # to maintenance.html
+    }
+
+    expires {
+        match ^/assets/.*\.css$ 1y
+        match ^/assets/.*\.js$ 1y
+        match ^/fonts 1y
+        match ^/mapproxy 7d
+        match .* 0s
+    }
+
+    proxy /api http://localhost:9115 {
+        transparent
+    }
+
+    proxy /files http://localhost:9115 {
+        transparent
+    }
+
+    proxy /client.php http://localhost:9115 {
+        transparent
+    }
+
+    proxy /track.php http://localhost:9115 {
+        transparent
+    }
+
+    proxy /widgets http://localhost:9115 {
+        transparent
+    }
+
+    proxy /mapproxy http://localhost:9109 {
+        transparent
+        without /mapproxy
+    }
+}
+
+www.skylinescondor.com {
+    redir https://skylinescondor.com{uri}
+}
+
+www02.skylinescondor.com {
+    redir https://skylinescondor.com{uri}
+}
+
+tracking.skylinescondor.com {
+    redir https://skylinescondor.com/tracking/
+}
+
+maps.skylinescondor.com {
+    redir https://skylinescondor.com{uri}
+}

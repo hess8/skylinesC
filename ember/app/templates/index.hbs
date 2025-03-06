@@ -1,0 +1,61 @@
+<BasePage>
+  <div id="about">
+    <div class="row">
+      <div class="col-md-12 tagline">
+        <p class="lead pull-left" data-test-welcome-message>{{t "about.welcome"}}</p>
+        <p class="lead pull-left" data-test-welcome-message>{{t "about.note"}}</p>
+        <div class="btn-group social-buttons pull-right visible-md visible-lg">
+{{!--           <a href="https://www.facebook.com/skylines.project" class="btn btn-default" target="_blank" rel="noopener">{{fa-icon "facebook-square"}}</a> --}}
+{{!--           <a href="https://twitter.com/skylinesproject" class="btn btn-default" target="_blank" rel="noopener">{{fa-icon "twitter"}}</a> --}}
+          <a href="https://github.com/hess8/skylinesC" class="btn btn-default" target="_blank" rel="noopener">{{fa-icon "github-alt"}}</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12 banner">
+        <div class="col-xs-12"><LinkTo @route="groupflights" ><img src="/images/teamlong.jpg" class="img-responsive"/></LinkTo></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4">
+        <h2><LinkTo @route="flights">{{fa-icon "plane"}} {{t "flight-database"}}</LinkTo></h2>
+        <p>{{t "about.flights" htmlSafe=true uploadURL=(href-to "flight-upload")}}</p>
+      </div>
+
+      <div class="col-md-4">
+        <h2>{{fa-icon "info-circle"}} {{t "flight-analysis"}}</h2>
+        <p>{{t "about.analysis" htmlSafe=true}}</p>
+      </div>
+    </div>
+    <div class="row">
+
+      <div class="col-md-4">
+        <h2><LinkTo @route="groupflights">{{fa-icon "random"}} {{t "groupflights"}} </LinkTo></h2>
+        <p>{{t "about.groupflights" htmlSafe=true joinURL=(href-to "settings")}}</p>
+      </div>
+      <div class="col-md-4">
+        <h2><LinkTo @route="landscapes">{{fa-icon "map"}} {{t "landscapes"}}</LinkTo> </h2>
+        <p>{{t "about.landscapes" htmlSafe=true landURL=(href-to "landscapes")}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4">
+        <h2>{{fa-icon "address-card"}} {{t "social-network"}}</h2>
+        <p>{{t "about.notifications" htmlSafe=true url=(href-to notificationsTarget)}}</p>
+      </div>
+
+      <div class="col-md-4">
+        <h2>{{fa-icon "envelope"}} {{t "contact"}}</h2>
+        <p><a href="mailto:{{'skylinescondor@gmail.com'}}">{{t "contact-admin"}}</a>{{" "}}{{t "contact-content"}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4">
+        <h2>{{fa-icon "wrench"}} {{t "open-source"}}</h2>
+        <p>{{t "about.open-source" htmlSafe=true teamURL="/about/team" licenseURL="/about/license" github=(html-safe "<a href=\"https://github.com/hess8/skylinesC#contact-and-contributing\" target=\"_blank\" rel=\"noopener\">GitHub</a>")}}</p>
+      </div>
+    </div>
+  </div>
+</BasePage>

@@ -1,0 +1,7 @@
+<FormPage @title={{t "recover-password"}}>
+  {{#if key}}
+    <RecoverStep2Form @recoveryKey={{key}} />
+  {{else}}
+    <RecoverStep1Form />
+  {{/if}}
+</FormPage>

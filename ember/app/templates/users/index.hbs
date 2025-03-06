@@ -1,0 +1,37 @@
+<BasePage>
+  <div class="page-header">
+    <h1>{{t "users"}}</h1>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>{{t "name"}}</th>
+          <th>{{t "club"}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#each model.users as |user|}}
+          <tr>
+            <td>
+              <LinkTo @route="user" @model={{user.id}}>{{user.name}}</LinkTo>
+            </td>
+            <td class="column-buttons">
+              {{#if user.club}}
+                <LinkTo @route="club" @model={{user.club.id}}>{{user.club.name}}</LinkTo>
+              {{/if}}
+
+              <div class="pull-right hidden-xs">
+                <LinkTo @route="flights.pilot" @model={{user.id}} class="btn btn-default btn-sm">{{fa-icon "plane"}} {{t "flights"}}</LinkTo>
+                <LinkTo @route="statistics.pilot" @model={{user.id}} class="btn btn-default btn-sm hidden-xs-inline">{{fa-icon "bar-chart"}} {{t "statistics"}}</LinkTo>
+              </div>
+            </td>
+          </tr>
+        {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</BasePage>

@@ -1,0 +1,52 @@
+<BasePage>
+  <div class="page-header">
+    <h1>{{club.name}}</h1>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row">
+        <div class="well col-sm-8 col-sm-offset-2">
+          <table class="right">
+            <tr>
+              <th>{{t "name"}}</th>
+              <td>{{club.name}}</td>
+            </tr>
+            <tr>
+              <th>{{t "contact"}}</th>
+              <td><a href="mailto:{{club.email}}">{{t "email-for-info"}}</a></td>
+            </tr>
+
+            {{#if club.website}}
+              <tr>
+                <th>{{t "website"}}</th>
+                <td><a target="_blank" rel="noopener" href="{{club.website}}">{{club.website}}</a></td>
+              </tr>
+            {{/if}}
+
+            <tr>
+              <th>{{t "created"}}</th>
+              <td>
+                {{#if club.owner}}
+                  {{format-relative club.timeCreated}} by <LinkTo @route="user" @model={{club.owner.id}}>{{club.owner.name}}</LinkTo>
+                {{else}}
+                  {{format-relative club.timeCreated}}
+                {{/if}}
+              </td>
+            </tr>
+          </table>
+
+          <p>
+            {{#if club.isWritable}}
+              <LinkTo @route="club.edit" @model={{club.id}} class="btn btn-default">{{t "edit"}}</LinkTo>
+            {{/if}}
+
+            <LinkTo @route="flights.club" @model={{club.id}} class="btn btn-default">{{fa-icon "plane"}} {{t "flights"}}</LinkTo>
+            <LinkTo @route="statistics.club" @model={{club.id}} class="btn btn-default">{{fa-icon "bar-chart"}} {{t "statistics"}}</LinkTo>
+            <LinkTo @route="club.pilots" @model={{club.id}} class="btn btn-default">{{fa-icon "group"}} {{t "members"}}</LinkTo>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</BasePage>

@@ -1,0 +1,18 @@
+#Instructions:  html format except for paragraph markings (added later).  Don't remove this line
+Convert C2 landscapes to C3, groupflights fixed, password reset fixed, TeamXC servers
+Hi $first_name,
+
+Here is the latest:
+
+1. All the C2 landscapes on skylinescondor.com can be flown in Condor3.  See the details below.
+
+2. TeamXC servers are hosting rotating flights that can be found on all the serverslists.  They focus on tasks on a large variety of mountainous landscapes including converted C2 landscapes.
+
+3. The groupflight feature in skylinesCondor is fully working now.  It had a version-change related bug.
+
+4. Password reset emails are working now, so if you forgot your password click the link on the login page.
+
+<b>Using a Condor2 landscape in Condor3</b>
+The new "C2C3" downloads contain converted landscapes. The "_to_C3" downloads have the few files needed add to a landscape you already have.
+<a href="https://skylinescondor.com/convert">Convert-Landscapes</a> is a tool to help you convert landscapes quickly. It creates the symbolic links needed between all converted C2 landscapes and the C3 Landscapes folder. It also quickly extracts the "_to_C3" downloads and places them in a C2 landscape you already have.
+
