@@ -2,6 +2,7 @@
 
 # pipenv env
 .venv
+venv
 
 # Secret environment variables
 .env
@@ -81,7 +82,6 @@ coverage.xml
 # ide projects
 /.idea
 .idea*
-/node_modules/
 
 # landscape page
 /ember/app/templates/landscapes.hbs

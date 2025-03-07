@@ -121,6 +121,9 @@ export POSTGIS_GDAL_ENABLED_DRIVERS=GTiff
 export POSTGIS_ENABLE_OUTDB_RASTERS=1
 export FLASK_ENV=development
 export PIPENV_VENV_IN_PROJECT=1
+export PATH="$PATH:/usr/local/go/bin"
+export GRPC_GO_LOG_SEVERITY_LEVEL=info
+export GRPC_GO_LOG_VERBOSITY_LEVEL=99
 alias skyl='cd /home/bret/skylinesC/'
 alias esky='cd /home/bret/skylinesC/ember'
 alias eserve42-5='esky;sudo ember serve --environment=production --port 4200 --proxy http://localhost:5000/'
@@ -159,7 +162,7 @@ alias ufallow='sudo ufw allow'
 alias ufdeny='sudo ufw deny'
 alias ufrules='sudo ufw status numbered' #shows all rules if ufw enabled
 alias cpl='skyl; cp /media/sf_landscapes-zip/latestLandscapesPage/landscapes.hbs ember/app/templates'
-nginxconfigbackup() {
+nginxconfigbackup() { 
   sudo cp /etc/nginx/sites-available/skylinescondor /etc/nginx/sites-available/skylinescondor.$(date "+%Y-%m-%d_%H:%M")-$1
 } #the parameter ending is the comment use dashes "-" between words
 #end bch
