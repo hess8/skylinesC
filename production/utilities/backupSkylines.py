@@ -106,7 +106,7 @@ while run:
         list = finishedDumpPath.split('.')
         #datedGitDumpPath =  '{}_{}.{}'.format(list[0], nowStr, list[1])
         #copy2(finishedDumpPath, datedGitDumpPath) #same folder as original (gitBU).  Keep date-tagged dump backups up to nkeep, but don't commit them
-        datedSFdumpPath =  os.path.join(sf_backup,'{}_{}.{}'.format(dumpName, nowStr, dumpType))
+        datedSFdumpPath =  os.path.join(sf_backup,'{}_{}.{}'.format(dumpBaseName, nowStr, dumpType))
         if not os.path.exists(datedSFdumpPath):
             copy2(finishedDumpPath, datedSFdumpPath)
         dumpsDelOld(sf_backup, nkeepSfBackup)
