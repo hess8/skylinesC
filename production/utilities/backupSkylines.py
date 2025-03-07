@@ -110,7 +110,7 @@ while run:
         if not os.path.exists(datedSFdumpPath):
             copy2(finishedDumpPath, datedSFdumpPath)
         dumpsDelOld(sf_backup, nkeepSfBackup)
-        addCmd =  ['git','add', finishedDumpPath]
+        addCmd =  ['git', '-C', gitBUdir, 'add', finishedDumpPath]
         status = subprocess.call(addCmd) #only current db
         if status != 0: print('Error git add new dB')
         commitStr = '"New /{}.{}"'.format(dumpBaseName, dumpType)
@@ -185,7 +185,7 @@ while run:
         tarSize = os.stat(finishedTarPath).st_size
         print( '\t{:.2f} MB, {}'.format(tarSize / float(10 ** 6), finishedTarPath))
         if not os.path.exists(finishedTarPath.replace(gitBUdir,sf_backup)):
-            copy2(finishedTarPath, sf_backup)
+            copy2(finishedTarPath, htdocsSFbu)
         addCmd =  ['git','-C', gitBUdir, 'add', htdocsGitDir] #all htdocs tars
         status = subprocess.call(addCmd)
         if status != 0: print('Error git add htdocs backup dir')
@@ -218,4 +218,5 @@ while run:
     secMidnight = ((24 - now.hour - 1) * 3600) + ((60 - now.minute - 1) * 60) + (60 - now.second)
 
     #wait until 10 min after midnight.  Groupflights runs at midnight.
+    print('sleeping')
     t.sleep(secMidnight + 10 * 60)
