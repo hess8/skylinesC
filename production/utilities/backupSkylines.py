@@ -58,12 +58,12 @@ def dumpsDelOld(buDir,nkeep):
                 print('\tError in deleting oldest dump',oldestDump)
 
 ###############################################################
-slcBase = '/home/bret/skylinesC'
-gitBUbase = '/home/bret/'
-htdocsSource = os.path.join(slcBase,'htdocs','files')
-dumpBaseName = 'skylinesdump'
+basePath = '/home/bret/'
 backupRepoName = 'backup-skylinesC'
-gitBUdir = os.path.join(gitBUbase, backupRepoName)
+gitBUdir = os.path.join(basePath, backupRepoName)
+htdocsSource = os.path.join(basePath,'skylinesC','htdocs','files')
+dumpBaseName = 'skylinesdump'
+
 htdocsGitDir = os.path.join(gitBUdir, 'htdocs')
 sf_backup = '/media/sf_backup'
 htdocsSFbu = os.path.join(sf_backup, 'htdocs')
@@ -85,9 +85,11 @@ while run:
     print
     print(now.strftime(timeFormat))
     #### Database backup #####
-    doDump = True  # debugging switch
+    doDump = False  # debugging switch
     dumpSize = 0
-    if doDump: #debugging switch, when working on tar section below
+    if not doDump: #debugging switch, when working on tar section below
+        print("Warning: Skipping db backup!")
+    else:
         dumpName = '{}.{}'.format(dumpBaseName,dumpType)
         tempDumpName = dumpName + '.temp'
         tempDumpPath = os.path.join(gitBUdir,tempDumpName)
@@ -112,7 +114,7 @@ while run:
         status = subprocess.call(addCmd) #only current db
         if status != 0: print('Error git add new dB')
         commitStr = '"New /{}.{}"'.format(dumpBaseName, dumpType)
-        cmd = ['git', '-C', gitBUbase, 'commit', '-am', commitStr]
+        cmd = ['git', '-C', gitBUdir, 'commit', '-am', commitStr]
         status = subprocess.call(cmd)
         if status != 0: print('Error git commit')
         newDump = True
@@ -182,13 +184,14 @@ while run:
         if status != 0: print('Error removing .temp tag')
         tarSize = os.stat(finishedTarPath).st_size
         print( '\t{:.2f} MB, {}'.format(tarSize / float(10 ** 6), finishedTarPath))
-        copy2(finishedTarPath, htdocsGitDir)
-        addCmd =  ['git','add', htdocsGitDir] #all htdocs tars
+        if not os.path.exists(finishedTarPath.replace(gitBUdir,sf_backup)):
+            copy2(finishedTarPath, sf_backup)
+        addCmd =  ['git','-C', gitBUdir, 'add', htdocsGitDir] #all htdocs tars
         status = subprocess.call(addCmd)
         if status != 0: print('Error git add htdocs backup dir')
         commitStr = '"New backup/{}.{}"'.format(dumpBaseName, dumpType)
         commitStr = '"New backup/{}.{} and {}"'.format(dumpBaseName, dumpType, tarName)
-        cmd = ['git', '-C', gitBUbase, 'commit', '-am', commitStr]
+        cmd = ['git', '-C', gitBUdir, 'commit', '-am', commitStr]
         status = subprocess.call(cmd)
         if status != 0: print('Error git commit')
         newTar = True
@@ -199,7 +202,7 @@ while run:
     print
     #commit the latest backup and the new htdocs tars  if any
     if newDump or newTar:
-        cmd = ['git', '-C', gitBUbase, 'push']
+        cmd = ['git', '-C', gitBUdir, 'push']
         status = subprocess.call(cmd)
         if status != 0: print('Error git push')
 
