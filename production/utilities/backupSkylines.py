@@ -189,8 +189,7 @@ while run:
         addCmd =  ['git','-C', gitBUdir, 'add', htdocsGitDir] #all htdocs tars
         status = subprocess.call(addCmd)
         if status != 0: print('Error git add htdocs backup dir')
-        commitStr = '"New backup/{}.{}"'.format(dumpBaseName, dumpType)
-        commitStr = '"New backup/{}.{} and {}"'.format(dumpBaseName, dumpType, tarName)
+        commitStr = '"New backup {}.{}"'.format(dumpBaseName, dumpType)
         cmd = ['git', '-C', gitBUdir, 'commit', '-am', commitStr]
         status = subprocess.call(cmd)
         if status != 0: print('Error git commit')
