@@ -85,7 +85,7 @@ while run:
     print
     print(now.strftime(timeFormat))
     #### Database backup #####
-    doDump = False  # debugging switch
+    doDump = True  # debugging switch
     dumpSize = 0
     if not doDump: #debugging switch, when working on tar section below
         print("Warning: Skipping db backup!")
