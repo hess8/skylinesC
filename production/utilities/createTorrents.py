@@ -55,7 +55,6 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             os.remove(os.path.join(zipDir, item))
         elif extension(item) == '.7z':
             zipPath = os.path.join(zipDir, item)
-            toMakeMagnet.append(zipPath)
             torrPath = zipPath + '.torrent'
             zipTime = os.path.getmtime(zipPath)
             # Check for outdated torrent
@@ -87,6 +86,7 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             os.system('mktorrent -a {} -l {} -c {} -w {} {}'.format(tracker,sizeExp,comment,webSeed,zippedPath))
             print('{}.torrent created'.format(zippedPath))
             createdTorr.append(zipPath)
+            toMakeMagnet.append(zipPath)
         except:
             sys.exit('Stop.Error in torrent {}'.format(zippedPath))
         try:

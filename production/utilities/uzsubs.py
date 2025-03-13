@@ -391,18 +391,22 @@ def get_qbtExe(qbtorrentExeDir):
     else:
         sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")
 
-def getLandPaths(landDirs, versionUpdateTag, args):
+def getLandPaths(topLandDirs, versionUpdateTag, args):
     from more_itertools import sort_together
     allLands = []
     allLandPaths = []
-    for dir in landDirs:
-        items = os.listdir(dir)
+    for topDir in topLandDirs:
+        items = os.listdir(topDir)
         for item in items:
-            itemPath = os.path.join(dir, item)
+            itemPath = os.path.join(topDir, item)
             if not item in allLands and os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'WestGermany3' not in item and 'Slovenia' not in item)
                         or versionUpdateTag in item ): # note: isdir is true for a link pointing to a dir
                 allLands.append(item)
-                allLandPaths.append(os.path.join(dir, item))
+                allLandPaths.append(itemPath)
+                cupFile = os.path.join(itemPath,item+'.cup')
+                if not os.path.exists(cupFile) and 'Textures' in os.listdir(itemPath): #.cup file required for COTACO task converter
+                    os.system('echo "name,code,country,lat,lon,elev,style,rwdir,rwlen,freq,descr \n" > {}'.format(cupFile))
+                    print('created', cupFile)
 
     allLands, allLandPaths = sort_together([allLands, allLandPaths],reverse=args.reverse)
     return allLands, allLandPaths
