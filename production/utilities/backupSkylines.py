@@ -218,5 +218,5 @@ while run:
     secMidnight = ((24 - now.hour - 1) * 3600) + ((60 - now.minute - 1) * 60) + (60 - now.second)
 
     #wait until 10 min after midnight.  Groupflights runs at midnight.
-    print('sleeping')
+    print('\n--- sleeping ---\n')
     t.sleep(secMidnight + 10 * 60)
