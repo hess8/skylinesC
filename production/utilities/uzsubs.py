@@ -5,7 +5,7 @@ import platform
 import signal
 from time import sleep
 from datetime import datetime
-sys.path.append('d:\\common_py')
+sys.path.append('/mnt/D/common_py')
 sys.path.append('/mnt/P/shared_VMs/common_py')
 sys.path.append('/media/sf_shared_VMs/common_py')
 from common import dirSize, landscapesMap, listRunningVms, makeLink, renameTry,copy_file_to_guest,dirSize, \
@@ -15,7 +15,7 @@ def getParams():
     import argparse
     forceHelp = "Force landscapespage to run"
     growthHelp = "Check dir growth before zipping"
-    linksHelp = "Do links work if on linux"
+    linksHelp = "Work on links if on linux"
     loopHelp = "Loop N times.  If N == -1, loop forever"
     nozipsHelp = "Not zip any folders"
     reverseHelp = "Go through landscapes and zip lists in reverse order"

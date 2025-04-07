@@ -119,23 +119,16 @@ go = True
 while go:
     startTime = perf_counter()
     loopCount += 1
-
-    # '.' and '-' tags
-    # for list in [lowVList,highVList]:
-    #     for item in list:
-    #         if list == lowVList: mainPath = lowVMain; ini = lowVini
-    #         elif list == highVList: mainPath = highVMain; ini = highVini
-    #         if item[0] == '-':
-    #             print("handling '-' files needs to be rewritten")
-                # path = os.path.join(mainPath,item)
-                # for item2 in os.listdir(mainPath):
-                #     if not '.ini' in item2:
-                #         if os.path.isdir(os.path.join(mainPath,item2)): # note: isdir is true for a link pointing to a dir
-                #             os.system('rmdir /S /Q "{}"'.format(os.path.join(mainPath,item2)))
-                #         else:
-                #             os.remove(os.path.join(mainPath,item2))
-                # shutil.move(path,os.path.join(ini,item.replace('-','')))
-                # print('Moved {} to {}'.format(path,ini))
+    #'.' and '-' tags
+    #Move newly marked files to ini-only
+    for list in [lowVList]:
+        for item in list:
+            if list == lowVList: mainPath = lowVMain; ini = lowVini
+            elif list == highVList: mainPath = highVMain; ini = highVini
+            if item[0] == '-':
+                landPath = os.path.join(mainPath,item)
+                shutil.move(landPath,os.path.join(ini,item.replace('-','')))
+                print('Moved {} to {}'.format(landPath,ini))
 
             #######
             # elif item[0] == '.':  #legacy to move to symlinks dir...keep in code
@@ -148,15 +141,16 @@ while go:
     for dir1 in [lowVini,highVini]:
         for landscape in os.listdir(dir1):
             notifiedRemove = False
-            for item in os.listdir(os.path.join(dir1,landscape)):
-                if not '.ini' in item:
-                    if not notifiedRemove:
+            landPath1 = os.path.join(dir1,landscape)
+            for item in os.listdir(landPath1):
+                if not '.ini' in item: #
+                    if not notifiedRemove: #one time notice
                         print ('Removing all but .ini in {}'.format(landscape))
                         notifiedRemove = True
-                    if os.path.isdir(os.path.join(dir1,landscape,item)): # note: isdir is true for a link pointing to a dir
-                        os.system('rmdir /S /Q "{}"'.format(os.path.join(dir1,landscape,item)))
+                    if os.path.isdir(os.path.join(landPath1,item)): # note: isdir is true for a link pointing to a dir
+                        os.system('rmdir /S /Q "{}"'.format(os.path.join(landPath1,item)))
                     else:
-                        os.remove(os.path.join(dir1,landscape,item))
+                        os.remove(os.path.join(landPath1,item))
 
     allZips = []
     allZipsPaths = []
