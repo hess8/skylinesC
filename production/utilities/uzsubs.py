@@ -423,3 +423,16 @@ def checkGrowth(landPath,landSizes):
     else:
         landSizes[landPath] = sizeNew
         return True #wait til next loop to check
+
+def rmExceptIni(landPath,landscape):
+        print ('Removing all but .ini in {}'.format(landscape))
+        notifiedRemove = False
+        for item in os.listdir(landPath):
+            if '.ini' in item:
+                continue
+            itemPath = os.path.join(landPath,item)
+            if os.path.isdir(itemPath): # note: isdir is true for a link pointing to a dir
+                if platform.system() == "Windows": os.system('rmdir /S /Q "{}"'.format(os.path.join(landPath,item)))
+                else: shutil.rmtree(itemPath)
+            else:
+                os.remove(itemPath)

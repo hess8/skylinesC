@@ -127,6 +127,7 @@ while go:
             elif list == highVList: mainPath = highVMain; ini = highVini
             if item[0] == '-':
                 landPath = os.path.join(mainPath,item)
+                rmExceptIni(landPath,item)
                 shutil.move(landPath,os.path.join(ini,item.replace('-','')))
                 print('Moved {} to {}'.format(landPath,ini))
 
@@ -137,20 +138,6 @@ while go:
             #     shutil.move(path,os.path.join(symLinksDir,item.replace('.','')))
             #     print('Moved {} to {}'.format(path,symLinksDir))
 
-    #remove extra files from ini-only dirs:
-    for dir1 in [lowVini,highVini]:
-        for landscape in os.listdir(dir1):
-            notifiedRemove = False
-            landPath1 = os.path.join(dir1,landscape)
-            for item in os.listdir(landPath1):
-                if not '.ini' in item: #
-                    if not notifiedRemove: #one time notice
-                        print ('Removing all but .ini in {}'.format(landscape))
-                        notifiedRemove = True
-                    if os.path.isdir(os.path.join(landPath1,item)): # note: isdir is true for a link pointing to a dir
-                        os.system('rmdir /S /Q "{}"'.format(os.path.join(landPath1,item)))
-                    else:
-                        os.remove(os.path.join(landPath1,item))
 
     allZips = []
     allZipsPaths = []
