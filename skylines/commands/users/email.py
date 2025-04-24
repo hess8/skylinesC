@@ -40,7 +40,7 @@ class Email(Command):
     def queueEmail(self, user, sender, recipient, subject, text):
         from datetime import datetime
         timeFormat = '%Y-%m-%d.%H.%M.%S.%f'
-        queue_dir = '/media/sf_shared_VMs/mail'
+        queue_dir = '/media/sf_shared_VMs/mail/queued'
         log_file = os.path.join(queue_dir,'emails.log')
         if not os.path.exists(queue_dir):
             os.mkdir(queue_dir)
@@ -49,7 +49,6 @@ class Email(Command):
             html.append(self.toHTML(line,user))
         html.append("<br><hr><p>For help contact skylinescondor@gmail.com.  Don't reply to this message.</p>\n")
         html.append('<br><p>--Bret at SkylinesCondor</p>\n')
-        print("Queueing email to {} (ID: {}) {}".format(user.name.encode("utf-8"),user.id,user.email_address))
         try:
             file_name = datetime.now().strftime(timeFormat) + '_skylinesC.msg'
             timeTag = datetime.now().strftime("%y/%m/%d %H:%M:%S")
@@ -62,6 +61,7 @@ class Email(Command):
             f = open(log_file,'a')
             f.write('{} queu {} {} {}'.format(timeTag, recipient, sender, subject))
             f.close()
+            print("Queued email to {} (ID: {}) {}".format(user.name.encode("utf-8"),user.id,user.email_address))
         except BaseException as e:
             print(recipient)
             print("Queueing email failed: {}".format(e), recipient, subject)
