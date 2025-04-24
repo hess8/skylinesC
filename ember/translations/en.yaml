@@ -196,7 +196,7 @@ publishing: Publishing
 ranking: Ranking
 recover-password: Reset Password
 recovering: Recovering...
-recovery-mail-sent: Check your email! We have sent you a link to recover your password.
+recovery-mail-sent: Check your email! We have sent you a link to recover your password. If you don't see it check your spam folder too.
 refresh: Please refresh this page.
 register: Register
 registering: Registering...

@@ -29,15 +29,13 @@ class Email(Command):
     )
 
     def toHTML(self,line,user):
-        if user.email_address == 'lubosf@centrum.cz':
-            xx=0
         if line.strip()[:3] not in ['<p>','<br', '<hr']:
             newline =  '<p>{}</p>\n'.format(line.rstrip('\n'))
         else:
             newline =  line
         return newline.replace('$first_name', user.first_name).encode("utf-8")
 
-    def queueEmail(self, user, sender, recipient, subject, text):
+    def queueEmail(self, user, sender, recipient, subject, text_list):
         from datetime import datetime
         timeFormat = '%Y-%m-%d.%H.%M.%S.%f'
         queue_dir = '/media/sf_shared_VMs/mail/queued'
@@ -45,7 +43,7 @@ class Email(Command):
         if not os.path.exists(queue_dir):
             os.mkdir(queue_dir)
         html = []
-        for line in text:
+        for line in text_list:
             html.append(self.toHTML(line,user))
         html.append("<br><hr><p>For help contact skylinescondor@gmail.com.  Don't reply to this message.</p>\n")
         html.append('<br><p>--Bret at SkylinesCondor</p>\n')
