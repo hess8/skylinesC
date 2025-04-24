@@ -59,7 +59,7 @@ class Email(Command):
             f.writelines(html)
             f.close()
             f = open(log_file,'a')
-            f.write('{} queu {} {} {}'.format(timeTag, recipient, sender, subject))
+            f.write('{} queu {} {} {}\n'.format(timeTag, recipient, sender, subject))
             f.close()
             print("Queued email to {} (ID: {}) {}".format(user.name.encode("utf-8"),user.id,user.email_address))
         except BaseException as e:
