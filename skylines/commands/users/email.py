@@ -39,7 +39,7 @@ class Email(Command):
         from datetime import datetime
         timeFormat = '%Y-%m-%d.%H.%M.%S.%f'
         queue_dir = '/media/sf_shared_VMs/mail/queued'
-        log_file = os.path.join(queue_dir,'emails.log')
+        log_file = '/media/sf_shared_VMs/mail/emails.log'
         if not os.path.exists(queue_dir):
             os.mkdir(queue_dir)
         html = []
