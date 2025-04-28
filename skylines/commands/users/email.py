@@ -69,7 +69,7 @@ class Email(Command):
         '''test option is to send one email to a site like www.mail-tester.com'''
         if audience not in ['admin','all','test']:
             sys.exit('Stop: audience must be "admin", "all" or "test"')
-        sender = 'mail@skylinescondor.com' #overwritten in mail-server
+        sender = 'SkylinesCondor' # will be skylinescondor@soardata.org.
         os.chdir('/home/bret/skylinesC')
         lines = readfileNoStrip(path_text)
         #lines[0] is instructions to write html but leave out any paragraph markings
