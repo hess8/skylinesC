@@ -1,3 +1,8 @@
+#See https://certbot.eff.org/instructions?ws=nginx&os=pip
+sudo apt install python3-certbot-nginx # optional plugin:
+# use with:
+sudo certbot --nginx # to have certbot configure nginx, or can do it manually:
+
 #to renew SSL certificate:
 sudo unlink /etc/nginx/sites-enabled/skylinescondor.com
 sudo ln -s /etc/nginx/sites-available/acme-challenge /etc/nginx/sites-enabled
@@ -13,6 +18,7 @@ ngrestart
 renewSSL.sh #don't need sudo because crontab runs as root.  Try after sudo -i to get to root
 	unlink /etc/nginx/sites-enabled/skylinescondor.com
 	ln -s /etc/nginx/sites-available/acme-challenge /etc/nginx/sites-enabled
+
 	systemctl restart nginx
 	certbot renew # remove --dry run part after testing
 	unlink /etc/nginx/sites-enabled/acme-challenge
