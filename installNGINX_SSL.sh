@@ -1,3 +1,8 @@
+#See https://certbot.eff.org/instructions?ws=nginx&os=pip
+sudo apt install python3-certbot-nginx # optional plugin:
+# use with:
+sudo certbot --nginx # to have certbot configure nginx, or can do it manually:
+
 #to renew SSL certificate:
 sudo unlink /etc/nginx/sites-enabled/skylinescondor.com
 sudo ln -s /etc/nginx/sites-available/acme-challenge /etc/nginx/sites-enabled
@@ -13,6 +18,7 @@ ngrestart
 renewSSL.sh #don't need sudo because crontab runs as root.  Try after sudo -i to get to root
 	unlink /etc/nginx/sites-enabled/skylinescondor.com
 	ln -s /etc/nginx/sites-available/acme-challenge /etc/nginx/sites-enabled
+
 	systemctl restart nginx
 	certbot renew # remove --dry run part after testing
 	unlink /etc/nginx/sites-enabled/acme-challenge
@@ -23,18 +29,18 @@ renewSSL.sh #don't need sudo because crontab runs as root.  Try after sudo -i to
 sudo apt-get update
 sudo apt-get install nginx
 
-sudo apt-get install software-properties-common
-sudo add-apt-repository ppa:certbot/certbot
+sudo apt-get install software-properties-common -y
+sudo add-apt-repository ppa:certbot/certbot -y
 sudo apt-get update
-sudo apt-get install certbot
+sudo apt-get install certbot -y
 
 cd /etc/nginx/
-sudo cp nginx.conf nginx.conf.orig
+sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig
 
 
-sudo cp sites-available/default sites-available/acme-challenge
+sudo cp /etc/nginx/sites-available/default sites-available/acme-challenge
 sudo ln -s /etc/nginx/sites-available/acme-challenge /etc/nginx/sites-enabled/
-sudo rm sites-enabled/default
+#sudo rm /etc/nginx/sites-enabled/default
 
 sudo vim /etc/nginx/sites-available/acme-challenge
 #replace;
@@ -47,83 +53,83 @@ sudo vim /etc/nginx/sites-available/acme-challenge
 	}
 sudo service nginx reload
 
+hostnamectl set-hostname soardata.org # Certificate is tied to hostname, so to make it portable
 
 #!!!!!!!!!!!!! Make sure you forward port 80 to this machine before the below!!!!!!!!!
-hostnamectl set-hostname soardata.org # Certificate is tied to hostname, so to make it portable
 # ...to other machines, they must all have this hostname.
-sudo certbot certonly --dry-run --webroot --webroot-path=/var/www/html -d skylinescondor.com
+sudo certbot certonly --dry-run --webroot --webroot-path=/var/www/html -d soardata.org
 ##### if that works, remove --dry-run and run again
 #success!
 
 sudo ls -l /etc/letsencrypt/live/skylinescondor.com
-sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
-
-sudo mkdir snippets
-sudo vim /etc/nginx/snippets/ssl-skylinescondor.com.conf
-#paste:
-    ssl_certificate /etc/letsencrypt/live/skylinescondor.com/fullchain.pem;
-	ssl_certificate_key /etc/letsencrypt/live/skylinescondor.com/privkey.pem;
-
-sudo vim /etc/nginx/snippets/ssl-params.conf
-#paste:
-	# from https://cipherli.st/
-	# and https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
-
-	ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-	ssl_prefer_server_ciphers on;
-	ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
-	ssl_ecdh_curve secp384r1;
-	ssl_session_cache shared:SSL:10m;
-	ssl_session_tickets off;
-	ssl_stapling on;
-	ssl_stapling_verify on;
-	resolver 8.8.8.8 8.8.4.4 valid=300s;
-	resolver_timeout 5s;
-	# Disable preloading HSTS for now.  You can use the commented out header line that includes
-	# the "preload" directive if you understand the implications.
-	#add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
-	add_header Strict-Transport-Security "max-age=63072000; includeSubdomains";
-	#add_header X-Frame-Options DENY;#needs to be deactivated because of keycloak
-	add_header X-Content-Type-Options nosniff;
-
-	ssl_dhparam /etc/ssl/certs/dhparam.pem;
+#sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+sudo openssl dhparam -out /etc/letsencrypt/ssl-dhparams.pem 2048
 
 #Make the real server:
 sudo unlink /etc/nginx/sites-enabled/acme-challenge
-sudo cp /etc/nginx/sites-available/default sites-available/skylinescondor.com
+#sudo cp /etc/nginx/sites-available/default sites-available/skylinescondor.com  #only if it doesn't exist
 sudo ln -s /etc/nginx/sites-available/skylinescondor.com /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/soardata.org /etc/nginx/sites-enabled/
 sudo vim /etc/nginx/sites-available/skylinescondor.com
 #replace server with:
-	upstream ember {
-	    server 192.168.1.50:4200;
-	  }
+upstream ember {
+    server 192.168.1.167:4200;
+  }
 
-	server {
-		    client_max_body_size 4M;
-		    listen 80;
-		    listen [::]:80;
+server {
+	    client_max_body_size 4M;
 
-		    listen 443 ssl default_server;
-		    listen [::]:443 ssl default_server;
+	    listen 443 ssl default_server;
+	    listen [::]:443 ssl default_server;
 
-		    include snippets/ssl-skylinescondor.com.conf;
-		    include snippets/ssl-params.conf;
-		    server_name skylinescondor.com;
-	    	    location / {
-	      		proxy_pass http://ember;
+	    server_name skylinescondor.com;
+    	    location / {
+    	    	root /var/www/nginx-default/;
+      		 	if (-f $document_root/maintenance.html) {
+                return 503;
+            	}
+           	proxy_pass http://ember;
+		#change to this location for renewing certificate:
+		#location ^~ /.well-known/acme-challenge/ {
+		allow all;
+  		default_type "text/plain";
+          proxy_http_version 1.1;
 
-	          proxy_http_version 1.1;
+          proxy_set_header Host               $host;
+          proxy_set_header X-Real-IP          $remote_addr;
+          proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto  $scheme;
 
-	          proxy_set_header Host               $host;
-	          proxy_set_header X-Real-IP          $remote_addr;
-	          proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
-	          proxy_set_header X-Forwarded-Proto  $scheme;
+    	    }
+    	error_page 503 @maintenance;
+        	location @maintenance {
+                rewrite ^(.*)$ /maintenance.html break;}
 
-	    	    }
-		}
+    ssl_certificate /etc/letsencrypt/live/skylinescondor.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/skylinescondor.com/privkey.pem; # managed by Certbot
+}
 
+
+server {
+    if ($host = skylinescondor.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+	    listen 80;
+	    listen [::]:80;
+	    server_name skylinescondor.com;
+    return 404; # managed by Certbot
+
+
+}
+
+
+# make sure Apache isn't using port 80
 sudo service nginx reload
 
+if /etc/letsencrypt is missing options-ssl-nginx.conf, get if from https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
+and make sure that ssl_ciphers above makes sense with it.
 #at this point localhost points to sudo https://skylinescondor.com  and should show the ember server, which is on a Ubuntu 14 machine
 #forward port 80 to this nginx machine (ubuntu 18+) and then test at
 https://www.ssllabs.com/ssltest/
