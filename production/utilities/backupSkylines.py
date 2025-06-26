@@ -10,11 +10,8 @@ import subprocess
 
 """
 
-This loops in a terminal and saves to local sf_backup and gitBUdir each day, which is committed and pushed. 
-They keep the latest db dump and others up to nkeep, and all the htdocs incremental tars. 
-
-Dump format "plain", or text requires about 3x more space than ".custom".  It requires psql to restore, not pg_restore.  
-
+This loops in a terminal and saves a compressed backed to shared folder, which keeps the latest db dump and others up to nkeep. 
+It saves a text backup to gitBUdir each day, which is committed and pushed. Each dir keeps all the htdocs incremental tars. 
 """
 def dumpsDelOld(buDir,nkeep):
     try:
@@ -68,10 +65,9 @@ htdocsGitDir = os.path.join(gitBUdir, 'htdocs')
 sf_backup = '/media/sf_backup'
 htdocsSFbu = os.path.join(sf_backup, 'htdocs')
 
-
-
-#dumpType = 'plain' #git can version this.
-dumpType = 'custom'
+dbName = 'skylines'
+gitDumpType = 'plain' # git can version text files.
+localDumpType = 'custom' # compression of about 3
 #nkeepGitBU = 1
 nkeepSfBackup = 15
 timeFormat = '%Y-%m-%d.%H.%M.%S'
@@ -90,30 +86,39 @@ while run:
     if not doDump: #debugging switch, when working on tar section below
         print("Warning: Skipping db backup!")
     else:
-        dumpName = '{}.{}'.format(dumpBaseName,dumpType)
-        tempDumpName = dumpName + '.temp'
-        tempDumpPath = os.path.join(gitBUdir,tempDumpName)
-        dumpCmd = ['sudo','-u','bret','pg_dump','--exclude-table-data=elevations','--format={}'.format(dumpType),'skylines']
-        f = open(tempDumpPath,'w')
-        status = subprocess.call(dumpCmd, stdout=f)
-        if status != 0: print('Error creating db dump')
-        f.close()
-        finishedDumpPath = tempDumpPath.replace('.temp', '')
-        status = subprocess.call(['mv',tempDumpPath,finishedDumpPath])
-        if status != 0: print('Error removing .temp tag')
-        dumpSize = os.stat(finishedDumpPath).st_size
-        print( '\t{:.2f} MB, {}'.format(dumpSize / float(10 ** 6), tempDumpName))
-        list = finishedDumpPath.split('.')
+        #local dump
+
+        def dump(dir,dbName,dumpType):
+            dumpName = '{}.{}'.format(dumpBaseName,dumpType)
+            tempDumpName = dumpName + '.temp'
+            tempDumpPath = os.path.join(dir,tempDumpName)
+            dumpCmd = ['sudo','-u','bret','pg_dump','--exclude-table-data=elevations','--format={}'.format(dumpType),dbName]
+            f = open(tempDumpPath,'w')
+            status = subprocess.call(dumpCmd, stdout=f)
+            if status != 0: print('Error creating db dump')
+            f.close()
+            finishedDumpPath = tempDumpPath.replace('.temp', '')
+            status = subprocess.call(['mv',tempDumpPath,finishedDumpPath])
+            if status != 0: print('Error removing .temp tag')
+            dumpSize = os.stat(finishedDumpPath).st_size
+            print( '\t{:.2f} MB, {}'.format(dumpSize / float(10 ** 6), finishedDumpPath))
+            return finishedDumpPath
+        print('Text backup for {}'.format(gitBUdir))
+        gitDumpPath = dump(gitBUdir,dbName,gitDumpType)
+        print('Binary backup for {}'.format(sf_backup))
+        localDumpPath = dump(sf_backup,dbName,localDumpType)
+        #list = finishedDumpPath.split('.')
         #datedGitDumpPath =  '{}_{}.{}'.format(list[0], nowStr, list[1])
         #copy2(finishedDumpPath, datedGitDumpPath) #same folder as original (gitBU).  Keep date-tagged dump backups up to nkeep, but don't commit them
-        datedSFdumpPath =  os.path.join(sf_backup,'{}_{}.{}'.format(dumpBaseName, nowStr, dumpType))
-        if not os.path.exists(datedSFdumpPath):
-            copy2(finishedDumpPath, datedSFdumpPath)
+        datedSFdumpPath =  os.path.join(sf_backup,'{}_{}.{}'.format(dumpBaseName, nowStr, localDumpType))
+        # if not os.path.exists(datedSFdumpPath):
+        copy2(localDumpPath, datedSFdumpPath)
         dumpsDelOld(sf_backup, nkeepSfBackup)
-        addCmd =  ['git', '-C', gitBUdir, 'add', finishedDumpPath]
-        status = subprocess.call(addCmd) #only current db
-        if status != 0: print('Error git add new dB')
-        commitStr = '"New /{}.{}"'.format(dumpBaseName, dumpType)
+        # git
+        # addCmd =  ['git', '-C', gitBUdir, 'add', finishedDumpPath]
+        # status = subprocess.call(addCmd) #only current db
+        # if status != 0: print('Error git add new dB')
+        commitStr = '"Latest db dump"'
         cmd = ['git', '-C', gitBUdir, 'commit', '-am', commitStr]
         status = subprocess.call(cmd)
         if status != 0: print('Error git commit')
@@ -189,7 +194,7 @@ while run:
         addCmd =  ['git','-C', gitBUdir, 'add', htdocsGitDir] #all htdocs tars
         status = subprocess.call(addCmd)
         if status != 0: print('Error git add htdocs backup dir')
-        commitStr = '"New backup {}.{}"'.format(dumpBaseName, dumpType)
+        commitStr = '"New backup {}.{}"'.format(dumpBaseName, localDumpType)
         cmd = ['git', '-C', gitBUdir, 'commit', '-am', commitStr]
         status = subprocess.call(cmd)
         if status != 0: print('Error git commit')
