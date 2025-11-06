@@ -15,6 +15,23 @@ This loops in a terminal and saves a compressed backed to a shared folder and gd
 which keeps the latest db dump and others up to nkeepDaily,nKeepWeekly,nKeepYearly past versions.
 It saves a text backup to gitBUdir each day, which is committed and pushed. Each dir keeps all the htdocs incremental tars. 
 """
+def sortDumps(dumps):
+    daily = []
+    weekly = []
+    monthly = []
+    yearly = []
+    files = os.listdir(dir)
+    for dump in dumps:
+        if '_D' in dump['filename']:
+           daily.append(dump)
+        elif '_W' in filename:
+            weekly.append(dump)
+        elif '_M' in filename:
+            monthly.append(dump)
+        elif '_Y' in filename:
+            yearly.append(dump)
+    return daily, weekly, monthly, yearly
+
 
 def dump(dir,dbName,dumpType):
     dumpName = '{}.{}'.format(dumpBaseName,dumpType)
@@ -32,37 +49,45 @@ def dump(dir,dbName,dumpType):
     print( '\t{:.2f} MB, {}'.format(dumpSize / float(10 ** 6), finishedDumpPath))
     return finishedDumpPath
 
-def dumpsDelOld(buDir,nkeepDaily):
-    try:
-        items = os.listdir(buDir)
-        dumps = []
-        dumpTimes = []
-        dumpSizes = []
-        for item in items:
-            if 'dump' in item and os.path.isfile(os.path.join(buDir,item)):
+def advanceTag(filename):
+    if '_D' in filename:
+        return filename.replace('_D','_W')
+    elif '_W' in filename:
+        return filename.replace('_W','_M')
+    elif '_M' in filename:
+       return filename.replace('_M','_Y')
+    elif '_Y' in filename:
+        sys.exit("Stop: no tag older than 'Y':", filename)
+    else:
+        sys.exit("Stop: can't advance", filename)
+
+def getDumpsInfo(buDir):
+    items = os.listdir(buDir)
+    dumps = []
+    for item in items:
+        if 'dump' in item and dumpType in item and os.path.isfile(os.path.join(buDir,item)):
+            try:
+                dump = {}
+                dump['name'] = item
+                dumpTimeStamp = item.split('_')[1].replace('.custom','')
+                dump['created'] = datetime.datetime.strptime(dumpTimeStamp, format(timeFormat))
+                dump['delete'] = False
+                size = None
                 try:
-                    dumps.append(item)
-                    dumpTimeStamp = item.split('_')[1].replace('.custom','')
-                    dumpTimes.append(datetime.datetime.strptime(dumpTimeStamp, format(timeFormat)))
-                    try:
-                        size = os.stat(os.path.join(buDir, item)).st_size
-                        # print('\ttest', item, size
-                    except:
-                        size = None
-                    dumpSizes.append(size)
-                    # print('\t{:.2f} MB, {}'.format(size / float(10 ** 6), item)
+                    size = os.stat(os.path.join(buDir, item)).st_size
+                    # print('\ttest', item, size
                 except:
-                    'skip file'
-    except:
-        print('\tError in reading dumps')
-    allInfo = zip(dumpTimes,dumps,dumpSizes)
-    dumpsInfo =  [[dump,timeFile,size] for timeFile,dump,size in sorted(allInfo,reverse=True)] # name, timeFile, size
-        #remove old dump files
-#        for i in range(len(dumpsInfo)):
-#            file = dumpsInfo[i][0]
-#            size = dumpsInfo[i][2]
-            # print('\t{:.2f} MB, {}'.format(size / float(10 ** 6), file)
-    if len(dumpsInfo) > 0:
+                    print('\tNo size found for',item)
+                dump['size'] = size
+                dumps.append(dump) # print('\t{:.2f} MB, {}'.format(size / float(10 ** 6), item)
+            except:
+                print('\tError getting info for ',filename)
+    return dumps
+
+def pruneDumps(dumps):
+    if len(dumps) > 0:
+        dumps = sorted(dumps, key=lambda x: x['created']) #oldest first
+        #advance oldest
         oldestDump = dumpsInfo[-1]
         while len(dumpsInfo) > nkeepDaily and oldestDump[2] <= dumpsInfo[0][2]: #Delete oldest if newest is larger or same size
             try: #delete oldest
@@ -72,7 +97,7 @@ def dumpsDelOld(buDir,nkeepDaily):
                 oldestDump = dumpsInfo[-1]
             except:
                 print('\tError in deleting oldest dump',oldestDump)
-
+    return dumps
 ###############################################################
 loopTime = 1 #days
 basePath = '/home/bret/'
@@ -82,7 +107,7 @@ htdocsSource = os.path.join(basePath,'skylinesC','htdocs','files')
 dumpBaseName = 'skylinesdump'
 
 # htdocsGitDir = os.path.join(gitBUdir, 'htdocs')
-sf_backup = '/media/sf_backup'
+sf_backup = '/media/sf_backup' #on shared folder
 htdocsSFbu = os.path.join(sf_backup, 'htdocs')
 if not os.path.exists(htdocsSFbu): os.mkdir(htdocsSFbu)
 # if not os.path.exists(htdocsGitDir): os.mkdir(htdocsGitDir)
@@ -91,10 +116,10 @@ dbName = 'skylines'
 dumpType = 'custom' # compression of about 3
 
 #nkeepGitBU = 1
-nkeepDaily = 7
-nkeepWeekly = 4
-nkeepMonthly = 10
-nkeepYearly = 10000
+nkeepDaily = 5
+nkeepWeekly = 5
+nkeepMonthly = 5
+nkeepYearly = 5
 timeFormat = '%Y-%m-%d.%H.%M.%S'
 
 debug = False
@@ -114,14 +139,18 @@ while not debug:
         # print('Text backup for {}'.format(gitBUdir))
         # gitDumpPath = dump(gitBUdir,dbName,gitDumpType)
         print('Binary backup for {}'.format(sf_backup))
-        localDumpPath = dump(sf_backup,dbName,dumpType)
+        sfDumpPath = dump(sf_backup,dbName,dumpType)
         #list = finishedDumpPath.split('.')
         #datedGitDumpPath =  '{}_{}.{}'.format(list[0], nowStr, list[1])
         #copy2(finishedDumpPath, datedGitDumpPath) #same folder as original (gitBU).  Keep date-tagged dump backups up to nkeepDaily, but don't commit them
-        datedSFdumpPath =  os.path.join(sf_backup,'{}_{}.{}'.format(dumpBaseName, nowStr, dumpType))
+        datedSFdumpPath =  os.path.join(sf_backup,'{}_D_{}.{}'.format(dumpBaseName, nowStr, dumpType))
         # if not os.path.exists(datedSFdumpPath):
-        copy2(localDumpPath, datedSFdumpPath)
-        dumpsDelOld(sf_backup, nkeepSfBackup)
+        copy2(sfDumpPath, datedSFdumpPath)
+    dumps = getDumpsInfo(sf_backup)
+    daily, weekly, monthly, yearly = sortDumps(dumps)
+    pruneDumps(dumps)
+
+    
         ## git
         # commitStr = '"Latest db dump"'
         # cmd = ['git', '-C', gitBUdir, 'commit', '-am', commitStr]
@@ -133,7 +162,7 @@ while not debug:
     #### htdocs backup #####:
     # Read date of last htdocs tar file
 
-    #find latest backup
+    #find latest htdocs backup
     try:
         htdocsBUfiles = os.listdir(htdocsSFbu)
     except:
