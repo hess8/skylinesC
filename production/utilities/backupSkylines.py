@@ -20,7 +20,6 @@ def sortDumps(dumps):
     weekly = []
     monthly = []
     yearly = []
-    files = os.listdir(dir)
     for dump in dumps:
         if '_D' in dump['filename']:
            daily.append(dump)
@@ -49,17 +48,18 @@ def dump(dir,dbName,dumpType):
     print( '\t{:.2f} MB, {}'.format(dumpSize / float(10 ** 6), finishedDumpPath))
     return finishedDumpPath
 
-def advanceTag(filename):
-    if '_D' in filename:
-        return filename.replace('_D','_W')
-    elif '_W' in filename:
-        return filename.replace('_W','_M')
-    elif '_M' in filename:
-       return filename.replace('_M','_Y')
-    elif '_Y' in filename:
-        sys.exit("Stop: no tag older than 'Y':", filename)
+def advanceTagPath(dump):
+    path = dump['path']
+    if '_D' in path:
+        return path.replace('_D','_W')
+    elif '_W' in path:
+        return path.replace('_W','_M')
+    elif '_M' in path:
+       return path.replace('_M','_Y')
+    elif '_Y' in path:
+        sys.exit("Stop: no tag older than 'Y':", path)
     else:
-        sys.exit("Stop: can't advance", filename)
+        sys.exit("Stop: can't advance", path)
 
 def getDumpsInfo(buDir):
     items = os.listdir(buDir)
@@ -68,36 +68,38 @@ def getDumpsInfo(buDir):
         if 'dump' in item and dumpType in item and os.path.isfile(os.path.join(buDir,item)):
             try:
                 dump = {}
-                dump['name'] = item
+                dump['path'] = os.path.abspath(item)
                 dumpTimeStamp = item.split('_')[1].replace('.custom','')
                 dump['created'] = datetime.datetime.strptime(dumpTimeStamp, format(timeFormat))
                 dump['delete'] = False
                 size = None
                 try:
-                    size = os.stat(os.path.join(buDir, item)).st_size
+                    size = os.stat(dump['path']).st_size
                     # print('\ttest', item, size
                 except:
-                    print('\tNo size found for',item)
+                    print('\tNo size found for',dump['path'])
                 dump['size'] = size
                 dumps.append(dump) # print('\t{:.2f} MB, {}'.format(size / float(10 ** 6), item)
             except:
-                print('\tError getting info for ',filename)
+                print('\tError getting info for ',dump['path'])
     return dumps
 
-def pruneDumps(dumps):
-    if len(dumps) > 0:
-        dumps = sorted(dumps, key=lambda x: x['created']) #oldest first
-        #advance oldest
-        oldestDump = dumpsInfo[-1]
-        while len(dumpsInfo) > nkeepDaily and oldestDump[2] <= dumpsInfo[0][2]: #Delete oldest if newest is larger or same size
-            try: #delete oldest
-                os.remove(os.path.join(buDir,oldestDump[0]))
-                print('\t\tDeleted', oldestDump[0])
-                dumpsInfo.pop()
-                oldestDump = dumpsInfo[-1]
-            except:
-                print('\tError in deleting oldest dump',oldestDump)
-    return dumps
+def pruneDumps(dumps, nkeep):
+    daily, weekly, monthly, yearly = sortDumps(dumps)
+    if len(dumpsGroup) < nkeep:
+       return dumpsGroup
+    dumpsGroup = sorted(dumpsGroup, key=lambda x: x['created']) #oldest first
+
+    oldestDump = dumpsInfo[-1]
+    while len(dumpsInfo) > nkeepDaily and oldestDump[2] <= dumpsInfo[0][2]: #Delete oldest if newest is larger or same size
+        try: #delete oldest
+            os.remove(os.path.join(buDir,oldestDump[0]))
+            print('\t\tDeleted', oldestDump[0])
+            dumpsInfo.pop()
+            oldestDump = dumpsInfo[-1]
+        except:
+            print('\tError in deleting oldest dump',oldestDump)
+return dumps
 ###############################################################
 loopTime = 1 #days
 basePath = '/home/bret/'
@@ -116,10 +118,7 @@ dbName = 'skylines'
 dumpType = 'custom' # compression of about 3
 
 #nkeepGitBU = 1
-nkeepDaily = 5
-nkeepWeekly = 5
-nkeepMonthly = 5
-nkeepYearly = 5
+nkeep = {'daily': 5, 'weekly': 5, 'monthly': 5, 'yearly': 5}
 timeFormat = '%Y-%m-%d.%H.%M.%S'
 
 debug = False
@@ -147,7 +146,6 @@ while not debug:
         # if not os.path.exists(datedSFdumpPath):
         copy2(sfDumpPath, datedSFdumpPath)
     dumps = getDumpsInfo(sf_backup)
-    daily, weekly, monthly, yearly = sortDumps(dumps)
     pruneDumps(dumps)
 
 
