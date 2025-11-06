@@ -150,7 +150,7 @@ while not debug:
     daily, weekly, monthly, yearly = sortDumps(dumps)
     pruneDumps(dumps)
 
-    
+
         ## git
         # commitStr = '"Latest db dump"'
         # cmd = ['git', '-C', gitBUdir, 'commit', '-am', commitStr]
