@@ -1,6 +1,7 @@
 
 from __future__ import print_function
 import os, sys, datetime, time, re
+from datetime import timedelta
 import time as t
 # import paramiko
 import tarfile
@@ -21,13 +22,13 @@ def sortDumps(dumps):
     monthly = []
     yearly = []
     for dump in dumps:
-        if '_D' in dump['filename']:
+        if '_D' in dump['path']:
            daily.append(dump)
-        elif '_W' in filename:
+        elif '_W' in dump['path']:
             weekly.append(dump)
-        elif '_M' in filename:
+        elif '_M' in dump['path']:
             monthly.append(dump)
-        elif '_Y' in filename:
+        elif '_Y' in dump['path']:
             yearly.append(dump)
     groups = [daily,weekly,monthly,yearly]
     groups = [[sorted(dump, key=lambda dump: dump['created']) for dump in group] for group in groups] #oldest dump appears first in group
@@ -42,12 +43,7 @@ def dump(dir,dbName,dumpExtension):
     status = subprocess.call(dumpCmd, stdout=f)
     if status != 0: print('Error creating db dump')
     f.close()
-    finishedDumpPath = tempDumpPath.replace('{}.temp'.format(dumpExtension), '_D.{}'.format(dumpExtension))
-    status = subprocess.call(['mv',tempDumpPath,finishedDumpPath])
-    if status != 0: print('Error removing .temp tag')
-    dumpSize = os.stat(finishedDumpPath).st_size
-    print( '\t{:.2f} MB, {}'.format(dumpSize / float(10 ** 6), finishedDumpPath))
-    return finishedDumpPath
+    return tempDumpPath
 
 def advanceTagPath(dump):
     path = dump['path']
@@ -67,10 +63,10 @@ def getDumpsInfo(buDir):
     dumps = []
     for item in items:
         if 'dump' in item and dumpExtension in item and os.path.isfile(os.path.join(buDir,item)):
-            try:
+            # try:
                 dump = {}
                 dump['path'] = os.path.abspath(item)
-                dumpTimeStamp = item.split('_')[1].replace('.custom','')
+                dumpTimeStamp = item.split('_')[0].split('dump_')[1]
                 dump['created'] = datetime.datetime.strptime(dumpTimeStamp, format(timeFormat))
                 dump['delete'] = False
                 size = None
@@ -81,13 +77,14 @@ def getDumpsInfo(buDir):
                     print('\tNo size found for',dump['path'])
                 dump['size'] = size
                 dumps.append(dump) # print('\t{:.2f} MB, {}'.format(size / float(10 ** 6), item)
-            except:
-                print('\tError getting info for ',dump['path'])
+            # except:
+            #     print('\tError getting info for ',dump['path'])
     return dumps
 
 def pruneDumps(dumps, nkeep):
     #period = {'W': 7, 'M': 30, 'Y': 365}
-    period = {'W': 2, 'M': 3, 'Y': 4}
+    period = {'W': timedelta(days=2), 'M': timedelta(days=3), 'Y': timedelta(days=4)}
+    # nkeep = {'daily': 2, 'weekly': 3, 'monthly': 4, 'yearly': 2}
     dumpGroups = sortDumps(dumps)
     for ig,group in enumerate(dumpGroups):
         if len(group) < nkeep:
@@ -107,7 +104,6 @@ def pruneDumps(dumps, nkeep):
             break
 
 ###############################################################
-# nkeep = {'daily': 5, 'weekly': 5, 'monthly': 5, 'yearly': 5}
 nkeep = {'daily': 2, 'weekly': 3, 'monthly': 4, 'yearly': 2}
 loopTime = 1 #days
 basePath = '/home/bret/'
@@ -115,14 +111,7 @@ htdocsSource = os.path.join(basePath,'skylinesC','htdocs','files')
 dumpBaseName = 'skylinesdump'
 
 #sf_backup = '/media/sf_backup' #on shared folder
-sf_backup = '/media/test'
-#testing
-realfiles = os.listdir('/media/sf_backup')
-for files in realfiles:
-    os.system('touch /media/test/{}'.format(file))
-#end testing
-
-
+sf_backup = '/home/bret/Downloads/test'
 htdocsSFbu = os.path.join(sf_backup, 'htdocs')
 if not os.path.exists(htdocsSFbu): os.mkdir(htdocsSFbu)
 dbName = 'skylines'
@@ -138,17 +127,28 @@ while not debug:
     print
     print(now.strftime(timeFormat))
     #### Database backup #####
-    doDump = True  # debugging switch
+    doDump = False  # debugging switch
     dumpSize = 0
     if not doDump: #debugging switch, when working on tar section below
         print("Warning: Skipping db backup!")
     else:
-        print('Binary backup for {}'.format(sf_backup))
-        sfDumpPath = dump(sf_backup,dbName,dumpExtension)
-        datedSFdumpPath =  os.path.join(sf_backup,'{}_D_{}.{}'.format(dumpBaseName, nowStr, dumpExtension))
-        copy2(sfDumpPath, datedSFdumpPath)
+        print('Binary backup to {}'.format(sf_backup))
+        tempDumpPath = dump(sf_backup,dbName,dumpExtension)
+        datedSFdumpPath =  os.path.join(sf_backup,'{}_{}_D.{}'.format(dumpBaseName, nowStr, dumpExtension))
+        status = subprocess.call(['mv',tempDumpPath,datedSFdumpPath])
+        if status != 0:
+            sys.exist('Error adding date to dump', tempDumpPath, datedSFdumpPath)
+        dumpSize = os.stat(datedSFdumpPath).st_size
+        print( '\t{:.2f} MB, {}'.format(dumpSize / float(10 ** 6), datedSFdumpPath))
+    # finishedDumpPath = tempDumpPath.replace('{}.temp'.format(dumpExtension), '_D.{}'.format(dumpExtension))
+    # status = subprocess.call(['mv',tempDumpPath,finishedDumpPath])
+    # if status != 0: print('Error removing .temp tag')
+    #
+    # return finishedDumpPath
+
+
     dumps = getDumpsInfo(sf_backup)
-    pruneDumps(dumps)
+    pruneDumps(dumps,nkeep)
 
     #### htdocs backup #####:
     # Read date of last htdocs tar file
