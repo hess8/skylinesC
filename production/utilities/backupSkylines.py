@@ -86,7 +86,8 @@ def getDumpsInfo(buDir):
     return dumps
 
 def pruneDumps(dumps, nkeep):
-    period = {'W': 7, 'M': 30, 'Y': 365}
+    #period = {'W': 7, 'M': 30, 'Y': 365}
+    period = {'W': 2, 'M': 3, 'Y': 4}
     dumpGroups = sortDumps(dumps)
     for ig,group in enumerate(dumpGroups):
         if len(group) < nkeep:
@@ -106,24 +107,26 @@ def pruneDumps(dumps, nkeep):
             break
 
 ###############################################################
+# nkeep = {'daily': 5, 'weekly': 5, 'monthly': 5, 'yearly': 5}
+nkeep = {'daily': 2, 'weekly': 3, 'monthly': 4, 'yearly': 2}
 loopTime = 1 #days
 basePath = '/home/bret/'
-# backupRepoName = 'backup-skylinesC'  #not using git for now because LFS backup saved much too much data and cost $ for bandwidth
-# gitBUdir = os.path.join(basePath, backupRepoName)
 htdocsSource = os.path.join(basePath,'skylinesC','htdocs','files')
 dumpBaseName = 'skylinesdump'
 
-# htdocsGitDir = os.path.join(gitBUdir, 'htdocs')
-sf_backup = '/media/sf_backup' #on shared folder
+#sf_backup = '/media/sf_backup' #on shared folder
+sf_backup = '/media/test'
+#testing
+realfiles = os.listdir('/media/sf_backup')
+for files in realfiles:
+    os.system('touch /media/test/{}'.format(file))
+#end testing
+
+
 htdocsSFbu = os.path.join(sf_backup, 'htdocs')
 if not os.path.exists(htdocsSFbu): os.mkdir(htdocsSFbu)
-# if not os.path.exists(htdocsGitDir): os.mkdir(htdocsGitDir)
 dbName = 'skylines'
-# gitdumpExtension = 'plain' # git can version text files.
 dumpExtension = 'custom' # compression of about 3
-
-#nkeepGitBU = 1
-nkeep = {'daily': 5, 'weekly': 5, 'monthly': 5, 'yearly': 5}
 timeFormat = '%Y-%m-%d.%H.%M.%S'
 
 debug = False
@@ -140,27 +143,12 @@ while not debug:
     if not doDump: #debugging switch, when working on tar section below
         print("Warning: Skipping db backup!")
     else:
-        # print('Text backup for {}'.format(gitBUdir))
-        # gitDumpPath = dump(gitBUdir,dbName,gitdumpExtension)
         print('Binary backup for {}'.format(sf_backup))
         sfDumpPath = dump(sf_backup,dbName,dumpExtension)
-        #list = finishedDumpPath.split('.')
-        #datedGitDumpPath =  '{}_{}.{}'.format(list[0], nowStr, list[1])
-        #copy2(finishedDumpPath, datedGitDumpPath) #same folder as original (gitBU).  Keep date-tagged dump backups up to nkeepDaily, but don't commit them
         datedSFdumpPath =  os.path.join(sf_backup,'{}_D_{}.{}'.format(dumpBaseName, nowStr, dumpExtension))
-        # if not os.path.exists(datedSFdumpPath):
         copy2(sfDumpPath, datedSFdumpPath)
     dumps = getDumpsInfo(sf_backup)
     pruneDumps(dumps)
-
-
-        ## git
-        # commitStr = '"Latest db dump"'
-        # cmd = ['git', '-C', gitBUdir, 'commit', '-am', commitStr]
-        # status = subprocess.call(cmd)
-        # if status != 0: print('Error git commit')
-        # newDump = True
-#    dumpsDelOld(gitBUdir, nkeepGitBU)
 
     #### htdocs backup #####:
     # Read date of last htdocs tar file
@@ -199,12 +187,12 @@ while not debug:
         latestTar = None
         latestTime = datetime.datetime.strptime('2000-1-1.0.0.0', format(timeFormat))
 
-    Are we adding to htdocs tar file or creating one for each day?
+    #Are we adding to htdocs tar file or creating one for each day?
 
     # Add igcs to tar file
     # print("Compressing igc files"
     tarName = 'htdocs_{}-backto-{}.tar.gz.temp'.format(nowStr, latestTime.strftime(timeFormat))
-    tempTarPath = os.path.join(htdocsGitDir,tarName)
+    tempTarPath = os.path.join(htdocsSFbu,tarName)
     htdocsTar = tarfile.open(tempTarPath, mode='w:gz')
     items = os.listdir(htdocsSource)
     count = 0
@@ -223,26 +211,10 @@ while not debug:
         if status != 0: print('Error removing .temp tag')
         tarSize = os.stat(finishedTarPath).st_size
         print( '\t{:.2f} MB, {}'.format(tarSize / float(10 ** 6), finishedTarPath))
-        if not os.path.exists(finishedTarPath.replace(gitBUdir,sf_backup)):
-            copy2(finishedTarPath, htdocsSFbu)
-        addCmd =  ['git','-C', gitBUdir, 'add', htdocsGitDir] #all htdocs tars
-        status = subprocess.call(addCmd)
-        if status != 0: print('Error git add htdocs backup dir')
-        commitStr = '"New backup {}.{}"'.format(dumpBaseName, gitdumpExtension)
-        cmd = ['git', '-C', gitBUdir, 'commit', '-am', commitStr]
-        status = subprocess.call(cmd)
-        if status != 0: print('Error git commit')
         newTar = True
     else:
         os.remove(tempTarPath)
         print('\tNo new htdocs files')
-
-    print
-    #commit the latest backup and the new htdocs tars  if any
-    if newDump or newTar:
-        cmd = ['git', '-C', gitBUdir, 'push']
-        status = subprocess.call(cmd)
-        if status != 0: print('Error git push')
 
     #ufw maintenance:
     # rules
