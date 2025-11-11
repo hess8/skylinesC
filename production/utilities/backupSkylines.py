@@ -29,19 +29,20 @@ def sortDumps(dumps):
             monthly.append(dump)
         elif '_Y' in filename:
             yearly.append(dump)
-    return daily, weekly, monthly, yearly
+    groups = [daily,weekly,monthly,yearly]
+    groups = [[sorted(dump, key=lambda dump: dump['created']) for dump in group] for group in groups] #oldest dump appears first in group
+    return groups #oldest firstdaily, weekly, monthly, yearly]
 
-
-def dump(dir,dbName,dumpType):
-    dumpName = '{}.{}'.format(dumpBaseName,dumpType)
+def dump(dir,dbName,dumpExtension):
+    dumpName = '{}.{}'.format(dumpBaseName,dumpExtension)
     tempDumpName = dumpName + '.temp'
     tempDumpPath = os.path.join(dir,tempDumpName)
-    dumpCmd = ['sudo','-u','bret','pg_dump','--exclude-table-data=elevations','--format={}'.format(dumpType),dbName]
+    dumpCmd = ['sudo','-u','bret','pg_dump','--exclude-table-data=elevations','--format={}'.format(dumpExtension),dbName]
     f = open(tempDumpPath,'w')
     status = subprocess.call(dumpCmd, stdout=f)
     if status != 0: print('Error creating db dump')
     f.close()
-    finishedDumpPath = tempDumpPath.replace('.temp', '')
+    finishedDumpPath = tempDumpPath.replace('{}.temp'.format(dumpExtension), '_D.{}'.format(dumpExtension))
     status = subprocess.call(['mv',tempDumpPath,finishedDumpPath])
     if status != 0: print('Error removing .temp tag')
     dumpSize = os.stat(finishedDumpPath).st_size
@@ -65,7 +66,7 @@ def getDumpsInfo(buDir):
     items = os.listdir(buDir)
     dumps = []
     for item in items:
-        if 'dump' in item and dumpType in item and os.path.isfile(os.path.join(buDir,item)):
+        if 'dump' in item and dumpExtension in item and os.path.isfile(os.path.join(buDir,item)):
             try:
                 dump = {}
                 dump['path'] = os.path.abspath(item)
@@ -85,21 +86,25 @@ def getDumpsInfo(buDir):
     return dumps
 
 def pruneDumps(dumps, nkeep):
-    daily, weekly, monthly, yearly = sortDumps(dumps)
-    if len(dumpsGroup) < nkeep:
-       return dumpsGroup
-    dumpsGroup = sorted(dumpsGroup, key=lambda x: x['created']) #oldest first
+    period = {'W': 7, 'M': 30, 'Y': 365}
+    dumpGroups = sortDumps(dumps)
+    for ig,group in enumerate(dumpGroups):
+        if len(group) < nkeep:
+           continue #group needs no action
+        oldest = group[0]
+        tag = oldest['path'].split('_')[0]
+        nextGroupNewest = dumpGroups[ig+1][-1]
+        if oldest['created'] < nextGroupNewest['created'] - period[tag]:
+            advanceTagPath(oldest['path'])
+        else:
+            try: #delete oldest
+                os.remove(oldest['path'])
+                print('\t\tDeleted', oldest['path'])
+            except:
+                print('\tError in deleting oldest dump',oldest['path'])
+        if tag == 'Y':
+            break
 
-    oldestDump = dumpsInfo[-1]
-    while len(dumpsInfo) > nkeepDaily and oldestDump[2] <= dumpsInfo[0][2]: #Delete oldest if newest is larger or same size
-        try: #delete oldest
-            os.remove(os.path.join(buDir,oldestDump[0]))
-            print('\t\tDeleted', oldestDump[0])
-            dumpsInfo.pop()
-            oldestDump = dumpsInfo[-1]
-        except:
-            print('\tError in deleting oldest dump',oldestDump)
-return dumps
 ###############################################################
 loopTime = 1 #days
 basePath = '/home/bret/'
@@ -114,8 +119,8 @@ htdocsSFbu = os.path.join(sf_backup, 'htdocs')
 if not os.path.exists(htdocsSFbu): os.mkdir(htdocsSFbu)
 # if not os.path.exists(htdocsGitDir): os.mkdir(htdocsGitDir)
 dbName = 'skylines'
-# gitDumpType = 'plain' # git can version text files.
-dumpType = 'custom' # compression of about 3
+# gitdumpExtension = 'plain' # git can version text files.
+dumpExtension = 'custom' # compression of about 3
 
 #nkeepGitBU = 1
 nkeep = {'daily': 5, 'weekly': 5, 'monthly': 5, 'yearly': 5}
@@ -136,13 +141,13 @@ while not debug:
         print("Warning: Skipping db backup!")
     else:
         # print('Text backup for {}'.format(gitBUdir))
-        # gitDumpPath = dump(gitBUdir,dbName,gitDumpType)
+        # gitDumpPath = dump(gitBUdir,dbName,gitdumpExtension)
         print('Binary backup for {}'.format(sf_backup))
-        sfDumpPath = dump(sf_backup,dbName,dumpType)
+        sfDumpPath = dump(sf_backup,dbName,dumpExtension)
         #list = finishedDumpPath.split('.')
         #datedGitDumpPath =  '{}_{}.{}'.format(list[0], nowStr, list[1])
         #copy2(finishedDumpPath, datedGitDumpPath) #same folder as original (gitBU).  Keep date-tagged dump backups up to nkeepDaily, but don't commit them
-        datedSFdumpPath =  os.path.join(sf_backup,'{}_D_{}.{}'.format(dumpBaseName, nowStr, dumpType))
+        datedSFdumpPath =  os.path.join(sf_backup,'{}_D_{}.{}'.format(dumpBaseName, nowStr, dumpExtension))
         # if not os.path.exists(datedSFdumpPath):
         copy2(sfDumpPath, datedSFdumpPath)
     dumps = getDumpsInfo(sf_backup)
@@ -223,7 +228,7 @@ while not debug:
         addCmd =  ['git','-C', gitBUdir, 'add', htdocsGitDir] #all htdocs tars
         status = subprocess.call(addCmd)
         if status != 0: print('Error git add htdocs backup dir')
-        commitStr = '"New backup {}.{}"'.format(dumpBaseName, gitDumpType)
+        commitStr = '"New backup {}.{}"'.format(dumpBaseName, gitdumpExtension)
         cmd = ['git', '-C', gitBUdir, 'commit', '-am', commitStr]
         status = subprocess.call(cmd)
         if status != 0: print('Error git commit')
