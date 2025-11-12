@@ -39,8 +39,8 @@ def sortDumps(dumps):
         elif '_Y' in dump['path']:
             yearly.append(dump)
     groups = [daily, weekly,monthly,yearly]
-    sortedGroups = [sortByKey(group,'created','ascending') for group in groups]
-    return sortedGroups #oldest firstdaily, weekly, monthly, yearly]
+    sortedGroups = [sortByKey(group,'created','descending') for group in groups] #newest dump first in each group
+    return sortedGroups
 
 def dump(dir,dbName,dumpExtension):
     dumpName = '{}.{}'.format(dumpBaseName,dumpExtension)
@@ -53,7 +53,7 @@ def dump(dir,dbName,dumpExtension):
     f.close()
     return tempDumpPath
 
-def advanceTagPath(dump):
+def advance(dump):
     path = dump['path']
     if '_D' in path:
         return path.replace('_D','_W')
@@ -93,23 +93,35 @@ def getDumpsInfo(buDir):
     return dumps
 
 def pruneDumps(dumps, nkeep):
-    period = {'W': 7, 'M': 30, 'Y': 365}
-    # period = {'W': timedelta(days=2), 'M': timedelta(days=3), 'Y': timedelta(days=4)}
-    # nkeep = {'daily': 2, 'weekly': 3, 'monthly': 4, 'yearly': 2}
+    periods = [timedelta(days=7), timedelta(days=7), timedelta(days=30), timedelta(days=365)]
+    tags = ['D','W','M','Y']
     dumpGroups = sortDumps(dumps)
     for ig,group in enumerate(dumpGroups):
-        if len(group) < nkeep:
+        tag = tags[ig]
+        if len(group) < nkeep[tag]:
            continue #group needs no action
-        oldest = group[0]
-        tag = oldest['path'].split('_')[1][0] #first character
-        nextGroupNewest = dumpGroups[ig+1][-1]
-        if oldest['created'] < nextGroupNewest['created'] - period[tag]:
-            advanceTagPath(oldest['path'])
+        oldest = group[-1]
+        nextGroupNewest = dumpGroups[ig+1][0]
+        if oldest['created'] > nextGroupNewest['created'] + periods[ig+1]:
+            advance(oldest['path'])
         else:
-            group[0]['delete'] = True
+            group[-1]['delete'] = True
+        for id in range(len(group) - 1):
+            if ig < nkeep:
+                continue
+            else:
+                group[ig]['delete'] = True
+
+
+
+
+
+
+
+
 
         if tag == 'Y':
-            break # keep all yearly backups
+            break # keep all yearly backups...nothing to advance to
 
 def deleteFile(path):
     try: #delete oldest
@@ -119,7 +131,7 @@ def deleteFile(path):
         print('\tError in deleting file',path)
 
 ###############################################################
-nkeep = {'daily': 2, 'weekly': 3, 'monthly': 4, 'yearly': 2}
+nkeep = {'D': 2, 'W': 4, 'M': 12} #, 'Y': 10000}
 loopTime = 1 #days
 basePath = '/home/bret/'
 htdocsSource = os.path.join(basePath,'skylinesC','htdocs','files')
