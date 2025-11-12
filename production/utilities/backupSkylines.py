@@ -16,6 +16,14 @@ This loops in a terminal and saves a compressed backed to a shared folder and gd
 which keeps the latest db dump and others up to nkeepDaily,nKeepWeekly,nKeepYearly past versions.
 It saves a text backup to gitBUdir each day, which is committed and pushed. Each dir keeps all the htdocs incremental tars. 
 """
+
+def sortByKey(list,mykey,order):
+    if order == 'ascending':
+        list.sort(key=lambda item: item[mykey])
+    else:
+        list.sort(key=lambda item: item[mykey], reverse=True)
+    return list
+
 def sortDumps(dumps):
     daily = []
     weekly = []
@@ -30,9 +38,9 @@ def sortDumps(dumps):
             monthly.append(dump)
         elif '_Y' in dump['path']:
             yearly.append(dump)
-    groups = [daily,weekly,monthly,yearly]
-    groups = [[sorted(dump, key=lambda dump: dump['created']) for dump in group] for group in groups] #oldest dump appears first in group
-    return groups #oldest firstdaily, weekly, monthly, yearly]
+    groups = [daily, weekly,monthly,yearly]
+    sortedGroups = [sortByKey(group,'created','ascending') for group in groups]
+    return sortedGroups #oldest firstdaily, weekly, monthly, yearly]
 
 def dump(dir,dbName,dumpExtension):
     dumpName = '{}.{}'.format(dumpBaseName,dumpExtension)
@@ -62,11 +70,14 @@ def getDumpsInfo(buDir):
     items = os.listdir(buDir)
     dumps = []
     for item in items:
-        if 'dump' in item and dumpExtension in item and os.path.isfile(os.path.join(buDir,item)):
+        if 'dump' in item and not '.temp' in item and dumpExtension in item and os.path.isfile(os.path.join(buDir,item)):
             # try:
                 dump = {}
                 dump['path'] = os.path.abspath(item)
-                dumpTimeStamp = item.split('_')[0].split('dump_')[1]
+                try:
+                    dumpTimeStamp = item.split('_')[1][:19]
+                except:
+                    xx=0
                 dump['created'] = datetime.datetime.strptime(dumpTimeStamp, format(timeFormat))
                 dump['delete'] = False
                 size = None
@@ -82,26 +93,30 @@ def getDumpsInfo(buDir):
     return dumps
 
 def pruneDumps(dumps, nkeep):
-    #period = {'W': 7, 'M': 30, 'Y': 365}
-    period = {'W': timedelta(days=2), 'M': timedelta(days=3), 'Y': timedelta(days=4)}
+    period = {'W': 7, 'M': 30, 'Y': 365}
+    # period = {'W': timedelta(days=2), 'M': timedelta(days=3), 'Y': timedelta(days=4)}
     # nkeep = {'daily': 2, 'weekly': 3, 'monthly': 4, 'yearly': 2}
     dumpGroups = sortDumps(dumps)
     for ig,group in enumerate(dumpGroups):
         if len(group) < nkeep:
            continue #group needs no action
         oldest = group[0]
-        tag = oldest['path'].split('_')[0]
+        tag = oldest['path'].split('_')[1][0] #first character
         nextGroupNewest = dumpGroups[ig+1][-1]
         if oldest['created'] < nextGroupNewest['created'] - period[tag]:
             advanceTagPath(oldest['path'])
         else:
-            try: #delete oldest
-                os.remove(oldest['path'])
-                print('\t\tDeleted', oldest['path'])
-            except:
-                print('\tError in deleting oldest dump',oldest['path'])
+            group[0]['delete'] = True
+
         if tag == 'Y':
-            break
+            break # keep all yearly backups
+
+def deleteFile(path):
+    try: #delete oldest
+        os.remove(path)
+        print('\t\tDeleted', path)
+    except:
+        print('\tError in deleting file',path)
 
 ###############################################################
 nkeep = {'daily': 2, 'weekly': 3, 'monthly': 4, 'yearly': 2}
@@ -118,8 +133,10 @@ dbName = 'skylines'
 dumpExtension = 'custom' # compression of about 3
 timeFormat = '%Y-%m-%d.%H.%M.%S'
 
-debug = False
-while not debug:
+debug = True
+loop = True
+print('Debug is on')
+while loop:
     newDump = False
     newTar = False
     now = datetime.datetime.now()
@@ -224,6 +241,8 @@ while not debug:
     # os.system('sudo ufw deny 22 > /dev/null 2>&1')
     # os.system('sudo ufw allow from 192.168.1.50 to any port 4200 > /dev/null 2>&1')
     # os.system('sudo ufw allow from 192.168.1.50 proto tcp to any port 22 > /dev/null 2>&1')
+    if debug:
+        break
 
     #find time until midnight
     secNextSave = ((24 * loopTime - now.hour - 1) * 3600) + ((60 - now.minute - 1) * 60) + (60 - now.second)
