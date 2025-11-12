@@ -1,6 +1,6 @@
 
 from __future__ import print_function
-import os, sys, datetime, time, re
+import os, sys, datetime, re, shutil
 from datetime import timedelta
 import time as t
 # import paramiko
@@ -53,19 +53,6 @@ def dump(dir,dbName,dumpExtension):
     f.close()
     return tempDumpPath
 
-def advance(dump):
-    path = dump['path']
-    if '_D' in path:
-        return path.replace('_D','_W')
-    elif '_W' in path:
-        return path.replace('_W','_M')
-    elif '_M' in path:
-       return path.replace('_M','_Y')
-    elif '_Y' in path:
-        sys.exit("Stop: no tag older than 'Y':", path)
-    else:
-        sys.exit("Stop: can't advance", path)
-
 def getDumpsInfo(buDir):
     items = os.listdir(buDir)
     dumps = []
@@ -73,7 +60,7 @@ def getDumpsInfo(buDir):
         if 'dump' in item and not '.temp' in item and dumpExtension in item and os.path.isfile(os.path.join(buDir,item)):
             # try:
                 dump = {}
-                dump['path'] = os.path.abspath(item)
+                dump['path'] = os.path.join(buDir,item)
                 try:
                     dumpTimeStamp = item.split('_')[1][:19]
                 except:
@@ -92,43 +79,61 @@ def getDumpsInfo(buDir):
             #     print('\tError getting info for ',dump['path'])
     return dumps
 
+def advance(path):
+    if '_D' in path:
+         return path.replace('_D','_W')
+    elif '_W' in path:
+        return path.replace('_W','_M')
+    elif '_M' in path:
+       return path.replace('_M','_Y')
+    elif '_Y' in path:
+        sys.exit("Stop: no tag older than 'Y':", path)
+    else:
+        sys.exit("Stop: can't advance", path)
+
+def moveFile(path1,path2):
+    try:
+        shutil.move(path1,path2)
+        print('\t\tMoved {} to {}'.format(path1,path2))
+    except:
+        print('\tError in moving file {} to {}'.format(path1,path2))
+
+def deleteFile(path):
+    try:
+        os.remove(path)
+        print('\t\tDeleted', path)
+    except:
+        print('\tError in deleting file',path)
+
+def deleteMarked(dumpGroups):
+    for group in dumpGroups:
+        for dump in group:
+            if dump['delete'] == True:
+                deleteFile(dump['path'])
+
 def pruneDumps(dumps, nkeep):
     periods = [timedelta(days=7), timedelta(days=7), timedelta(days=30), timedelta(days=365)]
     tags = ['D','W','M','Y']
     dumpGroups = sortDumps(dumps)
     for ig,group in enumerate(dumpGroups):
         tag = tags[ig]
-        if len(group) < nkeep[tag]:
-           continue #group needs no action
-        oldest = group[-1]
-        nextGroupNewest = dumpGroups[ig+1][0]
-        if oldest['created'] > nextGroupNewest['created'] + periods[ig+1]:
-            advance(oldest['path'])
-        else:
-            group[-1]['delete'] = True
-        for id in range(len(group) - 1):
-            if ig < nkeep:
-                continue
-            else:
-                group[ig]['delete'] = True
-
-
-
-
-
-
-
-
-
         if tag == 'Y':
             break # keep all yearly backups...nothing to advance to
+        if len(group) <= nkeep[tag]:
+            continue
+        oldest = dumpGroups[ig][-1]
+        nextGroupNewest = dumpGroups[ig+1][0]
+        if oldest['created'] >= nextGroupNewest['created'] + periods[ig+1]:
+            moveFile(oldest['path'], advance(oldest['path']))
+        else:
+            dumpGroups[ig][-1]['delete'] = True
+        for id in range(len(dumpGroups[ig]) - 1):
+            if id <= nkeep[tag]:
+                continue
+            else:
+                dumpGroups[ig][id]['delete'] = True
 
-def deleteFile(path):
-    try: #delete oldest
-        os.remove(path)
-        print('\t\tDeleted', path)
-    except:
-        print('\tError in deleting file',path)
+    deleteMarked(dumpGroups)
 
 ###############################################################
 nkeep = {'D': 2, 'W': 4, 'M': 12} #, 'Y': 10000}
