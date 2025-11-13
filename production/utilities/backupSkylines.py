@@ -3,7 +3,6 @@ from __future__ import print_function
 import os, sys, datetime, re, shutil
 from datetime import timedelta
 import time as t
-# import paramiko
 import tarfile
 from shutil import copy2
 sys.path.append('/media/sf_shared_VMs/common_py')
@@ -136,23 +135,22 @@ def pruneDumps(dumps, nkeep):
     deleteMarked(dumpGroups)
 
 ###############################################################
-nkeep = {'D': 2, 'W': 4, 'M': 12} #, 'Y': 10000}
+nkeep = {'D': 7, 'W': 4, 'M': 12} #, 'Y': 10000}
 loopTime = 1 #days
 basePath = '/home/bret/'
 htdocsSource = os.path.join(basePath,'skylinesC','htdocs','files')
 dumpBaseName = 'skylinesdump'
 
-#sf_backup = '/media/sf_backup' #on shared folder
-sf_backup = '/home/bret/Downloads/test'
+sf_backup = '/media/sf_backup' #on shared folder
+# sf_backup = '/home/bret/Downloads/test'
 htdocsSFbu = os.path.join(sf_backup, 'htdocs')
 if not os.path.exists(htdocsSFbu): os.mkdir(htdocsSFbu)
 dbName = 'skylines'
 dumpExtension = 'custom' # compression of about 3
 timeFormat = '%Y-%m-%d.%H.%M.%S'
 
-debug = True
+debug = False
 loop = True
-print('Debug is on')
 while loop:
     newDump = False
     newTar = False
@@ -161,7 +159,7 @@ while loop:
     print
     print(now.strftime(timeFormat))
     #### Database backup #####
-    doDump = False  # debugging switch
+    doDump = True  # debugging switch
     dumpSize = 0
     if not doDump: #debugging switch, when working on tar section below
         print("Warning: Skipping db backup!")
@@ -213,11 +211,7 @@ while loop:
     else:
         latestTar = None
         latestTime = datetime.datetime.strptime('2000-1-1.0.0.0', format(timeFormat))
-
-    #Are we adding to htdocs tar file or creating one for each day?
-
-    # Add igcs to tar file
-    # print("Compressing igc files"
+    # Add igcs to daily tar file
     tarName = 'htdocs_{}-backto-{}.tar.gz.temp'.format(nowStr, latestTime.strftime(timeFormat))
     tempTarPath = os.path.join(htdocsSFbu,tarName)
     htdocsTar = tarfile.open(tempTarPath, mode='w:gz')
@@ -225,9 +219,7 @@ while loop:
     count = 0
     for item in items:
         modTime = datetime.datetime.fromtimestamp(os.path.getmtime('{}/{}'.format(htdocsSource,item)))
-        print(modTime)
         if modTime > latestTime:
-            # try:
             htdocsTar.add(os.path.join(htdocsSource,item))
             count += 1
             print('\t',count, end='\r')
@@ -237,10 +229,9 @@ while loop:
     htdocsTar.close()
     if count > 0:
         finishedTarPath = tempTarPath.replace('.temp', '')
-        status = subprocess.call(['mv',tempTarPath,finishedTarPath])
-        if status != 0: print('Error removing .temp tag')
+        moveFile(tempTarPath,finishedTarPath)
         tarSize = os.stat(finishedTarPath).st_size
-        print( '\t{:.2f} MB, {}'.format(tarSize / float(10 ** 6), finishedTarPath))
+        print( '\t{} new files {:.2f} MB, {}'.format(count,tarSize / float(10 ** 6), finishedTarPath))
         newTar = True
     else:
         os.remove(tempTarPath)
@@ -255,6 +246,7 @@ while loop:
     # os.system('sudo ufw allow from 192.168.1.50 to any port 4200 > /dev/null 2>&1')
     # os.system('sudo ufw allow from 192.168.1.50 proto tcp to any port 22 > /dev/null 2>&1')
     if debug:
+        print('Debug is on')
         break
 
     #find time until midnight
