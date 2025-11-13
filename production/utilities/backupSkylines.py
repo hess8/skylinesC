@@ -174,13 +174,6 @@ while loop:
             sys.exist('Error adding date to dump', tempDumpPath, datedSFdumpPath)
         dumpSize = os.stat(datedSFdumpPath).st_size
         print( '\t{:.2f} MB, {}'.format(dumpSize / float(10 ** 6), datedSFdumpPath))
-    # finishedDumpPath = tempDumpPath.replace('{}.temp'.format(dumpExtension), '_D.{}'.format(dumpExtension))
-    # status = subprocess.call(['mv',tempDumpPath,finishedDumpPath])
-    # if status != 0: print('Error removing .temp tag')
-    #
-    # return finishedDumpPath
-
-
     dumps = getDumpsInfo(sf_backup)
     pruneDumps(dumps,nkeep)
 
@@ -232,11 +225,14 @@ while loop:
     count = 0
     for item in items:
         modTime = datetime.datetime.fromtimestamp(os.path.getmtime('{}/{}'.format(htdocsSource,item)))
+        print(modTime)
         if modTime > latestTime:
             # try:
             htdocsTar.add(os.path.join(htdocsSource,item))
             count += 1
             print('\t',count, end='\r')
+        else:
+            xx=0
     print('')
     htdocsTar.close()
     if count > 0:
