@@ -9,7 +9,7 @@ sys.path.append('/mnt/D/common_py')
 sys.path.append('/mnt/P/shared_VMs/common_py')
 sys.path.append('/media/sf_shared_VMs/common_py')
 from common import dirSize, landscapesMap, listRunningVms, makeLink, renameTry,copy_file_to_guest,dirSize, \
-    readfileNoStrip, readfile, renameTry, pathWinLin, getOKor
+    readfileNoStrip, readfile, renameTry, pathWinLin, getOKor, versions,versionUpdateTag, getLandPaths, subPopenTry
 
 def getParams():
     import argparse
@@ -18,6 +18,7 @@ def getParams():
     linksHelp = "Work on links if on linux"
     loopHelp = "Loop N times.  If N == -1, loop forever"
     nozipsHelp = "Not zip any folders"
+    omitHelp = "Omit some landscape folders"
     reverseHelp = "Go through landscapes and zip lists in reverse order"
     upversionHelp = "Work with low versions that have been updated to high"
     parser = argparse.ArgumentParser(description="Landscape compression and management")
@@ -26,11 +27,13 @@ def getParams():
     parser.add_argument("-k", "--links", help=linksHelp, action="store_true")
     parser.add_argument("-l", "--loop", help=loopHelp, type=int)
     parser.add_argument("-n", "--nozips", help=nozipsHelp, action="store_true")
+    parser.add_argument("-o", "--omit", help=omitHelp, action="store_true")
     parser.add_argument("-r", "--reverse", help=reverseHelp, action="store_true")
     parser.add_argument("-u", "--upversion", help=upversionHelp, action="store_true")
 
     args = parser.parse_args()
     args.upversion = True  # not keeping C2zips now
+    args.omit = True  # not keeping C2zips now
     if args.force:
         print('Will:', forceHelp)
     if args.growth:
@@ -390,26 +393,6 @@ def get_qbtExe(qbtorrentExeDir):
             return exePath
     else:
         sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")
-
-def getLandPaths(topLandDirs, versionUpdateTag, args):
-    from more_itertools import sort_together
-    allLands = []
-    allLandPaths = []
-    for topDir in topLandDirs:
-        items = os.listdir(topDir)
-        for item in items:
-            itemPath = os.path.join(topDir, item)
-            if not item in allLands and os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'WestGermany3' not in item and 'Slovenia' not in item)
-                        or versionUpdateTag in item ): # note: isdir is true for a link pointing to a dir
-                allLands.append(item)
-                allLandPaths.append(itemPath)
-                cupFile = os.path.join(itemPath,item+'.cup')
-                if not os.path.exists(cupFile) and 'Textures' in os.listdir(itemPath): #.cup file required for COTACO task converter
-                    os.system('echo "name,code,country,lat,lon,elev,style,rwdir,rwlen,freq,descr \n" > {}'.format(cupFile))
-                    print('created', cupFile)
-
-    allLands, allLandPaths = sort_together([allLands, allLandPaths],reverse=args.reverse)
-    return allLands, allLandPaths
 
 def checkGrowth(landPath,landSizes):
     sizeNew = dirSize(landPath)

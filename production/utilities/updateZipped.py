@@ -40,8 +40,6 @@ loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGr
 maxZipTilTorr = 10 # then will run createTorrents if Linux
 nThreads = {'linux': 8, 'windows': 12}
 
-versions = ['C2','C3']
-versionUpdateTag = '_to_{}'.format(versions[1])
 versionBothTag = versions[0] + versions[1]
 highVCheckExt = '.tm3'
 
@@ -82,6 +80,32 @@ trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
 watchDir = pathWinLin(os.path.join(zipMain + '/qbtWatch'))
 makeAllMagnets = False  # needed only occasionally
 
+# qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
+# qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
+# qbtWebPath = os.path.join('/files',qbtExeName)
+# slcVMname = skylinesC_VM()
+# [username, passwd] = readfile('/home/bret/.credentials/userU')
+# if slcVMname:
+#     copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
+#     print('Copied landscapes page to SkylinesC server')
+# else:
+#     print('SkylinesC server appears not to be running')
+# if os.path.exists(convert_landscapesPath) and slcVMname:
+#     copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath, 'Convert-Landscapes.ps1'),
+#                        username, passwd)
+#     print('Copied {} to SkylinesC server'.format(convert_landscapesPath))
+# else:
+#     print('Cannot copy Convert-Landscapes to SkylinesC server')
+# if os.path.exists(qbtExeLocalPath):
+#     copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
+#     print('Copied {} to SkylinesC server'.format(qbtExeLocalPath))
+# else:
+#     print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
+
+
+
+
+
 ########
 print('Starting')
 if not os.path.exists(watchDir):
@@ -97,7 +121,7 @@ highVList = os.listdir(highVMain)
 
 landSizes = {}
 
-landDirs = [lowVMain, lowVExt1, highVMain]
+landDirs = [lowVMain, highVMain]#[lowVMain, lowVExt1, highVMain]
 # landDirs = [lowVMain]
 allLands, allLandPaths = getLandPaths(landDirs, versionUpdateTag, args)
 
@@ -158,6 +182,8 @@ while go:
     for item in items:
         if item.split('.')[-1] == '7z':
             allZips.append(item)
+            path = os.path.join(zipMain, item)
+            #os.system('touch {}.torrent'.format(path))
             allZipsPaths.append(os.path.join(zipMain, item))
     allZips.sort()
 
@@ -175,6 +201,8 @@ while go:
             lowVLands.append(land)
     # check for needed zips
     for i, landPath, in enumerate(allLandPaths):
+        if "North_Texas" in landPath:
+            xx=0
         land = allLands[i]
         if os.path.basename(landPath)[0] == '!' or (highVMain in landPath and land in lowVLands):
             continue                      # no zips of C2 folders linked to C3
@@ -282,9 +310,8 @@ while go:
         qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
         qbtWebPath = os.path.join('/files',qbtExeName)
         slcVMname = skylinesC_VM()
-        [username, passwd] = readfile('/home/bret/.local/secure/userU')
+        [username, passwd] = readfile('/home/bret/.credentials/userU')
         if args.force or len(createdTorr) > 0 or not os.path.exists(landPageLocalDest):
-            landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)
             if slcVMname:
                 copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
                 print('Copied landscapes page to SkylinesC server')
@@ -293,7 +320,7 @@ while go:
         if os.path.exists(convert_landscapesPath) and slcVMname:
             copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath, 'Convert-Landscapes.ps1'),
                                username, passwd)
-            print('Copied {} to SKylinesC server'.format(convert_landscapesPath))
+            print('Copied {} to SkylinesC server'.format(convert_landscapesPath))
         else:
             print('Cannot copy Convert-Landscapes to SkylinesC server')
         if os.path.exists(qbtExeLocalPath):
