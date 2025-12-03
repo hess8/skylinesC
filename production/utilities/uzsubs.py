@@ -217,7 +217,7 @@ def sevenTest(archivePath,nThreads): # -mmt limits number of threads -t7z specif
         for sig in sigs:
             signal.signal(sig, signal_handler)
         maxThreads = nThreads['linux']# On Soto with base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
-        trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
+        trapSigPath = '/home/bret/skylinesC/production/utilities/trapSignals.sh'
         cmd = ['bash', trapSigPath, '7z', 't', '-mmt={}'.format(maxThreads), archivePath]
     elif platform.system() == 'Windows':
         maxThreads = nThreads['windows']
@@ -243,7 +243,7 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
         for sig in sigs:
             signal.signal(sig, signal_handler)
         maxThreads = nThreads['linux']# On Soto with base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
-        trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
+        trapSigPath = '/home/bret/skylinesC/production/utilities/trapSignals.sh'
         cmd = ['bash', trapSigPath, '7z', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, preFolder+folderPath]
     elif platform.system() == 'Windows':
         maxThreads = nThreads['windows']
