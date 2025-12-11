@@ -56,7 +56,7 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
             pass
         elif extension(item) == '.7z':
             zipPath = os.path.join(zipDir, item)
-            toMakeMagnet.append(zipPath)
+            if makeAllMagnets: toMakeMagnet.append(zipPath)
             torrPath = zipPath + '.torrent'
             zipTime = os.path.getmtime(zipPath)
             # Check for outdated torrent
@@ -103,4 +103,3 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
         createMagnet(magPath)
     # print('Torrents done')
     return createdTorr
-

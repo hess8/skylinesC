@@ -30,8 +30,3 @@ watchDir = os.path.join(zipMain + '/qbtWatch')
 makeAllMagnets = False  # needed only occasionally
 createdTorr = createTorrents(zipMain, watchDir, makeAllMagnets)
 landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)
-if slcVMname:
-    copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
-    print('Copied landscapes page to SkylinesC server')
-else:
-    print('SkylinesC server appears not to be running')

@@ -80,31 +80,11 @@ trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
 watchDir = pathWinLin(os.path.join(zipMain + '/qbtWatch'))
 makeAllMagnets = False  # needed only occasionally
 
-# qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
-# qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
-# qbtWebPath = os.path.join('/files',qbtExeName)
-# slcVMname = skylinesC_VM()
-# [username, passwd] = readfile('/home/bret/.credentials/userU')
-# if slcVMname:
-#     copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
-#     print('Copied landscapes page to SkylinesC server')
-# else:
-#     print('SkylinesC server appears not to be running')
-# if os.path.exists(convert_landscapesPath) and slcVMname:
-#     copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath, 'Convert-Landscapes.ps1'),
-#                        username, passwd)
-#     print('Copied {} to SkylinesC server'.format(convert_landscapesPath))
-# else:
-#     print('Cannot copy Convert-Landscapes to SkylinesC server')
-# if os.path.exists(qbtExeLocalPath):
-#     copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
-#     print('Copied {} to SkylinesC server'.format(qbtExeLocalPath))
-# else:
-#     print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
-
-
-
-
+qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
+qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
+qbtWebPath = os.path.join('/files',qbtExeName)
+slcVMname = skylinesC_VM()
+[username, passwd] = readfile('/home/bret/.credentials/userU')
 
 ########
 print('Starting')
@@ -201,9 +181,9 @@ while go:
             lowVLands.append(land)
     # check for needed zips
     for i, landPath, in enumerate(allLandPaths):
-        if "North_Texas" in landPath:
-            xx=0
         land = allLands[i]
+        if land == 'Japan-Kyusyu3':
+            xx=0
         if os.path.basename(landPath)[0] == '!' or (highVMain in landPath and land in lowVLands):
             continue                      # no zips of C2 folders linked to C3
         base, name = os.path.split(landPath)
@@ -312,19 +292,26 @@ while go:
         slcVMname = skylinesC_VM()
         [username, passwd] = readfile('/home/bret/.credentials/userU')
         if args.force or len(createdTorr) > 0 or not os.path.exists(landPageLocalDest):
+            landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)
             if slcVMname:
-                copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
+                e = copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
+                if e:
+                    sys.exit(f'Stop: error copying landscapes page to SLC: {e}')
                 print('Copied landscapes page to SkylinesC server')
             else:
-                print('SkylinesC server appears not to be running')
+                sys.exit('SkylinesC server appears not to be running')
         if os.path.exists(convert_landscapesPath) and slcVMname:
-            copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath, 'Convert-Landscapes.ps1'),
+            e = copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath, 'Convert-Landscapes.ps1'),
                                username, passwd)
+            if e:
+                sys.exit(f'Stop: error copying convert_landscapes page to SLC: {e}')
             print('Copied {} to SkylinesC server'.format(convert_landscapesPath))
         else:
             print('Cannot copy Convert-Landscapes to SkylinesC server')
         if os.path.exists(qbtExeLocalPath):
-            copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
+            e = copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
+            if e:
+                sys.exit(f'Stop: error copying qbt executable to SLC: {e}')
             print('Copied {} to SkylinesC server'.format(qbtExeLocalPath))
         else:
             print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
