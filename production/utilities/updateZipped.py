@@ -233,10 +233,10 @@ while go:
                     for path in allZipsPaths:
                         zipLand = os.path.split(path.split('.')[0])[-1]
                         if zipLand == land and land!='WestGermany3':
-                            getOKor('break', 'Do you want to remove old version {}'.format(path))
-                            os.remove(path)
-                            print('removed',path)
-                            break
+                            if getConfirmation('Do you want to remove old version {}'.format(path)):
+                                os.remove(path)
+                                print('removed',path)
+
 
 
     #this code works, but may be too short to check for growth, so for now let loop time determine it
