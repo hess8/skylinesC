@@ -240,8 +240,8 @@ while go:
                     land = os.path.split(landPath.split('.')[0])[-1]
                     for path in allZipsPaths:
                         zipLand = os.path.split(path.split('.')[0])[-1]
-                        if zipLand == land and land!='WestGermany3':
-                            getOKor('break', 'Do you want to remove old version {}'.format(path))
+                        if zipLand == land:# and land!='WestGermany3':
+                            getConfirmation('break', 'Do you want to remove old version {}'.format(path))
                             os.remove(path)
                             print('removed',path)
                             break
@@ -296,7 +296,7 @@ while go:
             if slcVMname:
                 e = copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
                 if e:
-                    sys.exit(f'Stop: error copying landscapes page to SLC: {e}')
+                    sys.exit(f'Stop: error copying landscapes page to SLC: {e}\n   Copy it manually.')
                 print('Copied landscapes page to SkylinesC server')
             else:
                 sys.exit('SkylinesC server appears not to be running')

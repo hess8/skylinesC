@@ -9,7 +9,7 @@ sys.path.append('/mnt/D/common_py')
 sys.path.append('/mnt/P/shared_VMs/common_py')
 sys.path.append('/media/sf_shared_VMs/common_py')
 from common import dirSize, landscapesMap, listRunningVms, makeLink, renameTry,copy_file_to_guest,dirSize, \
-    readfileNoStrip, readfile, renameTry, pathWinLin, getOKor, versions,versionUpdateTag, getLandPaths, subPopenTry
+    readfileNoStrip, readfile, renameTry, pathWinLin, getConfirmation, versions,versionUpdateTag, getLandPaths, subPopenTry
 
 def getParams():
     import argparse
@@ -94,7 +94,7 @@ def extractZipsLandsNotUpdated(zipDirs,lowVMain,destinationDir,versions,versionU
         dirList = sorted(os.listdir(dir), reverse=args.reverse)
         for item in dirList:
             match = re.search(r'(.*)\.v.*\.7z$',item)
-            if not match or versions[1] in item or 'WestGermany3' in item:
+            if not match or versions[1] in item:# or 'WestGermany3' in item:
                 continue
             name_underscores = match.group(1)
             archive = os.path.join(dir,item)
@@ -362,8 +362,11 @@ def checkLinksIni(mainDir,versionUpdateTag):
                 if extension != '.ini': # extension corrupted
                     newLandDirItem = landDirItem.replace(extension,'.ini')
                     renameTry(os.path.join(landscapeDir,landDirItem),os.path.join(landscapeDir,newLandDirItem))
-                iniName = os.path.basename(landDirItem).split('.')[0]
-                if iniName != mainItem and 'patch' not in mainItem.lower() and 'WestGermany3' not in mainItem:
+                if 'WestGermany3'  in mainItem:
+                    iniName = mainItem
+                else:
+                    iniName = os.path.basename(landDirItem).split('.')[0]
+                if iniName != mainItem and 'patch' not in mainItem.lower():# and
                     # try:
                         print(
                             "The .ini file name {} doesn't match {}.  Rename the landscape folder with the name of the .ini file"
