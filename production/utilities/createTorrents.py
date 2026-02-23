@@ -52,9 +52,11 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
 
     for item in zipDirList:
         if extension(item) == '.magnet': #create new magnets each time
-            os.remove(os.path.join(zipDir, item))
+            # os.remove(os.path.join(zipDir, item))
+            pass
         elif extension(item) == '.7z':
             zipPath = os.path.join(zipDir, item)
+            if makeAllMagnets: toMakeMagnet.append(zipPath)
             torrPath = zipPath + '.torrent'
             zipTime = os.path.getmtime(zipPath)
             # Check for outdated torrent
@@ -80,6 +82,8 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
     comment = 'skylinescondor.com'
     #make new torrents
     for zippedPath in toMakeTorrent:
+        #print('Skipping all torrent creation')
+        #continue
         webSeed = 'http://208.83.226.9:8080/{}'.format(zippedPath)
         try:
             print(zippedPath)
@@ -99,4 +103,3 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
         createMagnet(magPath)
     # print('Torrents done')
     return createdTorr
-

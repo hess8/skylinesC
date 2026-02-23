@@ -1,8 +1,8 @@
 
 from __future__ import print_function
-import os, sys, datetime, time, re
+import os, sys, datetime, re, shutil
+from datetime import timedelta
 import time as t
-# import paramiko
 import tarfile
 from shutil import copy2
 sys.path.append('/media/sf_shared_VMs/common_py')
@@ -16,89 +16,142 @@ which keeps the latest db dump and others up to nkeepDaily,nKeepWeekly,nKeepYear
 It saves a text backup to gitBUdir each day, which is committed and pushed. Each dir keeps all the htdocs incremental tars. 
 """
 
-def dump(dir,dbName,dumpType):
-    dumpName = '{}.{}'.format(dumpBaseName,dumpType)
+def sortByKey(list,mykey,order):
+    if order == 'ascending':
+        list.sort(key=lambda item: item[mykey])
+    else:
+        list.sort(key=lambda item: item[mykey], reverse=True)
+    return list
+
+def sortDumps(dumps):
+    daily = []
+    weekly = []
+    monthly = []
+    yearly = []
+    for dump in dumps:
+        if '_D' in dump['path']:
+           daily.append(dump)
+        elif '_W' in dump['path']:
+            weekly.append(dump)
+        elif '_M' in dump['path']:
+            monthly.append(dump)
+        elif '_Y' in dump['path']:
+            yearly.append(dump)
+    groups = [daily, weekly,monthly,yearly]
+    sortedGroups = [sortByKey(group,'created','descending') for group in groups] #newest dump first in each group
+    return sortedGroups
+
+def dump(dir,dbName,dumpExtension):
+    dumpName = '{}.{}'.format(dumpBaseName,dumpExtension)
     tempDumpName = dumpName + '.temp'
     tempDumpPath = os.path.join(dir,tempDumpName)
-    dumpCmd = ['sudo','-u','bret','pg_dump','--exclude-table-data=elevations','--format={}'.format(dumpType),dbName]
+    dumpCmd = ['sudo','-u','bret','pg_dump','--exclude-table-data=elevations','--format={}'.format(dumpExtension),dbName]
     f = open(tempDumpPath,'w')
     status = subprocess.call(dumpCmd, stdout=f)
     if status != 0: print('Error creating db dump')
     f.close()
-    finishedDumpPath = tempDumpPath.replace('.temp', '')
-    status = subprocess.call(['mv',tempDumpPath,finishedDumpPath])
-    if status != 0: print('Error removing .temp tag')
-    dumpSize = os.stat(finishedDumpPath).st_size
-    print( '\t{:.2f} MB, {}'.format(dumpSize / float(10 ** 6), finishedDumpPath))
-    return finishedDumpPath
+    return tempDumpPath
 
-def dumpsDelOld(buDir,nkeepDaily):
-    try:
-        items = os.listdir(buDir)
-        dumps = []
-        dumpTimes = []
-        dumpSizes = []
-        for item in items:
-            if 'dump' in item and os.path.isfile(os.path.join(buDir,item)):
+def getDumpsInfo(buDir):
+    items = os.listdir(buDir)
+    dumps = []
+    for item in items:
+        if 'dump' in item and not '.temp' in item and dumpExtension in item and os.path.isfile(os.path.join(buDir,item)):
+            # try:
+                dump = {}
+                dump['path'] = os.path.join(buDir,item)
                 try:
-                    dumps.append(item)
-                    dumpTimeStamp = item.split('_')[1].replace('.custom','')
-                    dumpTimes.append(datetime.datetime.strptime(dumpTimeStamp, format(timeFormat)))
-                    try:
-                        size = os.stat(os.path.join(buDir, item)).st_size
-                        # print('\ttest', item, size
-                    except:
-                        size = None
-                    dumpSizes.append(size)
-                    # print('\t{:.2f} MB, {}'.format(size / float(10 ** 6), item)
+                    dumpTimeStamp = item.split('_')[1][:19]
                 except:
-                    'skip file'
+                    xx=0
+                dump['created'] = datetime.datetime.strptime(dumpTimeStamp, format(timeFormat))
+                dump['delete'] = False
+                size = None
+                try:
+                    size = os.stat(dump['path']).st_size
+                    # print('\ttest', item, size
+                except:
+                    print('\tNo size found for',dump['path'])
+                dump['size'] = size
+                dumps.append(dump) # print('\t{:.2f} MB, {}'.format(size / float(10 ** 6), item)
+            # except:
+            #     print('\tError getting info for ',dump['path'])
+    return dumps
+
+def advance(path):
+    if '_D' in path:
+         return path.replace('_D','_W')
+    elif '_W' in path:
+        return path.replace('_W','_M')
+    elif '_M' in path:
+       return path.replace('_M','_Y')
+    elif '_Y' in path:
+        sys.exit("Stop: no tag older than 'Y':", path)
+    else:
+        sys.exit("Stop: can't advance", path)
+
+def moveFile(path1,path2):
+    try:
+        shutil.move(path1,path2)
+        print('\t\tMoved {} to {}'.format(path1,path2))
     except:
-        print('\tError in reading dumps')
-    allInfo = zip(dumpTimes,dumps,dumpSizes)
-    dumpsInfo =  [[dump,timeFile,size] for timeFile,dump,size in sorted(allInfo,reverse=True)] # name, timeFile, size
-        #remove old dump files
-#        for i in range(len(dumpsInfo)):
-#            file = dumpsInfo[i][0]
-#            size = dumpsInfo[i][2]
-            # print('\t{:.2f} MB, {}'.format(size / float(10 ** 6), file)
-    if len(dumpsInfo) > 0:
-        oldestDump = dumpsInfo[-1]
-        while len(dumpsInfo) > nkeepDaily and oldestDump[2] <= dumpsInfo[0][2]: #Delete oldest if newest is larger or same size
-            try: #delete oldest
-                os.remove(os.path.join(buDir,oldestDump[0]))
-                print('\t\tDeleted', oldestDump[0])
-                dumpsInfo.pop()
-                oldestDump = dumpsInfo[-1]
-            except:
-                print('\tError in deleting oldest dump',oldestDump)
+        print('\tError in moving file {} to {}'.format(path1,path2))
+
+def deleteFile(path):
+    try:
+        os.remove(path)
+        print('\t\tDeleted', path)
+    except:
+        print('\tError in deleting file',path)
+
+def deleteMarked(dumpGroups):
+    for group in dumpGroups:
+        for dump in group:
+            if dump['delete'] == True:
+                deleteFile(dump['path'])
+
+def pruneDumps(dumps, nkeep):
+    periods = [timedelta(days=7), timedelta(days=7), timedelta(days=30), timedelta(days=365)]
+    tags = ['D','W','M','Y']
+    dumpGroups = sortDumps(dumps)
+    for ig,group in enumerate(dumpGroups):
+        tag = tags[ig]
+        if tag == 'Y':
+            break # keep all yearly backups...nothing to advance to
+        if len(group) <= nkeep[tag]:
+            continue
+        oldest = dumpGroups[ig][-1]
+        nextGroupNewest = dumpGroups[ig+1][0]
+        if oldest['created'] >= nextGroupNewest['created'] + periods[ig+1]:
+            moveFile(oldest['path'], advance(oldest['path']))
+        else:
+            dumpGroups[ig][-1]['delete'] = True
+        for id in range(len(dumpGroups[ig]) - 1):
+            if id <= nkeep[tag]:
+                continue
+            else:
+                dumpGroups[ig][id]['delete'] = True
+
+    deleteMarked(dumpGroups)
 
 ###############################################################
+nkeep = {'D': 7, 'W': 4, 'M': 12} #, 'Y': 10000}
 loopTime = 1 #days
 basePath = '/home/bret/'
-# backupRepoName = 'backup-skylinesC'  #not using git for now because LFS backup saved much too much data and cost $ for bandwidth
-# gitBUdir = os.path.join(basePath, backupRepoName)
 htdocsSource = os.path.join(basePath,'skylinesC','htdocs','files')
 dumpBaseName = 'skylinesdump'
 
-# htdocsGitDir = os.path.join(gitBUdir, 'htdocs')
-sf_backup = '/media/sf_backup'
+sf_backup = '/media/sf_backup' #on shared folder
+# sf_backup = '/home/bret/Downloads/test'
 htdocsSFbu = os.path.join(sf_backup, 'htdocs')
 if not os.path.exists(htdocsSFbu): os.mkdir(htdocsSFbu)
-# if not os.path.exists(htdocsGitDir): os.mkdir(htdocsGitDir)
 dbName = 'skylines'
-# gitDumpType = 'plain' # git can version text files.
-dumpType = 'custom' # compression of about 3
-
-#nkeepGitBU = 1
-nkeepDaily = 7
-nkeepWeekly = 4
-nkeepMonthly = 10
-nkeepYearly = 10000
+dumpExtension = 'custom' # compression of about 3
 timeFormat = '%Y-%m-%d.%H.%M.%S'
 
 debug = False
-while not debug:
+loop = True
+while loop:
     newDump = False
     newTar = False
     now = datetime.datetime.now()
@@ -111,29 +164,21 @@ while not debug:
     if not doDump: #debugging switch, when working on tar section below
         print("Warning: Skipping db backup!")
     else:
-        # print('Text backup for {}'.format(gitBUdir))
-        # gitDumpPath = dump(gitBUdir,dbName,gitDumpType)
-        print('Binary backup for {}'.format(sf_backup))
-        localDumpPath = dump(sf_backup,dbName,dumpType)
-        #list = finishedDumpPath.split('.')
-        #datedGitDumpPath =  '{}_{}.{}'.format(list[0], nowStr, list[1])
-        #copy2(finishedDumpPath, datedGitDumpPath) #same folder as original (gitBU).  Keep date-tagged dump backups up to nkeepDaily, but don't commit them
-        datedSFdumpPath =  os.path.join(sf_backup,'{}_{}.{}'.format(dumpBaseName, nowStr, dumpType))
-        # if not os.path.exists(datedSFdumpPath):
-        copy2(localDumpPath, datedSFdumpPath)
-        dumpsDelOld(sf_backup, nkeepSfBackup)
-        ## git
-        # commitStr = '"Latest db dump"'
-        # cmd = ['git', '-C', gitBUdir, 'commit', '-am', commitStr]
-        # status = subprocess.call(cmd)
-        # if status != 0: print('Error git commit')
-        # newDump = True
-#    dumpsDelOld(gitBUdir, nkeepGitBU)
+        print('Binary backup to {}'.format(sf_backup))
+        tempDumpPath = dump(sf_backup,dbName,dumpExtension)
+        datedSFdumpPath =  os.path.join(sf_backup,'{}_{}_D.{}'.format(dumpBaseName, nowStr, dumpExtension))
+        status = subprocess.call(['mv',tempDumpPath,datedSFdumpPath])
+        if status != 0:
+            sys.exist('Error adding date to dump', tempDumpPath, datedSFdumpPath)
+        dumpSize = os.stat(datedSFdumpPath).st_size
+        print( '\t{:.2f} MB, {}'.format(dumpSize / float(10 ** 6), datedSFdumpPath))
+    dumps = getDumpsInfo(sf_backup)
+    pruneDumps(dumps,nkeep)
 
     #### htdocs backup #####:
     # Read date of last htdocs tar file
 
-    #find latest backup
+    #find latest htdocs backup
     try:
         htdocsBUfiles = os.listdir(htdocsSFbu)
     except:
@@ -166,51 +211,31 @@ while not debug:
     else:
         latestTar = None
         latestTime = datetime.datetime.strptime('2000-1-1.0.0.0', format(timeFormat))
-
-    Are we adding to htdocs tar file or creating one for each day?
-
-    # Add igcs to tar file
-    # print("Compressing igc files"
+    # Add igcs to daily tar file
     tarName = 'htdocs_{}-backto-{}.tar.gz.temp'.format(nowStr, latestTime.strftime(timeFormat))
-    tempTarPath = os.path.join(htdocsGitDir,tarName)
+    tempTarPath = os.path.join(htdocsSFbu,tarName)
     htdocsTar = tarfile.open(tempTarPath, mode='w:gz')
     items = os.listdir(htdocsSource)
     count = 0
     for item in items:
         modTime = datetime.datetime.fromtimestamp(os.path.getmtime('{}/{}'.format(htdocsSource,item)))
         if modTime > latestTime:
-            # try:
             htdocsTar.add(os.path.join(htdocsSource,item))
             count += 1
             print('\t',count, end='\r')
+        else:
+            xx=0
     print('')
     htdocsTar.close()
     if count > 0:
         finishedTarPath = tempTarPath.replace('.temp', '')
-        status = subprocess.call(['mv',tempTarPath,finishedTarPath])
-        if status != 0: print('Error removing .temp tag')
+        moveFile(tempTarPath,finishedTarPath)
         tarSize = os.stat(finishedTarPath).st_size
-        print( '\t{:.2f} MB, {}'.format(tarSize / float(10 ** 6), finishedTarPath))
-        if not os.path.exists(finishedTarPath.replace(gitBUdir,sf_backup)):
-            copy2(finishedTarPath, htdocsSFbu)
-        addCmd =  ['git','-C', gitBUdir, 'add', htdocsGitDir] #all htdocs tars
-        status = subprocess.call(addCmd)
-        if status != 0: print('Error git add htdocs backup dir')
-        commitStr = '"New backup {}.{}"'.format(dumpBaseName, gitDumpType)
-        cmd = ['git', '-C', gitBUdir, 'commit', '-am', commitStr]
-        status = subprocess.call(cmd)
-        if status != 0: print('Error git commit')
+        print( '\t{} new files {:.2f} MB, {}'.format(count,tarSize / float(10 ** 6), finishedTarPath))
         newTar = True
     else:
         os.remove(tempTarPath)
         print('\tNo new htdocs files')
-
-    print
-    #commit the latest backup and the new htdocs tars  if any
-    if newDump or newTar:
-        cmd = ['git', '-C', gitBUdir, 'push']
-        status = subprocess.call(cmd)
-        if status != 0: print('Error git push')
 
     #ufw maintenance:
     # rules
@@ -220,6 +245,9 @@ while not debug:
     # os.system('sudo ufw deny 22 > /dev/null 2>&1')
     # os.system('sudo ufw allow from 192.168.1.50 to any port 4200 > /dev/null 2>&1')
     # os.system('sudo ufw allow from 192.168.1.50 proto tcp to any port 22 > /dev/null 2>&1')
+    if debug:
+        print('Debug is on')
+        break
 
     #find time until midnight
     secNextSave = ((24 * loopTime - now.hour - 1) * 3600) + ((60 - now.minute - 1) * 60) + (60 - now.second)
