@@ -5,12 +5,13 @@ import platform
 import signal
 from time import sleep
 from datetime import datetime
+
 sys.path.append('/mnt/D/common_py')
 sys.path.append('/mnt/P/shared_VMs/common_py')
 sys.path.append('/media/sf_shared_VMs/common_py')
 sys.path.append('/home/bret/common_py')
 from common import dirSize, getConfirmation, landscapesMap, listRunningVms, makeLink, renameTry,copy_file_to_guest,dirSize, \
-    readfileNoStrip, readfile, renameTry, pathWinLin
+    readfileNoStrip, readfile, renameTry#, pathWinLin
 
 def getParams():
     import argparse
@@ -91,6 +92,7 @@ def good7zOrDel(response,archive):
         return 'OK'
 
 def extractZipsLandsNotUpdated(zipDirs,lowVMain,destinationDir,versions,versionUpdateTag,nThreads,args):
+    '''optional script to extract zips of landscapes that haven't been updated to newer condor version'''
     for dir in zipDirs:
         dirList = sorted(os.listdir(dir), reverse=args.reverse)
         for item in dirList:
@@ -364,6 +366,7 @@ def checkLinksIni(mainDir,versionUpdateTag):
                     newLandDirItem = landDirItem.replace(extension,'.ini')
                     renameTry(os.path.join(landscapeDir,landDirItem),os.path.join(landscapeDir,newLandDirItem))
                 iniName = os.path.basename(landDirItem).split('.')[0]
+                '''check if ini name is the same as landscape (not WestGermany3)'''
                 if iniName != mainItem and 'patch' not in mainItem.lower() and 'WestGermany3' not in mainItem:
                     # try:
                         print(
@@ -378,9 +381,10 @@ def checkLinksIni(mainDir,versionUpdateTag):
                             if targetList[-1] != iniName:
                                 renameTry(targetPath, os.path.join(os.sep.join(targetList[:-1]),iniName))
 
+
                     # except:
                     #     renameTry(landscapeDir, os.path.join(mainDir,'__no_match_ini_' + iniName))
-                break
+                #break
         else:
                 print('no .ini file found in full dir {}; adding "!no_ini_" to name'.format(landscapeDir))
                 renameTry(landscapeDir,os.path.join(mainDir, "!no_ini_" + mainItem))
@@ -394,6 +398,26 @@ def get_qbtExe(qbtorrentExeDir):
             return exePath
     else:
         sys.exit("Stop.  Can't find path to qbittorrent.exe for landscapes.hbs")
+
+def getLandPaths(topLandDirs, versionUpdateTag, args):
+    from more_itertools import sort_together
+    allLands = []
+    allLandPaths = []
+    for topDir in topLandDirs:
+        items = os.listdir(topDir)
+        for item in items:
+            itemPath = os.path.join(topDir, item)
+            if not item in allLands and os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'Slovenia' not in item) #and 'WestGermany3' not in item
+                        or versionUpdateTag in item ): # note: isdir is true for a link pointing to a dir
+                allLands.append(item)
+                allLandPaths.append(itemPath)
+                cupFile = os.path.join(topDir,item+'.cup')
+                if not os.path.exists(cupFile) and 'Textures' in os.listdir(itemPath): #.cup file required for COTACO task converter
+                    os.system('echo "name,code,country,lat,lon,elev,style,rwdir,rwlen,freq,descr \n" > {}'.format(cupFile))
+                    print('created', cupFile)
+
+    allLands, allLandPaths = sort_together([allLands, allLandPaths],reverse=args.reverse)
+    return allLands, allLandPaths
 
 def checkGrowth(landPath,landSizes):
     sizeNew = dirSize(landPath)

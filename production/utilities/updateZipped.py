@@ -40,6 +40,8 @@ loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGr
 maxZipTilTorr = 10 # then will run createTorrents if Linux
 nThreads = {'linux': 8, 'windows': 12}
 
+versions = ['C2','C3']
+versionUpdateTag = '_to_{}'.format(versions[1])
 versionBothTag = versions[0] + versions[1]
 highVCheckExt = '.tm3'
 
@@ -241,11 +243,9 @@ while go:
                     for path in allZipsPaths:
                         zipLand = os.path.split(path.split('.')[0])[-1]
                         if zipLand == land and land!='WestGermany3':
-                            getOKor('break', 'Do you want to remove old version {}'.format(path))
-                            os.remove(path)
-                            print('removed',path)
-                            break
-
+                            if getConfirmation('Do you want to remove old version {}'.format(path)):
+                                os.remove(path)
+                                print('removed',path)
 
     #this code works, but may be too short to check for growth, so for now let loop time determine it
     # if len(toTestGrowth) > 0:
@@ -296,7 +296,7 @@ while go:
             if slcVMname:
                 e = copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
                 if e:
-                    sys.exit(f'Stop: error copying landscapes page to SLC: {e}')
+                    sys.exit(f'Stop: error copying landscapes page to SLC: {e}\n   Copy it manually.')
                 print('Copied landscapes page to SkylinesC server')
             else:
                 sys.exit('SkylinesC server appears not to be running')
