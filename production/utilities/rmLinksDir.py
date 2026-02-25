@@ -7,7 +7,7 @@ Mode 'remove' Removes all links that do contain one of the selected strings'
 Mode 'all' removes all links
 Mode 'broken' removes only broken links'''
 
-dirToRmLinks = pathWinLin(os.path.join('E','landscapes','landscapesC2-main'))
+dirToRmLinks = pathWinLin(os.path.join('E','landscapes','landscapesC3-main'))
 # dirToRmLinks = pathWinLin(os.path.join('C','condor2','landscapes'))
 keepStrs = []
 # controlStrs = ['remove',['_to_C3to_C3']]

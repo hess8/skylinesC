@@ -411,7 +411,7 @@ def getLandPaths(topLandDirs, versionUpdateTag, args):
                         or versionUpdateTag in item ): # note: isdir is true for a link pointing to a dir
                 allLands.append(item)
                 allLandPaths.append(itemPath)
-                cupFile = os.path.join(topDir,item+'.cup')
+                cupFile = os.path.join(itemPath,item+'.cup')
                 if not os.path.exists(cupFile) and 'Textures' in os.listdir(itemPath): #.cup file required for COTACO task converter
                     os.system('echo "name,code,country,lat,lon,elev,style,rwdir,rwlen,freq,descr \n" > {}'.format(cupFile))
                     print('created', cupFile)
