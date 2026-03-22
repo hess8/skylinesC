@@ -1,11 +1,11 @@
 """
-    Calls landscapes.py and createTorrents.py if on Linux
+    Calls landscapes.py and createTorrMag.py if on Linux
 
     loop
     1. checks links and folder size
     2. creates new zips for folders that are static
     3. creates new links
-    4. runs createTorrents.py
+    4. runs createTorrMag.py
     5. runs landscapesPage.py
     6. can confirm (not enabled) that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
     link target eg C:\\Users\\Bret\\AppData\\Local\\qBittorrent\\logs\\qbittorrent.log
@@ -28,7 +28,7 @@ import platform
 
 from uzsubs import *
 from time import perf_counter
-from createTorrents import createTorrents
+from createTorrMag import createTorrMag
 from landscapesPage import landscapesPage
 
 args = getParams()
@@ -37,7 +37,7 @@ if args.loop == -1:
     forever = True
 
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
-maxZipTilTorr = 10 # then will run createTorrents if Linux
+maxZipTilTorr = 10 # then will run createTorrMag if Linux
 nThreads = {'linux': 8, 'windows': 12}
 
 versions = ['C2','C3']
@@ -184,8 +184,6 @@ while go:
     # check for needed zips
     for i, landPath, in enumerate(allLandPaths):
         land = allLands[i]
-        if land == 'Japan-Kyusyu3':
-            xx=0
         if os.path.basename(landPath)[0] == '!' or (highVMain in landPath and land in lowVLands):
             continue                      # no zips of C2 folders linked to C3
         base, name = os.path.split(landPath)
@@ -197,6 +195,8 @@ while go:
             continue
         files = os.listdir(landPath)
         iniFilePath = os.path.join(landPath,land+'.ini')
+        if 'WestGermany3' in landPath:
+            iniFilePath = os.path.join(landPath,'WestGermany3'+'.ini')
         if os.path.exists(iniFilePath):
             lines = readfile(iniFilePath)
         else:
@@ -213,21 +213,16 @@ while go:
         if condorOrigVers == versions[0]:
             if args.upversion:
                 items = os.listdir(landPath)
-                if land + highVCheckExt in items:
+                landText = land
+                if 'WestGermany3' in land:
+                    landText = 'WestGermany3'
+                if landText + highVCheckExt in items:
                     cVersInNewZip = versionBothTag
                 else:
                     print('Landscape {} needs to be updated to {}'.format(land, versions[1]))
                     continue
 
         zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),landVersion,cVersInNewZip) #no zips will have spaces, but landscapes folders might
-        # if versionBothTag in zipName: #see if we need to and can merge...but zipmerge doesn't work for 7z...keep for now.
-        #     zipPathlow = os.path.join(zipMain, zipName.replace(versionBothTag, versions[0]))
-        #     zipNameUpdateVers = os.path.join(zipMain, name.replace(' ', '_') + versionUpdateTag +'.7z')
-        #     zipPathUpdateVers = os.path.join(zipMain, zipNameUpdateVers)
-        #     zipPathBothVers = os.path.join(zipMain, zipName)
-        #     if os.path.exists(zipPathlow) and os.path.exists(zipPathUpdateVers) and not os.path.exists(zipPathBothVers):
-        #         zipMergeIntoNew([zipPathlow, zipPathUpdateVers], os.path.join(zipMain,zipName))
-        #         continue
 
         if zipName not in allZips and not nZipAfterTorr >= maxZipTilTorr:
             if args.growth and checkGrowth(landPath, landSizes):
@@ -285,13 +280,13 @@ while go:
                 response = sevenzip("compression", zipPath, landPath2, nThreads)
 
     if linux:
-        createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
+        createdTorr, createdMag = createTorrMag(zipMain,watchDir,makeAllMagnets)
         qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
         qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
         qbtWebPath = os.path.join('/files',qbtExeName)
         slcVMname = skylinesC_VM()
         [username, passwd] = readfile('/home/bret/.credentials/userU')
-        if args.force or len(createdTorr) > 0 or not os.path.exists(landPageLocalDest):
+        if args.force or len(createdTorr) > 0  or len(createdMag) > 0 or not os.path.exists(landPageLocalDest):
             landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)
             if slcVMname:
                 e = copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)

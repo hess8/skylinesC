@@ -3,7 +3,7 @@ import os, sys
 
 from uzsubs import copy_file_to_guest, getParams, get_qbtExe, readfile, pathWinLin, skylinesC_VM
 from landscapesPage import landscapesPage
-from createTorrents import createTorrents
+from createTorrMag import createTorrMag
 '''Runs on linux'''
 
 args = getParams()
@@ -28,5 +28,5 @@ versions = ['C2','C3']
 trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
 watchDir = os.path.join(zipMain + '/qbtWatch')
 makeAllMagnets = False  # needed only occasionally
-createdTorr = createTorrents(zipMain, watchDir, makeAllMagnets)
+createdTorr = createTorrMag(zipMain, watchDir, makeAllMagnets)
 landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)

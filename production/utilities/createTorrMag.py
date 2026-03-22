@@ -1,4 +1,6 @@
-def createTorrents(zipDir, watchDir,makeAllMagnets):
+import os
+
+def createTorrMag(zipDir, watchDir,makeAllMagnets):
     '''Called by updateZipped.py
     mktorrent can be installed in PyCharm interpreter settings
 
@@ -46,44 +48,30 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
     os.chdir(workDir)
 
     zipDirList = sorted(os.listdir(zipDir))
-    torrentsList = []
     toMakeTorrent  = []
     toMakeMagnet = []
 
     for item in zipDirList:
-        if extension(item) == '.magnet': #create new magnets each time
-            # os.remove(os.path.join(zipDir, item))
-            pass
-        elif extension(item) == '.7z':
+        # if extension(item) == '.magnet': #create new magnets each time
+        #     # os.remove(os.path.join(zipDir, item))
+        #     pass
+        if extension(item) == '.7z':
             zipPath = os.path.join(zipDir, item)
             if makeAllMagnets: toMakeMagnet.append(zipPath)
             torrPath = zipPath + '.torrent'
+            magPath = zipPath + '.magnet'
             zipTime = os.path.getmtime(zipPath)
-            # Check for outdated torrent
-            if os.path.exists(torrPath):
-                torrTime = os.path.getmtime(torrPath)
-                if torrTime < zipTime or os.stat(torrPath).st_size == 0:
-                    os.remove(torrPath)
-                    toMakeTorrent.append(zipPath)
-                else:
-                    torrentsList.append(torrPath)
-            else:
-                toMakeTorrent.append(zipPath)
+            toMakeTorrent = checkTorrMag(zipPath,zipTime,torrPath,toMakeTorrent)
+            toMakeMagnet = checkTorrMag(zipPath,zipTime,magPath,toMakeMagnet)
 
-        # Check for missing .7z file
-        elif extension(item) == '.torrent':
-            if not os.path.exists(os.path.join(zipDir,item.replace('.torrent', ''))):
-                print('remove', os.path.join(zipDir,item))
-                os.remove(os.path.join(zipDir,item))
     createdTorr = []
+    createdMag = []
     #create torrents
     tracker = 'http://tracker.opentrackr.org:1337/announcefile'
     sizeExp = 21 # 2^21 bytes = 2MB
     comment = 'skylinescondor.com'
     #make new torrents
     for zippedPath in toMakeTorrent:
-        #print('Skipping all torrent creation')
-        #continue
         webSeed = 'http://208.83.226.9:8080/{}'.format(zippedPath)
         try:
             print(zippedPath)
@@ -101,5 +89,16 @@ def createTorrents(zipDir, watchDir,makeAllMagnets):
     # make new magnets
     for magPath in toMakeMagnet:
         createMagnet(magPath)
+        createdMag.append(magPath)
     # print('Torrents done')
-    return createdTorr
+    return createdTorr, createdMag
+
+def checkTorrMag(zipPath,zipTime,path,makeList):
+    if os.path.exists(path):
+        torrTime = os.path.getmtime(path)
+        if torrTime < zipTime or os.stat(path).st_size == 0:
+            os.remove(path)
+            makeList.append(zipPath)
+    else:
+        makeList.append(zipPath)
+    return makeList
