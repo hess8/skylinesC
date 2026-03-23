@@ -286,30 +286,35 @@ while go:
         qbtWebPath = os.path.join('/files',qbtExeName)
         slcVMname = skylinesC_VM()
         [username, passwd] = readfile('/home/bret/.credentials/userU')
-        if args.force or len(createdTorr) > 0  or len(createdMag) > 0 or not os.path.exists(landPageLocalDest):
-            landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)
-            if slcVMname:
-                e = copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
+        if slcVMname:
+            if args.force or len(createdTorr) > 0  or len(createdMag) > 0 or not os.path.exists(landPageLocalDest):
+                landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)
+                if slcVMname:
+                    e = copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
+                    if e:
+                        print(f'Error copying landscapes page to SLC: \n{e}\n   Copy it manually.')
+                    else:
+                        print('Copied landscapes page to SkylinesC server')
+            if os.path.exists(convert_landscapesPath):
+                e = copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath, 'Convert-Landscapes.ps1'),
+                                   username, passwd)
                 if e:
-                    sys.exit(f'Stop: error copying landscapes page to SLC: {e}\n   Copy it manually.')
-                print('Copied landscapes page to SkylinesC server')
+                    print(f'Error copying convert_landscapes page to SLC: {e}')
+                else:
+                    print('Copied {} to SkylinesC server'.format(convert_landscapesPath))
             else:
-                sys.exit('SkylinesC server appears not to be running')
-        if os.path.exists(convert_landscapesPath) and slcVMname:
-            e = copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath, 'Convert-Landscapes.ps1'),
-                               username, passwd)
-            if e:
-                sys.exit(f'Stop: error copying convert_landscapes page to SLC: {e}')
-            print('Copied {} to SkylinesC server'.format(convert_landscapesPath))
-        else:
-            print('Cannot copy Convert-Landscapes to SkylinesC server')
-        if os.path.exists(qbtExeLocalPath):
-            e = copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
-            if e:
-                sys.exit(f'Stop: error copying qbt executable to SLC: {e}')
-            print('Copied {} to SkylinesC server'.format(qbtExeLocalPath))
-        else:
-            print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
+                print('Cannot copy Convert-Landscapes to SkylinesC server')
+            if os.path.exists(qbtExeLocalPath):
+                e = copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
+                if e:
+                    print(f'Error copying qbt executable to SLC: {e}')
+                else:
+                    print('Copied {} to SkylinesC server'.format(qbtExeLocalPath))
+            else:
+                print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
+    else:
+        print('SkylinesC server appears not to be running')
+
     if not forever and (not args.loop or loopCount == args.loop):
         print('Done')
         break
