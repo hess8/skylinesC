@@ -2,4 +2,4 @@
 SkylinesCondor is back up
 Hi $first_name,
 
-The server for skylinescondor.com is working again.
+The server for skylinescondor.com was down for a couple of days, but is working again.

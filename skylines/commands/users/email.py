@@ -51,7 +51,7 @@ class Email(Command):
             file_name = datetime.now().strftime(timeFormat) + '_skylinesC.msg'
             timeTag = datetime.now().strftime("%y/%m/%d %H:%M:%S")
             f = open(os.path.join(queue_dir,file_name),'w')
-            f.write(sender + '\n')
+            f.write(sender + '@skylinescondor.com\n')
             f.write(recipient + '\n')
             f.write(subject + '\n')
             f.writelines(html)
@@ -69,7 +69,7 @@ class Email(Command):
         '''test option is to send one email to a site like www.mail-tester.com'''
         if audience not in ['admin','all','test']:
             sys.exit('Stop: audience must be "admin", "all" or "test"')
-        sender = 'SkylinesCondor' # will be skylinescondor@soardata.org.
+        sender = 'bret' # will be skylinescondor@soardata.org.
         os.chdir('/home/bret/skylinesC')
         lines = readfileNoStrip(path_text)
         #lines[0] is instructions to write html but leave out any paragraph markings
