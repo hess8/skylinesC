@@ -51,7 +51,7 @@ class Email(Command):
             file_name = datetime.now().strftime(timeFormat) + '_skylinesC.msg'
             timeTag = datetime.now().strftime("%y/%m/%d %H:%M:%S")
             f = open(os.path.join(queue_dir,file_name),'w')
-            f.write(sender + '@skylinescondor.com\n')
+            f.write(sender + '@soardata.org\n')
             f.write(recipient + '\n')
             f.write(subject + '\n')
             f.writelines(html)
