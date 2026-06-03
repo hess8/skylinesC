@@ -127,7 +127,7 @@ export GRPC_GO_LOG_VERBOSITY_LEVEL=99
 alias skyl='cd /home/bret/skylinesC/'
 alias esky='cd /home/bret/skylinesC/ember'
 alias eserve42-5='esky;sudo ember serve --environment=production --port 4200 --proxy http://localhost:5000/'
-#alias mserve='skyl; pipenv run ./manage.py runserver'
+alias cpl='cp /media/sf_shared_VMs/skylinesC-related/landscapes-zip/latestLandscapesPage/landscapes.hbs  /home/bret/skylinesC/ember/app/templates/'
 alias gserve='skyl; pipenv run gunicorn -b 127.0.0.1:5000 -w 8 --no-sendfile wsgi_skylines'
 alias torrcreate='skyl; python production/utilities/createTorrents.py'
 alias dbrecreate='pipenv run ./manage.py db recreate'
