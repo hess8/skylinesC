@@ -27,7 +27,7 @@ from time import sleep
 import platform
 
 from uzsubs import *
-from time import perf_counter
+from time import perf_counter,sleep
 from createTorrMag import createTorrMag
 from landscapesPage import landscapesPage
 
@@ -240,6 +240,8 @@ while go:
                         if zipLand == land and land!='WestGermany3':
                             if getConfirmation('Do you want to remove old version {}'.format(path)):
                                 os.remove(path)
+                                os.remove(path + '.magnet')
+                                os.remove(path + '.torrent')
                                 print('removed',path)
 
     #this code works, but may be too short to check for growth, so for now let loop time determine it
@@ -295,6 +297,7 @@ while go:
                         print(f'Error copying landscapes page to SLC: \n{e}\n   Copy it manually.')
                     else:
                         print('Copied landscapes page to SkylinesC server')
+                    sleep(1)
             if os.path.exists(convert_landscapesPath):
                 e = copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath, 'Convert-Landscapes.ps1'),
                                    username, passwd)
@@ -302,6 +305,7 @@ while go:
                     print(f'Error copying convert_landscapes page to SLC: {e}')
                 else:
                     print('Copied {} to SkylinesC server'.format(convert_landscapesPath))
+                sleep(1)
             else:
                 print('Cannot copy Convert-Landscapes to SkylinesC server')
             if os.path.exists(qbtExeLocalPath):
@@ -310,6 +314,7 @@ while go:
                     print(f'Error copying qbt executable to SLC: {e}')
                 else:
                     print('Copied {} to SkylinesC server'.format(qbtExeLocalPath))
+                sleep(1)
             else:
                 print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
     else:
