@@ -10,7 +10,7 @@ import os,sys
 # sys.path.append('/media/sf_shared_VMs/common_py')
 # sys.path.append('/media/sf_shared_VMs/common_py')
 sys.path.append('/home/bret/common_py')
-from common import landscapesMap, keepC2, pathWinLin#, seven_extract_single_file
+from common import landscapesMap, keepC2, pathWinLin, sevenExtractSingleFile
 from uzsubs import *
 
 desired_landscapes = keepC2
@@ -45,13 +45,12 @@ keepC2_spaces = [x.replace('_', ' ') for x in keepC2]
 # from more_itertools import sort_together
 allLands = []
 allLandPaths = []
-for topDir in landDirs:
+for topDir in [lowVMain]:
     items = os.listdir(topDir)
     for item in items:
         itemPath = os.path.join(topDir, item)
         item_spaces = item.replace('_',' ')
-        if item_spaces in keepC2_spaces and item_spaces not in allLands and os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'Slovenia' not in item) #and 'WestGermany3' not in item
-                    or versionUpdateTag in item ): # note: isdir is true for a link pointing to a dir
+        if item_spaces not in allLands and os.path.isdir(itemPath): # note: isdir is true for a link pointing to a dir
             allLands.append(item.replace('_', ' '))
             allLandPaths.append(itemPath)
             cupFile = os.path.join(itemPath,item+'.cup')
@@ -64,20 +63,14 @@ zips = os.listdir(zipMain)
 zips_to_extract = []
 
 for zip in zips:
-    name = zip.split('.')[0]
-    if zip.split('.')[-1] =='7z' and '_to' not in zip and 'WestGermany' not in zip:L
+    name_spaces = zip.split('.')[0].replace('_',' ')
+    if name_spaces not in allLands and name_spaces in keepC2_spaces and zip.split('.')[-1] =='7z' and '_to' not in zip and 'WestGermany' not in zip:
         zips_to_extract.append(zip)
 
-source_tag = file.split('.')[0]
-# flight = flight_from_string(source_tag)
-# if not flight:
-#     write_line_new(processed_file,source_tag)
-#     logging.error(f'Flight None was returned by flight_from_string for {i},{file}')
-#     continue
-# elif source_tag not in processed:
-#     zip_path = os.path.join(zip_dir, file)
-#     igc_path = os.path.join(igc_dir, file.replace('.7z','.igc'))
-#     if not os.path.exists(igc_path) or os.path.getsize(igc_path) == 0:
-#         zip_path = igc_path.replace('/temp','').replace('.igc','.7z')
-#         seven_extract_single_file(zip_path,igc_path)
-# igc_path
+for zip in zips_to_extract:
+    zip_path = os.path.join(zipMain, zip)
+    destination = zip_path.replace(zipMain, lowVMain).replace('.7z',' ')
+    print(zip)
+    sevenExtractSingleFile(zip_path,destination)
+    pass
+
