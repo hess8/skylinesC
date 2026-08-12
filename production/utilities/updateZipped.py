@@ -1,11 +1,11 @@
 """
-    Calls landscapes.py and createTorrents.py if on Linux
+    Calls landscapes.py and createTorrMag.py if on Linux
 
     loop
     1. checks links and folder size
     2. creates new zips for folders that are static
     3. creates new links
-    4. runs createTorrents.py
+    4. runs createTorrMag.py
     5. runs landscapesPage.py
     6. can confirm (not enabled) that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
     link target eg C:\\Users\\Bret\\AppData\\Local\\qBittorrent\\logs\\qbittorrent.log
@@ -27,8 +27,8 @@ from time import sleep
 import platform
 
 from uzsubs import *
-from time import perf_counter
-from createTorrents import createTorrents
+from time import perf_counter,sleep
+from createTorrMag import createTorrMag
 from landscapesPage import landscapesPage
 
 args = getParams()
@@ -37,7 +37,7 @@ if args.loop == -1:
     forever = True
 
 loopWaitTime = 5 # min when idle before checking agin (can be changed by checkGrowth)
-maxZipTilTorr = 10 # then will run createTorrents if Linux
+maxZipTilTorr = 10 # then will run createTorrMag if Linux
 nThreads = {'linux': 8, 'windows': 12}
 
 versions = ['C2','C3']
@@ -72,7 +72,7 @@ utilitiesDir = pathWinLin(os.path.join('L','condor-related','skylinesC','product
 ## Landscapes page ##
 landPageLocalDest = pathWinLin(os.path.join(zipMain,'latestLandscapesPage', 'landscapes.hbs'))
 qbtExeLocalPath = get_qbtExe(pathWinLin(os.path.join(zipMain,'qbt_exe')))
-convert_landscapesPath = pathWinLin(os.path.join('/mnt/L/condor-related/skylinesC/production/utilities/','Convert-Landscapes.ps1'))
+convert_landscapesPath = pathWinLin(os.path.join('/home/bret/skylinesC/production/utilities/','Convert-Landscapes.ps1'))
 slcPath = '/home/bret/skylinesC/'
 slcFilesPath = os.path.join(slcPath, 'htdocs/files/')
 landPageServerDest = os.path.join(slcPath,'ember/app/templates/landscapes.hbs')
@@ -81,6 +81,12 @@ landPageServerDest = os.path.join(slcPath,'ember/app/templates/landscapes.hbs')
 trackerStr = "&tr=http://tracker.opentrackr.org:1337/announce"
 watchDir = pathWinLin(os.path.join(zipMain + '/qbtWatch'))
 makeAllMagnets = False  # needed only occasionally
+
+qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
+qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
+qbtWebPath = os.path.join('/files',qbtExeName)
+slcVMname = skylinesC_VM()
+[username, passwd] = readfile('/home/bret/.credentials/userU')
 
 ########
 print('Starting')
@@ -97,7 +103,7 @@ highVList = os.listdir(highVMain)
 
 landSizes = {}
 
-landDirs = [lowVMain, lowVExt1, highVMain]
+landDirs = [lowVMain, highVMain]#[lowVMain, lowVExt1, highVMain]
 # landDirs = [lowVMain]
 allLands, allLandPaths = getLandPaths(landDirs, versionUpdateTag, args)
 
@@ -158,6 +164,8 @@ while go:
     for item in items:
         if item.split('.')[-1] == '7z':
             allZips.append(item)
+            path = os.path.join(zipMain, item)
+            #os.system('touch {}.torrent'.format(path))
             allZipsPaths.append(os.path.join(zipMain, item))
     allZips.sort()
 
@@ -187,6 +195,8 @@ while go:
             continue
         files = os.listdir(landPath)
         iniFilePath = os.path.join(landPath,land+'.ini')
+        if 'WestGermany3' in landPath:
+            iniFilePath = os.path.join(landPath,'WestGermany3'+'.ini')
         if os.path.exists(iniFilePath):
             lines = readfile(iniFilePath)
         else:
@@ -203,21 +213,16 @@ while go:
         if condorOrigVers == versions[0]:
             if args.upversion:
                 items = os.listdir(landPath)
-                if land + highVCheckExt in items:
+                landText = land
+                if 'WestGermany3' in land:
+                    landText = 'WestGermany3'
+                if landText + highVCheckExt in items:
                     cVersInNewZip = versionBothTag
                 else:
                     print('Landscape {} needs to be updated to {}'.format(land, versions[1]))
                     continue
 
         zipName = '{}.v{}_{}.7z'.format(land.replace(' ','_'),landVersion,cVersInNewZip) #no zips will have spaces, but landscapes folders might
-        # if versionBothTag in zipName: #see if we need to and can merge...but zipmerge doesn't work for 7z...keep for now.
-        #     zipPathlow = os.path.join(zipMain, zipName.replace(versionBothTag, versions[0]))
-        #     zipNameUpdateVers = os.path.join(zipMain, name.replace(' ', '_') + versionUpdateTag +'.7z')
-        #     zipPathUpdateVers = os.path.join(zipMain, zipNameUpdateVers)
-        #     zipPathBothVers = os.path.join(zipMain, zipName)
-        #     if os.path.exists(zipPathlow) and os.path.exists(zipPathUpdateVers) and not os.path.exists(zipPathBothVers):
-        #         zipMergeIntoNew([zipPathlow, zipPathUpdateVers], os.path.join(zipMain,zipName))
-        #         continue
 
         if zipName not in allZips and not nZipAfterTorr >= maxZipTilTorr:
             if args.growth and checkGrowth(landPath, landSizes):
@@ -233,11 +238,11 @@ while go:
                     for path in allZipsPaths:
                         zipLand = os.path.split(path.split('.')[0])[-1]
                         if zipLand == land and land!='WestGermany3':
-                            getOKor('break', 'Do you want to remove old version {}'.format(path))
-                            os.remove(path)
-                            print('removed',path)
-                            break
-
+                            if getConfirmation('Do you want to remove old version {}'.format(path)):
+                                os.remove(path)
+                                os.remove(path + '.magnet')
+                                os.remove(path + '.torrent')
+                                print('removed',path)
 
     #this code works, but may be too short to check for growth, so for now let loop time determine it
     # if len(toTestGrowth) > 0:
@@ -277,30 +282,44 @@ while go:
                 response = sevenzip("compression", zipPath, landPath2, nThreads)
 
     if linux:
-        createdTorr = createTorrents(zipMain,watchDir,makeAllMagnets)
+        createdTorr, createdMag = createTorrMag(zipMain,watchDir,makeAllMagnets)
         qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
         qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
         qbtWebPath = os.path.join('/files',qbtExeName)
         slcVMname = skylinesC_VM()
-        [username, passwd] = readfile('/home/bret/.local/secure/userU')
-        if args.force or len(createdTorr) > 0 or not os.path.exists(landPageLocalDest):
-            landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)
-            if slcVMname:
-                copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
-                print('Copied landscapes page to SkylinesC server')
+        [username, passwd] = readfile('/home/bret/.credentials/userU')
+        if slcVMname:
+            if args.force or len(createdTorr) > 0  or len(createdMag) > 0 or not os.path.exists(landPageLocalDest):
+                landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)
+                if slcVMname:
+                    e = copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
+                    if e:
+                        print(f'Error copying landscapes page to SLC: \n{e}\n   Copy it manually.')
+                    else:
+                        print('Copied landscapes page to SkylinesC server')
+                    sleep(1)
+            if os.path.exists(convert_landscapesPath):
+                e = copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath, 'Convert-Landscapes.ps1'),
+                                   username, passwd)
+                if e:
+                    print(f'Error copying convert_landscapes page to SLC: {e}')
+                else:
+                    print('Copied {} to SkylinesC server'.format(convert_landscapesPath))
+                sleep(1)
             else:
-                print('SkylinesC server appears not to be running')
-        if os.path.exists(convert_landscapesPath) and slcVMname:
-            copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath, 'Convert-Landscapes.ps1'),
-                               username, passwd)
-            print('Copied {} to SKylinesC server'.format(convert_landscapesPath))
-        else:
-            print('Cannot copy Convert-Landscapes to SkylinesC server')
-        if os.path.exists(qbtExeLocalPath):
-            copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
-            print('Copied {} to SkylinesC server'.format(qbtExeLocalPath))
-        else:
-            print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
+                print('Cannot copy Convert-Landscapes to SkylinesC server')
+            if os.path.exists(qbtExeLocalPath):
+                e = copy_file_to_guest(slcVMname, qbtExeLocalPath, qbtExeDest, username, passwd)
+                if e:
+                    print(f'Error copying qbt executable to SLC: {e}')
+                else:
+                    print('Copied {} to SkylinesC server'.format(qbtExeLocalPath))
+                sleep(1)
+            else:
+                print('Cannot copy qbt executable to SkylinesC server: not found at', qbtExeLocalPath)
+    else:
+        print('SkylinesC server appears not to be running')
+
     if not forever and (not args.loop or loopCount == args.loop):
         print('Done')
         break

@@ -34,7 +34,8 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 ASSETS_LOAD_DIR = os.path.join(base, "skylines", "frontend", "static")
 
 SKYLINES_FILES_PATH = os.path.join(base, "htdocs", "files")
-SKYLINES_ELEVATION_PATH = os.path.join(base, "htdocs", "srtm")
+# SKYLINES_ELEVATION_PATH = os.path.join(base, "htdocs", "srtm")
+SKYLINES_ELEVATION_PATH = "/media/sf_srtmSkylinesCondor"
 SKYLINES_MAPSERVER_PATH = os.path.join(base, "mapserver")
 
 SKYLINES_TEMPORARY_DIR = "/tmp"

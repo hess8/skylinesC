@@ -5,11 +5,13 @@ import platform
 import signal
 from time import sleep
 from datetime import datetime
+
 sys.path.append('/mnt/D/common_py')
 sys.path.append('/mnt/P/shared_VMs/common_py')
 sys.path.append('/media/sf_shared_VMs/common_py')
-from common import dirSize, landscapesMap, listRunningVms, makeLink, renameTry,copy_file_to_guest,dirSize, \
-    readfileNoStrip, readfile, renameTry, pathWinLin, getOKor
+sys.path.append('/home/bret/common_py')
+from common import dirSize, getConfirmation, landscapesMap, listRunningVms, makeLink, renameTry,copy_file_to_guest,dirSize, \
+    readfileNoStrip, readfile, renameTry#, pathWinLin
 
 def getParams():
     import argparse
@@ -18,6 +20,7 @@ def getParams():
     linksHelp = "Work on links if on linux"
     loopHelp = "Loop N times.  If N == -1, loop forever"
     nozipsHelp = "Not zip any folders"
+    omitHelp = "Omit some landscape folders"
     reverseHelp = "Go through landscapes and zip lists in reverse order"
     upversionHelp = "Work with low versions that have been updated to high"
     parser = argparse.ArgumentParser(description="Landscape compression and management")
@@ -26,11 +29,13 @@ def getParams():
     parser.add_argument("-k", "--links", help=linksHelp, action="store_true")
     parser.add_argument("-l", "--loop", help=loopHelp, type=int)
     parser.add_argument("-n", "--nozips", help=nozipsHelp, action="store_true")
+    parser.add_argument("-o", "--omit", help=omitHelp, action="store_true")
     parser.add_argument("-r", "--reverse", help=reverseHelp, action="store_true")
     parser.add_argument("-u", "--upversion", help=upversionHelp, action="store_true")
 
     args = parser.parse_args()
     args.upversion = True  # not keeping C2zips now
+    args.omit = True  # not keeping C2zips now
     if args.force:
         print('Will:', forceHelp)
     if args.growth:
@@ -87,6 +92,7 @@ def good7zOrDel(response,archive):
         return 'OK'
 
 def extractZipsLandsNotUpdated(zipDirs,lowVMain,destinationDir,versions,versionUpdateTag,nThreads,args):
+    '''optional script to extract zips of landscapes that haven't been updated to newer condor version'''
     for dir in zipDirs:
         dirList = sorted(os.listdir(dir), reverse=args.reverse)
         for item in dirList:
@@ -214,7 +220,7 @@ def sevenTest(archivePath,nThreads): # -mmt limits number of threads -t7z specif
         for sig in sigs:
             signal.signal(sig, signal_handler)
         maxThreads = nThreads['linux']# On Soto with base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
-        trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
+        trapSigPath = '/home/bret/skylinesC/production/utilities/trapSignals.sh'
         cmd = ['bash', trapSigPath, '7z', 't', '-mmt={}'.format(maxThreads), archivePath]
     elif platform.system() == 'Windows':
         maxThreads = nThreads['windows']
@@ -240,7 +246,7 @@ def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of th
         for sig in sigs:
             signal.signal(sig, signal_handler)
         maxThreads = nThreads['linux']# On Soto with base cpu at 40%...1: 60% 2: 65% 3: 70& 4:80% 5:85% 6: 95%,
-        trapSigPath = '/mnt/L/condor-related/skylinesC/production/utilities/trapSignals.sh'
+        trapSigPath = '/home/bret/skylinesC/production/utilities/trapSignals.sh'
         cmd = ['bash', trapSigPath, '7z', command, '-t7z', '-y', '-mmt={}'.format(maxThreads), archivePath, preFolder+folderPath]
     elif platform.system() == 'Windows':
         maxThreads = nThreads['windows']
@@ -360,6 +366,7 @@ def checkLinksIni(mainDir,versionUpdateTag):
                     newLandDirItem = landDirItem.replace(extension,'.ini')
                     renameTry(os.path.join(landscapeDir,landDirItem),os.path.join(landscapeDir,newLandDirItem))
                 iniName = os.path.basename(landDirItem).split('.')[0]
+                '''check if ini name is the same as landscape (not WestGermany3)'''
                 if iniName != mainItem and 'patch' not in mainItem.lower() and 'WestGermany3' not in mainItem:
                     # try:
                         print(
@@ -374,9 +381,10 @@ def checkLinksIni(mainDir,versionUpdateTag):
                             if targetList[-1] != iniName:
                                 renameTry(targetPath, os.path.join(os.sep.join(targetList[:-1]),iniName))
 
+
                     # except:
                     #     renameTry(landscapeDir, os.path.join(mainDir,'__no_match_ini_' + iniName))
-                break
+                #break
         else:
                 print('no .ini file found in full dir {}; adding "!no_ini_" to name'.format(landscapeDir))
                 renameTry(landscapeDir,os.path.join(mainDir, "!no_ini_" + mainItem))
@@ -399,7 +407,7 @@ def getLandPaths(topLandDirs, versionUpdateTag, args):
         items = os.listdir(topDir)
         for item in items:
             itemPath = os.path.join(topDir, item)
-            if not item in allLands and os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'WestGermany3' not in item and 'Slovenia' not in item)
+            if not item in allLands and os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'Slovenia' not in item) #and 'WestGermany3' not in item
                         or versionUpdateTag in item ): # note: isdir is true for a link pointing to a dir
                 allLands.append(item)
                 allLandPaths.append(itemPath)
