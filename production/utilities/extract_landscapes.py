@@ -10,7 +10,7 @@ import os,sys
 # sys.path.append('/media/sf_shared_VMs/common_py')
 # sys.path.append('/media/sf_shared_VMs/common_py')
 sys.path.append('/home/bret/common_py')
-from common import landscapesMap, keepC2, pathWinLin, sevenExtractSingleFile
+from common import landscapesMap, keepC2, pathWinLin, seven_extract, subPopenTry
 from uzsubs import *
 
 desired_landscapes = keepC2
@@ -53,11 +53,6 @@ for topDir in [lowVMain]:
         if item_spaces not in allLands and os.path.isdir(itemPath): # note: isdir is true for a link pointing to a dir
             allLands.append(item.replace('_', ' '))
             allLandPaths.append(itemPath)
-            cupFile = os.path.join(itemPath,item+'.cup')
-            if not os.path.exists(cupFile) and 'Textures' in os.listdir(itemPath): #.cup file required for COTACO task converter
-                os.system('echo "name,code,country,lat,lon,elev,style,rwdir,rwlen,freq,descr \n" > {}'.format(cupFile))
-                print('created', cupFile)
-
 
 zips = os.listdir(zipMain)
 zips_to_extract = []
@@ -71,6 +66,8 @@ for zip in zips_to_extract:
     zip_path = os.path.join(zipMain, zip)
     destination = zip_path.replace(zipMain, lowVMain).replace('.7z',' ')
     print(zip)
-    sevenExtractSingleFile(zip_path,destination)
-    pass
+    seven_extract(zip_path,destination)
+    cmd = f'mv {destination}/* {lowVMain}'.split(' ')
+    subPopenTry(cmd)
+    sys.exit('stop')
 
