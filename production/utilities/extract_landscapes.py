@@ -55,6 +55,8 @@ utilitiesDir = pathWinLin(os.path.join('L','condor-related','skylinesC','product
 landDirs = [lowVMain, highVMain]
 # landDirs = [lowVMain]
 
+keepC2_spaces = [x.replace('_', ' ') for x in keepC2]
+
 # from more_itertools import sort_together
 allLands = []
 allLandPaths = []
@@ -62,16 +64,16 @@ for topDir in landDirs:
     items = os.listdir(topDir)
     for item in items:
         itemPath = os.path.join(topDir, item)
-        if not item in allLands and os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'Slovenia' not in item) #and 'WestGermany3' not in item
+        item_spaces = item.replace('_',' ')
+        if item_spaces in keepC2_spaces and item_spaces not in allLands and os.path.isdir(itemPath) and ( ('Textures' in os.listdir(itemPath) and 'Slovenia' not in item) #and 'WestGermany3' not in item
                     or versionUpdateTag in item ): # note: isdir is true for a link pointing to a dir
-            allLands.append(item)
+            allLands.append(item.replace('_', ' '))
             allLandPaths.append(itemPath)
             cupFile = os.path.join(itemPath,item+'.cup')
             if not os.path.exists(cupFile) and 'Textures' in os.listdir(itemPath): #.cup file required for COTACO task converter
                 os.system('echo "name,code,country,lat,lon,elev,style,rwdir,rwlen,freq,descr \n" > {}'.format(cupFile))
                 print('created', cupFile)
 
-# allLands, allLandPaths = sort_together([allLands, allLandPaths],reverse=args.reverse)
 
 
 
