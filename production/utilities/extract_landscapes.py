@@ -64,10 +64,10 @@ for zip in zips:
 
 for zip in zips_to_extract:
     zip_path = os.path.join(zipMain, zip)
-    destination = zip_path.replace(zipMain, lowVMain).replace('.7z',' ')
+    destination = zip_path.replace(zipMain, lowVMain).replace('.7z','')
     print(zip)
     seven_extract(zip_path,destination)
-    cmd = f'mv {destination}/* {lowVMain}'.split(' ')
-    subPopenTry(cmd)
-    sys.exit('stop')
+    cmd = f'mv {destination}/* {lowVMain}'
+    os.system(cmd)
+    os.rmdir(destination)
 
