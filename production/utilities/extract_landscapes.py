@@ -1,31 +1,16 @@
 """
-    Calls landscapes.py and createTorrents.py if on Linux
-
-    loop
-    1. checks links and folder size
-    2. creates new zips for folders that are static
-    3. creates new links
-    4. runs createTorrents.py
-    5. runs landscapesPage.py
-    6. can confirm (not enabled) that qBitTorrent has the new torrent is read from qbittorrent.log links in landscapes-qip.
-    link target eg C:\\Users\\Bret\\AppData\\Local\\qBittorrent\\logs\\qbittorrent.log
-
-      sample line:  (N) 2022-04-03T19:07:50 - 'Falkland_Islands.v1.0.7z' added to download list.
-
-    Add "-" to the beginning of the landscape dir name to remove all but .ini files and move to lowVini
-    Add "." to the beginning of the landscape dir name to move landscape to symlink directory,
-
-    landscapes.py writes the new page locally so we need to make this symbolic link on the skylinesC server:
+    Calls landscapes.py an
 """
 import os,sys
 # import py7zr #py7zr does not follow symlinks!
 # import win32com.client
 
-sys.path.append('/mnt/D/common_py')
-sys.path.append('/mnt/P/shared_VMs/common_py')
-sys.path.append('/media/sf_shared_VMs/common_py')
-
-from common import landscapesMap, keepC2, pathWinLin
+# sys.path.append('/mnt/D/common_py')
+# sys.path.append('/mnt/P/shared_VMs/common_py')
+# sys.path.append('/media/sf_shared_VMs/common_py')
+# sys.path.append('/media/sf_shared_VMs/common_py')
+sys.path.append('/home/bret/common_py')
+from common import landscapesMap, keepC2, pathWinLin#, seven_extract_single_file
 from uzsubs import *
 
 desired_landscapes = keepC2
@@ -73,30 +58,24 @@ for topDir in landDirs:
 
 # allLands, allLandPaths = sort_together([allLands, allLandPaths],reverse=args.reverse)
 
-
-
-
-files = os.listdir(zipMain)
-files.sort()
+zips = os.listdir(zipMain)
 zips_to_extract = []
 
-# for file in files:
-#     if file in
-#
-# for i,file in enumerate(files):
-#     if np.mod(i,100) == 0:
-#         print('\r', f'{i} of {len(files) - len(processed)} adding/checking tracks')
-#     if '.7z' not in file: continue
-#
-#     source_tag = file.split('.')[0]
-#     flight = flight_from_string(source_tag)
-#     if not flight:
-#         write_line_new(processed_file,source_tag)
-#         logging.error(f'Flight None was returned by flight_from_string for {i},{file}')
-#         continue
-#     elif source_tag not in processed:
-#         zip_path = os.path.join(zip_dir, file)
-#         igc_path = os.path.join(igc_dir, file.replace('.7z','.igc'))
-#         if not os.path.exists(igc_path) or os.path.getsize(igc_path) == 0:
-#             zip_path = igc_path.replace('/temp','').replace('.igc','.7z')
-#             seven_extract_single_file(zip_path,igc_path)
+for zip in zips:
+    name = zip.split('.')[0]
+    if zip.split('.')[-1] =='7z' and '_to' not in zip and 'WestGermany' not in zip:L
+        zips_to_extract.append(zip)
+
+source_tag = file.split('.')[0]
+# flight = flight_from_string(source_tag)
+# if not flight:
+#     write_line_new(processed_file,source_tag)
+#     logging.error(f'Flight None was returned by flight_from_string for {i},{file}')
+#     continue
+# elif source_tag not in processed:
+#     zip_path = os.path.join(zip_dir, file)
+#     igc_path = os.path.join(igc_dir, file.replace('.7z','.igc'))
+#     if not os.path.exists(igc_path) or os.path.getsize(igc_path) == 0:
+#         zip_path = igc_path.replace('/temp','').replace('.igc','.7z')
+#         seven_extract_single_file(zip_path,igc_path)
+# igc_path
