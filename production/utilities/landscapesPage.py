@@ -65,7 +65,7 @@ def landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args
     for i, name in enumerate(names):
         if '_to_{}'.format(versions[1]) in name:
             low_to_high_list.append(name)
-        if '_{}'.format(versions[1]) in name and 'AA2v' not in name:
+        elif '_{}'.format(versions[1]) in name and 'AA2v' not in name:
             highVersionList.append(name)
         else:
             lowVersionList.append(name)
