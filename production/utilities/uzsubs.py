@@ -11,7 +11,7 @@ sys.path.append('/mnt/P/shared_VMs/common_py')
 sys.path.append('/media/sf_shared_VMs/common_py')
 sys.path.append('/home/bret/common_py')
 from common import dirSize, getConfirmation, landscapesMap, listRunningVms, makeLink, renameTry,copy_file_to_guest,dirSize, \
-    readfileNoStrip, readfile, renameTry#, pathWinLin
+    readfileNoStrip, readfile, renameTry, pathWinLin, subPopenTry
 
 def getParams():
     import argparse
@@ -225,7 +225,7 @@ def sevenTest(archivePath,nThreads): # -mmt limits number of threads -t7z specif
     elif platform.system() == 'Windows':
         maxThreads = nThreads['windows']
         cmd = ['C:\\Program Files\\7-Zip\\7z.exe', 't', '-mmt={}'.format(maxThreads), archivePath]
-    outputLines = subPopenTry(cmd)
+    outputLines = subPopenTry(cmd, results=False)
     return outputLines
 
 def sevenzip(action,archivePath,folderPath,nThreads): # -mmt limits number of threads -t7z specifies type of archive
