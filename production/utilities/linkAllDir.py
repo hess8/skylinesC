@@ -8,7 +8,7 @@ from common import makeLink,pathWinLin
 truePath = pathWinLin(os.path.join('E','landscapes','landscapesC2-main'))
 #truePath = pathWinLin(os.path.join('A','landscapesC2'))
 #linksPath =  pathWinLin(os.path.join('C','condor2','Landscapes'))
-linksPath =  pathWinLin(os.path.join('E','landscapes','landscapesC3-main'))
+linksPath =  pathWinLin(os.path.join('E','landscapes','landscapes{}-main'.format(versions[1])))
 
 if platform.system() == 'Windows': print('Must run as Administrator to use linkAllPath')
 if not os.path.exists(linksPath):

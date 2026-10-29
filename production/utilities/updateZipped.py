@@ -51,14 +51,14 @@ if platform.system() == 'Windows':
     linux = False
 else:
     linux = True
-lowVMain = pathWinLin(os.path.join('E','landscapes','landscapesC2-main'))
-lowVExt1 = pathWinLin(os.path.join('A','landscapesC2')) # None
-lowVini = pathWinLin(os.path.join('E','landscapes','landscapesC2-ini'))
-lowVserver = pathWinLin(os.path.join('E','landscapes','landscapesC2-server'))
-highVMain = pathWinLin(os.path.join('E','landscapes','landscapesC3-main'))
-highVExt1 = None #pathWinLin(os.path.join('E','landscapes','landscapesC3-main')
-highVini = pathWinLin(os.path.join('E','landscapes','landscapesC3-ini'))
-highVserver = pathWinLin(os.path.join('E','landscapes','landscapesC3-server'))
+lowVMain = pathWinLin(os.path.join('E','landscapes','landscapes{}-main'.format(versions[0])))
+lowVExt1 = pathWinLin(os.path.join('A','landscapes{}'.format(versions[0]))) # None
+lowVini = pathWinLin(os.path.join('E','landscapes','landscapes{}-ini'.format(versions[0])))
+lowVserver = pathWinLin(os.path.join('E','landscapes','landscapes{}-server'.format(versions[0])))
+highVMain = pathWinLin(os.path.join('E','landscapes','landscapes{}-main'.format(versions[1])))
+highVExt1 = None #pathWinLin(os.path.join('E','landscapes','landscapes{}-main'.format(versions[1]))
+highVini = pathWinLin(os.path.join('E','landscapes','landscapes{}-ini'.format(versions[1])))
+highVserver = pathWinLin(os.path.join('E','landscapes','landscapes{}-server'.format(versions[1])))
 lowerVersionLandDirs = [lowVMain,lowVini,lowVserver]
 higherVersionLandDirs = [highVMain,highVini,highVserver]
 landVersionsLists = [lowerVersionLandDirs, higherVersionLandDirs]
@@ -84,9 +84,10 @@ makeAllMagnets = False  # needed only occasionally
 
 qbtExeName = qbtExeLocalPath.split(os.sep)[-1]
 qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
-qbtWebPath = os.path.join('/files',qbtExeName)
+# qbtWebPath = os.path.join('/files',qbtExeName)
+qbtWebPath = 'https://sourceforge.net/projects/qbittorrent/files/qbittorrent-win32/'
 slcVMname = skylinesC_VM()
-[username, passwd] = readfile('/home/bret/.credentials/userU')
+[username, passwd] = readfile('/home/bret/.credentials/user_ubuntu')
 
 ########
 print('Starting')
@@ -108,11 +109,11 @@ landDirs = [lowVMain, highVMain]#[lowVMain, lowVExt1, highVMain]
 allLands, allLandPaths = getLandPaths(landDirs, versionUpdateTag, args)
 
 #### optional scripts ###
-# extractZipsLandsNotUpdated(zipDirs,lowVMain,'A:\\landscapesC2',versions,versionUpdateTag,nThreads,args)
+# extractZipsLandsNotUpdated(zipDirs,lowVMain,'A:\\landscapes{}'.format(versions[0]),versions,versionUpdateTag,nThreads,args)
 # renameDirsWithTag(dirsList,tags,tagReplacement)
 # copyFilesFromVersionUpdate(allLandPaths,lowVMain, highVMain,versions,versionUpdateTag,highVCheckExt)
-# linkWinLinAllDir('\\192.168.1.161\\E\\landscapes\\landscapesC2-main','C:\\Condor2\\Landscapes')
-# linkWinLinAllDir('s:\\E\\landscapes\\landscapesC2-main','C:\\Condor2\\Landscapes')
+# linkWinLinAllDir('\\192.168.1.161\\E\\landscapes\\landscapes{}-main'.format(versions[0]),'C:\\Condor2\\Landscapes')
+# linkWinLinAllDir('s:\\E\\landscapes\\landscapes{}-main'.format(versions[0]),'C:\\Condor2\\Landscapes')
 # linkWinLinAllDir('s:\\E\\landscapes\\landscapesC3-main','C:\\Condor3\\Landscapes')
 # sys.exit('Stop')
 
@@ -267,7 +268,7 @@ while go:
                 # print('skipping zipping')
                 # continue
                 landPath2 = newZip['landPath']
-                if 'C3' in landPath2:
+                if '{}'.format(versions[1]) in landPath2:
                     mainPath = highVMain
                 else:
                     mainDir = lowVMain
@@ -287,14 +288,14 @@ while go:
         qbtExeDest = os.path.join(slcFilesPath,qbtExeName)
         qbtWebPath = os.path.join('/files',qbtExeName)
         slcVMname = skylinesC_VM()
-        [username, passwd] = readfile('/home/bret/.credentials/userU')
+        [username, passwd] = readfile('/home/bret/.credentials/user_ubuntu')
         if slcVMname:
             if args.force or len(createdTorr) > 0  or len(createdMag) > 0 or not os.path.exists(landPageLocalDest):
                 landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args)
                 if slcVMname:
                     e = copy_file_to_guest(slcVMname, landPageLocalDest, landPageServerDest, username, passwd)
                     if e:
-                        print(f'Error copying landscapes page to SLC: \n{e}\n   Copy it manually.')
+                        print('Error copying landscapes page to SLC: \n{e}\n   Copy it manually.')
                     else:
                         print('Copied landscapes page to SkylinesC server')
                     sleep(1)
@@ -302,7 +303,7 @@ while go:
                 e = copy_file_to_guest(slcVMname, convert_landscapesPath, os.path.join(slcFilesPath, 'Convert-Landscapes.ps1'),
                                    username, passwd)
                 if e:
-                    print(f'Error copying convert_landscapes page to SLC: {e}')
+                    print('Error copying convert_landscapes page to SLC: {e}')
                 else:
                     print('Copied {} to SkylinesC server'.format(convert_landscapesPath))
                 sleep(1)

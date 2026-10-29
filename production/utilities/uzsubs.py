@@ -15,7 +15,7 @@ from common import dirSize, getConfirmation, landscapesMap, listRunningVms, make
 
 def getParams():
     import argparse
-    forceHelp = "Force landscapespage to run"
+    forceHelp = "Force landscapesPage to run"
     growthHelp = "Check dir growth before zipping"
     linksHelp = "Work on links if on linux"
     loopHelp = "Loop N times.  If N == -1, loop forever"

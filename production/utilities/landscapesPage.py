@@ -41,7 +41,7 @@ def landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args
 
 
     ##############  script  ##############
-    colWidth = 330
+    colWidth = 335
     colPad = 18
 
     # get torrents
@@ -52,8 +52,8 @@ def landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args
     for item in dirList:
         if item.split('.')[-1]=='torrent':
             name = item.split('.torrent')[0]
-            if '_to_C3' in name: #don't add if there is a version 3 for this landscape
-                landName1 = name.replace('_to_C3.7z','')
+            if '_to_{}'.format(versions[1]) in name: #don't add if there is a version 3 for this landscape
+                landName1 = name.replace('_to_{}.7z'.format(versions[1]),'')
                 landName2 = landName1.replace('_',' ')
                 if landName1 in landscapesMap or landName2 in landscapesMap:
                     continue
@@ -61,8 +61,11 @@ def landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args
     names.sort()
     lowVersionList = []
     highVersionList = []
+    low_to_high_list = []
     for i, name in enumerate(names):
-        if '_C3' in name and '_to_C3' not in name and 'AA2v' not in name:
+        if '_to_{}'.format(versions[1]) in name:
+            low_to_high_list.append(name)
+        if '_{}'.format(versions[1]) in name and 'AA2v' not in name:
             highVersionList.append(name)
         else:
             lowVersionList.append(name)
@@ -102,17 +105,25 @@ def landscapesPage(zipMain,landPageLocalDest,qbtWebPath,trackerStr,versions,args
     lines.append('   </style> \n')
 
     lines.append(' <div class="row"> \n')
-    if args.upversion:
-        versionStr = '{}/{}'.format(versions[0].replace('C',''),versions[1].replace('C',''))
-    column_table_head(versionStr)
-    for i, name in enumerate(lowVersionList):
-        tableRow()
-    column_table_end()
 
-    column_table_head(versions[1].replace('C',''))
+    column_table_head(versions[1].replace('C', ''))
     for i, name in enumerate(highVersionList):
         tableRow()
     column_table_end()
+
+    if args.upversion:
+        versionStr = '{}/{}'.format(versions[0].replace('C',''),versions[1].replace('C',''))
+        column_table_head(versionStr)
+        for i, name in enumerate(lowVersionList):
+            tableRow()
+        column_table_end()
+
+        versionStr = '{} patch to {}'.format(versions[0].replace('C',''),versions[1].replace('C',''))
+        column_table_head(versionStr)
+        for i, name in enumerate(low_to_high_list):
+            tableRow()
+        column_table_end()
+
     lines.append(' </div> \n')
     lines.append('</BasePage> \n')
     writefile(lines,landPageLocalDest)
